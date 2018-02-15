@@ -32,6 +32,14 @@ public abstract class BluetoothActivity extends AppCompatActivity {
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
+    @Override
+    protected void onDestroy() {
+        // Disconnecting from the service
+        unbindService(connection);
+
+        super.onDestroy();
+    }
+
     ///////////////////////
     // Protected methods //
     ///////////////////////

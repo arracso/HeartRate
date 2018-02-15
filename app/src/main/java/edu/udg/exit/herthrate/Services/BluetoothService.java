@@ -28,21 +28,46 @@ public class BluetoothService extends Service implements IScanService {
     private final IBinder bluetoothBinder = new BluetoothBinder();
 
     // Bluetooth
-    private BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();;
+    private final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();;
 
     // Scan
-    private IScanView scanView;
     private final Map<String, BluetoothDevice> devices = new HashMap<>(10);
-    private Boolean scanning = false;
-    private BluetoothAdapter.LeScanCallback scanCallback = initScanCallback();
+
+    private IScanView scanView;
+    private Boolean scanning;
+    private BluetoothAdapter.LeScanCallback scanCallback;
 
     ////////////////////////////
     // Service implementation //
     ////////////////////////////
 
     @Override
+    public void onCreate() {
+        // Scan
+        scanning = false;
+        scanView = null;
+        scanCallback = initScanCallback();
+
+        // Log
+        Log.d("BluetoothService", "onCreate()");
+    }
+
+    @Override
     public IBinder onBind(Intent intent) {
         return bluetoothBinder;
+    }
+
+    // onStartCommand()
+
+    @Override
+    public void onDestroy() {
+        // Scan
+        devices.clear();
+        scanning = null;
+        scanView = null;
+        scanCallback = null;
+
+        super.onDestroy();
     }
 
     /**
