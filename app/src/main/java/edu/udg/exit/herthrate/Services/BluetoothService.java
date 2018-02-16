@@ -1,24 +1,26 @@
 package edu.udg.exit.herthrate.Services;
 
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
+import android.bluetooth.*;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 
 import android.os.IBinder;
 import android.util.Log;
+import edu.udg.exit.herthrate.Interfaces.IBluetoothService;
 import edu.udg.exit.herthrate.Interfaces.IScanService;
 import edu.udg.exit.herthrate.Interfaces.IScanView;
+import edu.udg.exit.herthrate.Protocol;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Bluetooth Low Energy Service
  */
-public class BluetoothService extends Service implements IScanService {
+public class BluetoothService extends Service implements IBluetoothService, IScanService {
 
     ////////////////
     // Attributes //
@@ -33,9 +35,14 @@ public class BluetoothService extends Service implements IScanService {
     // Scan
     private final Map<String, BluetoothDevice> devices = new HashMap<>(10);
 
-    private IScanView scanView;
     private Boolean scanning;
+    private IScanView scanView;
     private BluetoothAdapter.LeScanCallback scanCallback;
+
+    // Connect
+    private Boolean connecting;
+    private BluetoothGatt connectGATT;
+    private BluetoothGattCallback connectCallback;
 
     ////////////////////////////
     // Service implementation //
@@ -48,6 +55,11 @@ public class BluetoothService extends Service implements IScanService {
         scanView = null;
         scanCallback = initScanCallback();
 
+        // Connect
+        connecting = false;
+        connectGATT = null;
+        connectCallback = initConnectCallback();
+
         // Log
         Log.d("BluetoothService", "onCreate()");
     }
@@ -57,7 +69,10 @@ public class BluetoothService extends Service implements IScanService {
         return bluetoothBinder;
     }
 
-    // onStartCommand()
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
 
     @Override
     public void onDestroy() {
@@ -83,20 +98,24 @@ public class BluetoothService extends Service implements IScanService {
     // Public methods //
     ////////////////////
 
-    /**
-     * Check if the device has Bluetooth
-     * @return boolean
-     */
+    @Override
     public boolean hasBluetooth(){
         return adapter != null;
     }
 
-    /**
-     * Check if Bluetooth is Enabled
-     * @return boolean
-     */
+    @Override
     public boolean isEnabled(){
         return adapter != null && adapter.isEnabled();
+    }
+
+    @Override
+    public BluetoothDevice getRemoteDevice(String address) {
+        return adapter.getRemoteDevice(address);
+    }
+
+    @Override
+    public void connectRemoteDevice(BluetoothDevice device) {
+        device.connectGatt(this,false,connectCallback);
     }
 
     /*----------------------*/
@@ -131,6 +150,18 @@ public class BluetoothService extends Service implements IScanService {
         String name = device.getName();
         if(name == null) name = "NO NAME";
         Log.d("BIND",name);
+
+        connectRemoteDevice(device);
+
+
+        // TODO - Set device address to user preferences
+    }
+
+    @Override
+    public void unbindDevice() {
+        // TODO - UNPAIR
+        // TODO - Disconnect from remote device
+        // TODO - Unset device address from user preferences
     }
 
     /////////////////////
@@ -142,7 +173,7 @@ public class BluetoothService extends Service implements IScanService {
     /*------------------*/
 
     /**
-     * Create a Bluetooth Low Energy ScanCallback
+     * Creates a Bluetooth Low Energy ScanCallback
      * @return BluetoothAdapter.LeScanCallback
      */
     private BluetoothAdapter.LeScanCallback initScanCallback() {
@@ -190,6 +221,58 @@ public class BluetoothService extends Service implements IScanService {
             if(scanView != null) scanView.stopLoadingAnimation();
             adapter.stopLeScan(scanCallback);
         }
+    }
+
+    /*--------------------*/
+    /* Connecting methods */
+    /*--------------------*/
+
+    /**
+     * Creates a Bluetooth GATT server callback
+     * @return BluetoothGattCallback
+     */
+    private BluetoothGattCallback initConnectCallback() {
+        return new BluetoothGattCallback() {
+            @Override
+            public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    Log.d("GATT", "Device connected");
+                    connectGATT = gatt;
+
+                    connectGATT.discoverServices();
+
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                    // TODO - UNPAIR
+
+                    Log.d("GATT", "Device disconnected");
+                    connectGATT = null;
+                }
+            }
+
+            @Override
+            public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+                if (status == BluetoothGatt.GATT_SUCCESS) {
+                    //broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+                    Log.d("GATT", "Services discovered");
+
+                    // TODO - PAIR
+
+                    // Vibration test
+                    BluetoothGattService service = connectGATT.getService(Protocol.UUID_SERVICE_VIBRATION);
+                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Protocol.UUID_CHAR_VIBRATION);
+                    characteristic.setValue(Protocol.VIBRATION_WITH_LED);
+                    connectGATT.writeCharacteristic(characteristic);
+                }
+            }
+
+            @Override
+            public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+                if (status == BluetoothGatt.GATT_SUCCESS) {
+                    //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+                    Log.d("GATT", "Characteristic read");
+                }
+            }
+        };
     }
 
 }

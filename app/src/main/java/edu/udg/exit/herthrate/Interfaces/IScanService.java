@@ -36,8 +36,14 @@ public interface IScanService {
     boolean isScanning();
 
     /**
-     * Connect to the GATT server of a device.
+     * Bind the device using its address and add to user preferences.
      * @param address - MAC address of the device.
      */
     void bindDevice(String address);
+
+
+    /**
+     * Unbind the binded device and remove from user preferences.
+     */
+    void unbindDevice();
 }

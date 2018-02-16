@@ -29,13 +29,13 @@ public abstract class BluetoothActivity extends AppCompatActivity {
 
         // Connecting to the service
         Intent intent = new Intent(this, BluetoothService.class);
-        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onDestroy() {
         // Disconnecting from the service
-        unbindService(connection);
+        unbindService(serviceConnection);
 
         super.onDestroy();
     }
@@ -82,7 +82,7 @@ public abstract class BluetoothActivity extends AppCompatActivity {
 
     protected BluetoothService bluetoothService = null;
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
             BluetoothActivity.this.onServiceConnected(name, (BluetoothService.BluetoothBinder) binder);

@@ -25,6 +25,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Starts BluetoothService
+        Intent serviceIntent = new Intent(this,BluetoothService.class);
+        startService(serviceIntent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        // Stops BluetoothService
+        Intent serviceIntent = new Intent(this,BluetoothService.class);
+        stopService(serviceIntent);
+
+        super.onDestroy();
     }
 
     ////////////////////
