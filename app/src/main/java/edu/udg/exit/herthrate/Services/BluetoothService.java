@@ -8,14 +8,14 @@ import android.os.Handler;
 
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 import edu.udg.exit.herthrate.Interfaces.IBluetoothService;
 import edu.udg.exit.herthrate.Interfaces.IScanService;
 import edu.udg.exit.herthrate.Interfaces.IScanView;
-import edu.udg.exit.herthrate.Protocol;
+import edu.udg.exit.herthrate.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Bluetooth Low Energy Service
@@ -238,12 +238,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     Log.d("GATT", "Device connected");
                     connectGATT = gatt;
-
                     connectGATT.discoverServices();
-
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                    // TODO - UNPAIR
-
                     Log.d("GATT", "Device disconnected");
                     connectGATT = null;
                 }
@@ -252,16 +248,44 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
             @Override
             public void onServicesDiscovered(BluetoothGatt gatt, int status) {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
+
                     //broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
                     Log.d("GATT", "Services discovered");
 
-                    // TODO - PAIR
+                    // Initialize - TODO
 
-                    // Vibration test
-                    BluetoothGattService service = connectGATT.getService(Protocol.UUID_SERVICE_VIBRATION);
-                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Protocol.UUID_CHAR_VIBRATION);
-                    characteristic.setValue(Protocol.VIBRATION_WITH_LED);
+                    BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.MILI);
+                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.DATA_TIME);
+                    connectGATT.readCharacteristic(characteristic);
+                    // PAIR
+                    characteristic = service.getCharacteristic(Constants.UUID_CHAR.PAIR);
+                    characteristic.setValue(Constants.PROTOCOL.PAIR);
                     connectGATT.writeCharacteristic(characteristic);
+                    connectGATT.readCharacteristic(characteristic);
+
+                    /* Vibration with led - DONE without pairing
+                    BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.VIBRATION);
+                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.VIBRATION);
+                    characteristic.setValue(Constants.PROTOCOL.VIBRATION_WITH_LED);
+                    connectGATT.writeCharacteristic(characteristic);*/
+
+                    /* Vibration without led - DONE without pairing
+                    BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.VIBRATION);
+                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.VIBRATION);
+                    characteristic.setValue(Constants.PROTOCOL.VIBRATION_WITHOUT_LED);
+                    connectGATT.writeCharacteristic(characteristic);*/
+
+                    /* Vibration 10 times with led - TODO without pairing
+                    BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.VIBRATION);
+                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.VIBRATION);
+                    characteristic.setValue(Constants.PROTOCOL.VIBRATION_10_TIMES_WITH_LED);
+                    connectGATT.writeCharacteristic(characteristic);*/
+
+                    /* Self Test - TODO without pairing
+                    BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.MILI);
+                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.TEST);
+                    characteristic.setValue(Constants.PROTOCOL.SELF_TEST);
+                    connectGATT.writeCharacteristic(characteristic);*/
                 }
             }
 
@@ -269,7 +293,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-                    Log.d("GATT", "Characteristic read");
+                    Log.d("GATT", "Characteristic read: " + characteristic.toString());
+                    Toast.makeText(BluetoothService.this, characteristic.toString(),Toast.LENGTH_LONG).show();
                 }
             }
         };
