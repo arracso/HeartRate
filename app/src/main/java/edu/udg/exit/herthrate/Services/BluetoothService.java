@@ -14,6 +14,7 @@ import edu.udg.exit.herthrate.Interfaces.IBluetoothService;
 import edu.udg.exit.herthrate.Interfaces.IScanService;
 import edu.udg.exit.herthrate.Interfaces.IScanView;
 import edu.udg.exit.herthrate.Constants;
+import edu.udg.exit.herthrate.MiBand.BatteryInfo;
 import edu.udg.exit.herthrate.MiBand.MiDate;
 
 import java.util.*;
@@ -254,7 +255,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     Log.d("GATT", "Services discovered");
                     // Initialize - TODO
-                    readBattery();
+                    vibrationWithLed();
                 }
             }
 
@@ -262,21 +263,22 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 super.onCharacteristicRead(gatt,characteristic,status);
 
-                Log.d("GATT", "Characteristic read status: " + status);
+                Log.d("GATTread", "status: " + status);
 
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     UUID characteristicUUID = characteristic.getUuid();
                     if (Constants.UUID_CHAR.DEVICE_INFO.equals(characteristicUUID)) {
-                        Log.d("GATT", "Info read: " + characteristic.getValue());
+                        Log.d("GATTread", "Info: " + characteristic.getValue());
                     } else if (Constants.UUID_CHAR.DEVICE_NAME.equals(characteristicUUID)) {
-                        Log.d("GATT", "Name read: " + characteristic.getValue());
+                        Log.d("GATTread", "Name: " + characteristic.getValue());
                     } else if (Constants.UUID_CHAR.BATTERY.equals(characteristicUUID)) {
-                        Log.d("GATT", "Battery read: " + characteristic.getValue()[0]);
-                    } else if (Constants.UUID_CHAR.DATA_TIME.equals(characteristicUUID)) {
-                        MiDate calendar = new MiDate(characteristic.getValue());
-                        Log.d("GATT", "Data time read: " + DateUtils.formatDateTime(BluetoothService.this.getApplicationContext(),calendar.getTime().getTime(),DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME));
+                        BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
+                        Log.d("GATTread", "Battery: " + batteryInfo);
+                    } else if (Constants.UUID_CHAR.DATE_TIME.equals(characteristicUUID)) {
+                        MiDate miDate = new MiDate(characteristic.getValue());
+                        Log.d("GATTread", "Date: " + miDate);
                     } else {
-                        Log.d("GATT", "Characteristic read: " + characteristic.getValue());
+                        Log.d("GATTread", "Characteristic: " + characteristic.getValue());
 
                     }
                 }
@@ -291,6 +293,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     Log.d("GATT", "Characteristic write: " + characteristic.getValue()[0]);
+                    //vibrationWithLed();
                 }
             }
 
@@ -315,17 +318,17 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     /**
      * Read data time
-     * REQUIREMENT: TODO - It isnt reading really.
+     * REQUIREMENT: TODO - It isn't reading.
      */
-    public void readDataTime() {
+    public void readDate() {
         BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.MILI);
-        BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.DATA_TIME);
+        BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.DATE_TIME);
         connectGATT.readCharacteristic(characteristic);
     }
 
     /**
      * Pair
-     * REQUIREMENT: TODO - Read data time????.
+     * REQUIREMENT: TODO - Read data time???? (for the moment seems to be working).
      */
     public void pair() {
         BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.MILI);

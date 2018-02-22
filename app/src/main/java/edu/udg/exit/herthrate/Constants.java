@@ -48,7 +48,7 @@ public final class Constants {
         public static final UUID ACTIVITY = UUID.fromString("0000ff07-0000-1000-8000-00805f9b34fb");
         public static final UUID FIRMWARE_DATA = UUID.fromString("0000ff08-0000-1000-8000-00805f9b34fb");
         public static final UUID LE_PARAMS = UUID.fromString("0000ff09-0000-1000-8000-00805f9b34fb");
-        public static final UUID DATA_TIME = UUID.fromString("0000ff0a-0000-1000-8000-00805f9b34fb");
+        public static final UUID DATE_TIME = UUID.fromString("0000ff0a-0000-1000-8000-00805f9b34fb");
         public static final UUID STATISTICS = UUID.fromString("0000ff0b-0000-1000-8000-00805f9b34fb");
 
         public static final UUID BATTERY = UUID.fromString("0000ff0c-0000-1000-8000-00805f9b34fb");

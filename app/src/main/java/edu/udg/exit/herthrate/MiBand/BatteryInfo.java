@@ -26,7 +26,7 @@ public class BatteryInfo {
     private Integer percent;
     private Integer state;
     private Integer numCharges;
-    private GregorianCalendar lastCharge;
+    private MiDate lastCharge;
 
     ///////////////////////
     // Lifecycle methods //
@@ -100,7 +100,12 @@ public class BatteryInfo {
      * Gets the last time the device was charged.
      * @return
      */
-    public GregorianCalendar getLastCharge() {
+    public MiDate getLastCharge() {
         return lastCharge;
+    }
+
+    @Override
+    public String toString() {
+        return "Level: " + getPercent() + "% | State: " + getState() + " | Charges: " + getNumberOfCharges()  + " | Last Charge: " + getLastCharge();
     }
 }
