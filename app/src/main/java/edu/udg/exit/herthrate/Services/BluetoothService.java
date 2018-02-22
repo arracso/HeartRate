@@ -7,15 +7,16 @@ import android.os.Binder;
 import android.os.Handler;
 
 import android.os.IBinder;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
 import edu.udg.exit.herthrate.Interfaces.IBluetoothService;
 import edu.udg.exit.herthrate.Interfaces.IScanService;
 import edu.udg.exit.herthrate.Interfaces.IScanView;
 import edu.udg.exit.herthrate.Constants;
+import edu.udg.exit.herthrate.MiBand.MiDate;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Bluetooth Low Energy Service
@@ -30,11 +31,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     private final IBinder bluetoothBinder = new BluetoothBinder();
 
     // Bluetooth
-    private final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();;
+    private final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
     // Scan
     private final Map<String, BluetoothDevice> devices = new HashMap<>(10);
-
     private Boolean scanning;
     private IScanView scanView;
     private BluetoothAdapter.LeScanCallback scanCallback;
@@ -235,6 +235,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         return new BluetoothGattCallback() {
             @Override
             public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                super.onConnectionStateChange(gatt,status,newState);
+
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     Log.d("GATT", "Device connected");
                     connectGATT = gatt;
@@ -247,57 +249,151 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
             @Override
             public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+                super.onServicesDiscovered(gatt,status);
+
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-
-                    //broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
                     Log.d("GATT", "Services discovered");
-
                     // Initialize - TODO
-
-                    BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.MILI);
-                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.DATA_TIME);
-                    connectGATT.readCharacteristic(characteristic);
-                    // PAIR
-                    characteristic = service.getCharacteristic(Constants.UUID_CHAR.PAIR);
-                    characteristic.setValue(Constants.PROTOCOL.PAIR);
-                    connectGATT.writeCharacteristic(characteristic);
-                    connectGATT.readCharacteristic(characteristic);
-
-                    /* Vibration with led - DONE without pairing
-                    BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.VIBRATION);
-                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.VIBRATION);
-                    characteristic.setValue(Constants.PROTOCOL.VIBRATION_WITH_LED);
-                    connectGATT.writeCharacteristic(characteristic);*/
-
-                    /* Vibration without led - DONE without pairing
-                    BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.VIBRATION);
-                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.VIBRATION);
-                    characteristic.setValue(Constants.PROTOCOL.VIBRATION_WITHOUT_LED);
-                    connectGATT.writeCharacteristic(characteristic);*/
-
-                    /* Vibration 10 times with led - TODO without pairing
-                    BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.VIBRATION);
-                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.VIBRATION);
-                    characteristic.setValue(Constants.PROTOCOL.VIBRATION_10_TIMES_WITH_LED);
-                    connectGATT.writeCharacteristic(characteristic);*/
-
-                    /* Self Test - TODO without pairing
-                    BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.MILI);
-                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.TEST);
-                    characteristic.setValue(Constants.PROTOCOL.SELF_TEST);
-                    connectGATT.writeCharacteristic(characteristic);*/
+                    readBattery();
                 }
             }
 
             @Override
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+                super.onCharacteristicRead(gatt,characteristic,status);
+
+                Log.d("GATT", "Characteristic read status: " + status);
+
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-                    //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-                    Log.d("GATT", "Characteristic read: " + characteristic.toString());
-                    Toast.makeText(BluetoothService.this, characteristic.toString(),Toast.LENGTH_LONG).show();
+                    UUID characteristicUUID = characteristic.getUuid();
+                    if (Constants.UUID_CHAR.DEVICE_INFO.equals(characteristicUUID)) {
+                        Log.d("GATT", "Info read: " + characteristic.getValue());
+                    } else if (Constants.UUID_CHAR.DEVICE_NAME.equals(characteristicUUID)) {
+                        Log.d("GATT", "Name read: " + characteristic.getValue());
+                    } else if (Constants.UUID_CHAR.BATTERY.equals(characteristicUUID)) {
+                        Log.d("GATT", "Battery read: " + characteristic.getValue()[0]);
+                    } else if (Constants.UUID_CHAR.DATA_TIME.equals(characteristicUUID)) {
+                        MiDate calendar = new MiDate(characteristic.getValue());
+                        Log.d("GATT", "Data time read: " + DateUtils.formatDateTime(BluetoothService.this.getApplicationContext(),calendar.getTime().getTime(),DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME));
+                    } else {
+                        Log.d("GATT", "Characteristic read: " + characteristic.getValue());
+
+                    }
                 }
+
+            }
+
+            @Override
+            public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+                super.onCharacteristicWrite(gatt,characteristic,status);
+
+                Log.d("GATT", "Characteristic write status: " + status);
+
+                if (status == BluetoothGatt.GATT_SUCCESS) {
+                    Log.d("GATT", "Characteristic write: " + characteristic.getValue()[0]);
+                }
+            }
+
+            @Override
+            public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+                super.onCharacteristicChanged(gatt,characteristic);
+                Log.d("GATT", "Characteristic changed: " + characteristic.getValue()[0]);
             }
         };
     }
+
+    ////////////////////////////////
+    // MiBand services methods    //
+    ////////////////////////////////
+    // Need to discover services  //
+    // before using these methods //
+    ////////////////////////////////
+
+    /*--------------*/
+    /* MILI SERVICE */
+    /*--------------*/
+
+    /**
+     * Read data time
+     * REQUIREMENT: TODO - It isnt reading really.
+     */
+    public void readDataTime() {
+        BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.MILI);
+        BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.DATA_TIME);
+        connectGATT.readCharacteristic(characteristic);
+    }
+
+    /**
+     * Pair
+     * REQUIREMENT: TODO - Read data time????.
+     */
+    public void pair() {
+        BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.MILI);
+        BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.PAIR);
+        characteristic.setValue(Constants.PROTOCOL.PAIR);
+        connectGATT.writeCharacteristic(characteristic);
+    }
+
+    /**
+     * Read battery
+     * REQUIREMENT: ANY
+     * ACCESS:
+     */
+    public void readBattery() {
+        BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.MILI);
+        BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.BATTERY);
+        connectGATT.readCharacteristic(characteristic);
+    }
+
+    /**
+     * Self test - Mi Band will do crazy things.
+     * REQUIREMENT -> TODO - PAIR ????.
+     * WARNING -> Will need to unlink miband from bluetooth.
+     */
+    public void selfTest() {
+        BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.MILI);
+        BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.TEST);
+        characteristic.setValue(Constants.PROTOCOL.SELF_TEST);
+        connectGATT.writeCharacteristic(characteristic);
+    }
+
+    /*-------------------*/
+    /* VIBRATION SERVICE */
+    /*-------------------*/
+
+    /**
+     *  Vibration with led.
+     *  REQUIREMENT: ANY.
+     */
+    public void vibrationWithLed() {
+        BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.VIBRATION);
+        BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.VIBRATION);
+        characteristic.setValue(Constants.PROTOCOL.VIBRATION_WITH_LED);
+        connectGATT.writeCharacteristic(characteristic);
+    }
+
+    /**
+     *  Vibration without led.
+     *  REQUIREMENT: ANY.
+     */
+    public void vibrationWithoutLed() {
+        BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.VIBRATION);
+        BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.VIBRATION);
+        characteristic.setValue(Constants.PROTOCOL.VIBRATION_WITHOUT_LED);
+        connectGATT.writeCharacteristic(characteristic);
+    }
+
+    /**
+     * Vibration 10 times with led.
+     * REQUIREMENT: TODO - PAIR ????.
+     */
+    public void vibration10TimesWithLed() {
+        BluetoothGattService service = connectGATT.getService(Constants.UUID_SERVICE.VIBRATION);
+        BluetoothGattCharacteristic characteristic = service.getCharacteristic(Constants.UUID_CHAR.VIBRATION);
+        characteristic.setValue(Constants.PROTOCOL.VIBRATION_10_TIMES_WITH_LED);
+        connectGATT.writeCharacteristic(characteristic);
+    }
+
+
 
 }
