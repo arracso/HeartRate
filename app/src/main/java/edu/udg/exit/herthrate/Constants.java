@@ -14,8 +14,8 @@ public final class Constants {
     //////////////
 
     public static final class UUID_SERVICE {
-        public static final UUID MILI = UUID.fromString("0000fee0-0000-1000-8000-00805f9b34fb");
-        public static final UUID VIBRATION = UUID.fromString("00001802-0000-1000-8000-00805f9b34fb"); // Verified
+        public static final UUID MILI = UUID.fromString(String.format(BASE_UUID, "FEE0"));
+        public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "1802")); // Verified
         public static final UUID HEARTRATE = UUID.fromString("0000180d-0000-1000-8000-00805f9b34fb");
         // Unknown services
         public static final UUID UNKNOWN1 = UUID.fromString("00001800-0000-1000-8000-00805f9b34fb");
