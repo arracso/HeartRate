@@ -335,7 +335,11 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                         BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
                         Log.d("GATTwrite", "Battery: " + batteryInfo);
                     }else{
-                        Log.d("GATTwrite", "Characteristic: " + characteristic.getValue()[0]);
+                        if(characteristic.getValue().length>0){
+                            Log.d("GATTread", "Characteristic: " + characteristic.getValue()[0]);
+                        }else{
+                            Log.d("GATTread", "Characteristic: " + characteristic.getValue());
+                        }
                     }
                 }
             }

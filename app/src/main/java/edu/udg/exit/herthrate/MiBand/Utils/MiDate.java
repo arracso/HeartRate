@@ -46,10 +46,6 @@ public class MiDate extends GregorianCalendar {
         if (data.length - offset >= 6){
             this.set(data[0 + offset] + baseYear, data[1 + offset], data[2 + offset], data[3 + offset], data[4 + offset], data[5 + offset]);
             Log.d("Date", "Year: " + data[offset]);
-
-            // Maybe mi band don't have the local hour
-            //int offsetInHours = MiBandCoordinator.getDeviceTimeOffsetHours();
-            //if(offsetInHours != 0) timestamp.add(Calendar.HOUR_OF_DAY,-offsetInHours);
         }
     }
 
