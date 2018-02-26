@@ -7,15 +7,17 @@ import android.os.Binder;
 import android.os.Handler;
 
 import android.os.IBinder;
-import android.text.format.DateUtils;
 import android.util.Log;
-import android.widget.Toast;
 import edu.udg.exit.herthrate.Interfaces.IBluetoothService;
 import edu.udg.exit.herthrate.Interfaces.IScanService;
 import edu.udg.exit.herthrate.Interfaces.IScanView;
 import edu.udg.exit.herthrate.Constants;
-import edu.udg.exit.herthrate.MiBand.BatteryInfo;
-import edu.udg.exit.herthrate.MiBand.MiDate;
+import edu.udg.exit.herthrate.MiBand.Services.MiBandService;
+import edu.udg.exit.herthrate.MiBand.Services.MiliService;
+import edu.udg.exit.herthrate.MiBand.Services.VibrationService;
+import edu.udg.exit.herthrate.MiBand.Utils.BatteryInfo;
+import edu.udg.exit.herthrate.MiBand.Utils.Latency;
+import edu.udg.exit.herthrate.MiBand.Utils.MiDate;
 
 import java.util.*;
 
@@ -45,6 +47,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     private BluetoothGatt connectGATT;
     private BluetoothGattCallback connectCallback;
 
+    // MiBandServices
+    private MiliService miliService;
+    private VibrationService vibrationService;
+
     ////////////////////////////
     // Service implementation //
     ////////////////////////////
@@ -60,6 +66,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         connecting = false;
         connectGATT = null;
         connectCallback = initConnectCallback();
+
+        // MiBandService
+        miliService = null;
+        vibrationService = null;
 
         // Log
         Log.d("BluetoothService", "onCreate()");
@@ -254,12 +264,14 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     Log.d("GATT", "Services discovered");
+
+                    // Init Services
+                    miliService = new MiliService(gatt);
+                    vibrationService = new VibrationService(gatt);
+
                     // Initialize - TODO
-
-                    setLowLatency(); // Very important to obtain a faster connection
-
+                    miliService.setLowLatency(); // Very important to obtain a faster connection
                 }
-
             }
 
             @Override
@@ -310,12 +322,12 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                         Log.d("GATTwrite", "Latency: " + characteristic.getValue()[0]);
 
                         //TODO - extract
-                        enableNotifications();
+                        miliService.enableNotifications();
                     }else if(Constants.UUID_CHAR.PAIR.equals(characteristic.getUuid())){
                         Log.d("GATTwrite", "PAIR: " + characteristic.getValue()[0]);
 
                         // TODO - extract
-                        readPair();
+                        miliService.readPair();
                     }else if(Constants.UUID_CHAR.DATE_TIME.equals(characteristic.getUuid())){
                         MiDate miDate = new MiDate(characteristic.getValue());
                         Log.d("GATTwrite", "Date: " + miDate);
@@ -338,7 +350,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                     Log.d("GATTchange", "Device name: " + characteristic.getValue());
                 }else if(Constants.UUID_CHAR.NOTIFICATION.equals(characteristic.getUuid())){
                     Log.d("GATTchange", "Notification: " + characteristic.getValue()[0]);
-                    pair();
+                    miliService.pair();
                 }else if(Constants.UUID_CHAR.USER_INFO.equals(characteristic.getUuid())){
                     Log.d("GATTchange", "User information: " + characteristic.getValue());
                 }else if(Constants.UUID_CHAR.CONTROL_POINT.equals(characteristic.getUuid())){
@@ -362,224 +374,5 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
             }
         };
     }
-
-    ////////////////////////////////
-    // MiBand services methods    //
-    ////////////////////////////////
-    // Need to discover services  //
-    // before using these methods //
-    ////////////////////////////////
-
-    /**
-     * Enables or disables a notification
-     * @param serviceUUID
-     * @param characteristicUUID
-     * @param descriptorUUID
-     * @param enable
-     */
-    public void setCharacteristicNotification(UUID serviceUUID, UUID characteristicUUID, UUID descriptorUUID, boolean enable){
-        // Retrieve the service
-        BluetoothGattService service = connectGATT.getService(serviceUUID);
-        if(service == null) {
-            Log.w("GATT", "Service not found: " + serviceUUID);
-            return;
-        }
-
-        // Retrieve  the characteristic
-        BluetoothGattCharacteristic characteristic = service.getCharacteristic(characteristicUUID);
-        if(characteristic == null) {
-            Log.w("GATT", "Characteristic not found: " + characteristicUUID);
-            return;
-        }
-
-        // Enable or disable the notification
-        if(connectGATT.setCharacteristicNotification(characteristic,enable)){
-            // Retrieve the descriptor
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(descriptorUUID);
-            if (descriptor == null) {
-                Log.w("GATT","Descriptor not found:" + descriptorUUID);
-                return;
-            }
-
-            // Sets descriptor value
-            int properties = characteristic.getProperties();
-            if ((properties & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                descriptor.setValue(enable ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-            } else if ((properties & BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) {
-                descriptor.setValue(enable ? BluetoothGattDescriptor.ENABLE_INDICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-            } else return;
-
-            // Write the descriptor to the device
-            connectGATT.writeDescriptor(descriptor);
-        }else{
-            Log.e("GATT", "Unable to enable notifications.");
-        }
-    }
-
-    /**
-     * Reads a value from a characteristic of the service.
-     * @param serviceUUID
-     * @param characteristicUUID
-     */
-    public void readCharacteristic(UUID serviceUUID, UUID characteristicUUID) {
-        // Retrieve the service
-        BluetoothGattService service = connectGATT.getService(serviceUUID);
-        if(service == null) {
-            Log.d("GATT", "Service not found: " + serviceUUID);
-            return;
-        }
-        // Retrive the characteristic
-        BluetoothGattCharacteristic characteristic = service.getCharacteristic(characteristicUUID);
-        if(characteristic == null) {
-            Log.d("GATT", "Characteristic not found: " + characteristicUUID);
-            return;
-        }
-        // Read the characteristic from the device
-        connectGATT.readCharacteristic(characteristic);
-    }
-
-    /**
-     * Writes a value to a characteristic of the service.
-     * @param serviceUUID
-     * @param characteristicUUID
-     * @param value
-     */
-    public void writeCharacteristic(UUID serviceUUID, UUID characteristicUUID, byte[] value) {
-        // Retrieve the service
-        BluetoothGattService service = connectGATT.getService(serviceUUID);
-        if(service == null) {
-            Log.d("GATT", "Service not found: " + serviceUUID);
-            return;
-        }
-        // Retrive the characteristic
-        BluetoothGattCharacteristic characteristic = service.getCharacteristic(characteristicUUID);
-        if(characteristic == null) {
-            Log.d("GATT", "Characteristic not found: " + characteristicUUID);
-            return;
-        }
-        // Set the value of the characteristic
-        characteristic.setValue(value);
-        // Write the characteristic to the device
-        connectGATT.writeCharacteristic(characteristic);
-    }
-
-    /*--------------*/
-    /* MILI SERVICE */
-    /*--------------*/
-
-    /**
-     * Enables notifications
-     * REQUIREMENT : ANY
-     */
-    public void enableNotifications() {
-        setCharacteristicNotification(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.NOTIFICATION,Constants.UUID_DESC.UPDATE_NOTIFICATION,true);
-    }
-
-    /**
-     * Sets the lowest latency possible.
-     * REQUIREMENT : ANY
-     */
-    public void setLowLatency() {
-        writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.LE_PARAMS,getLowLatency());
-    }
-
-    private byte[] getLatency(int minConnectionInterval, int maxConnectionInterval, int latency, int timeout, int advertisementInterval) {
-        byte result[] = new byte[12];
-        result[0] = (byte) (minConnectionInterval & 0xff);
-        result[1] = (byte) (0xff & minConnectionInterval >> 8);
-        result[2] = (byte) (maxConnectionInterval & 0xff);
-        result[3] = (byte) (0xff & maxConnectionInterval >> 8);
-        result[4] = (byte) (latency & 0xff);
-        result[5] = (byte) (0xff & latency >> 8);
-        result[6] = (byte) (timeout & 0xff);
-        result[7] = (byte) (0xff & timeout >> 8);
-        result[8] = 0;
-        result[9] = 0;
-        result[10] = (byte) (advertisementInterval & 0xff);
-        result[11] = (byte) (0xff & advertisementInterval >> 8);
-
-        return result;
-    }
-
-    private byte[] getLowLatency() {
-        int minConnectionInterval = 39;
-        int maxConnectionInterval = 49;
-        int latency = 0;
-        int timeout = 500;
-        int advertisementInterval = 0;
-
-        return getLatency(minConnectionInterval, maxConnectionInterval, latency, timeout, advertisementInterval);
-    }
-
-    /**
-     * Read date time
-     * REQUIREMENT: TODO - It isn't reading.
-     */
-    public void readDate() {
-        readCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.DATE_TIME);
-    }
-
-    /**
-     * Write Pair
-     * REQUIREMENT: TODO - Read data time???? (for the moment seems to be working).
-     */
-    public void pair() {
-        writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.PAIR,Constants.PROTOCOL.PAIR);
-    }
-
-    /**
-     * Read pair
-     * REQUIREMENT : ANY
-     */
-    public void readPair() {
-        readCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.PAIR);
-    }
-
-    /**
-     * Read battery
-     * REQUIREMENT: ANY
-     */
-    public void readBattery() {
-        readCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.BATTERY);
-    }
-
-    /**
-     * Self test - Mi Band will do crazy things.
-     * REQUIREMENT -> TODO - PAIR ????.
-     * WARNING -> Will need to unlink miband from bluetooth.
-     */
-    public void selfTest() {
-        writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.TEST,Constants.PROTOCOL.SELF_TEST);
-    }
-
-    /*-------------------*/
-    /* VIBRATION SERVICE */
-    /*-------------------*/
-
-    /**
-     *  Vibration with led.
-     *  REQUIREMENT: ANY.
-     */
-    public void vibrationWithLed() {
-        writeCharacteristic(Constants.UUID_SERVICE.VIBRATION,Constants.UUID_CHAR.VIBRATION,Constants.PROTOCOL.VIBRATION_WITH_LED);
-    }
-
-    /**
-     *  Vibration without led.
-     *  REQUIREMENT: ANY.
-     */
-    public void vibrationWithoutLed() {
-        writeCharacteristic(Constants.UUID_SERVICE.VIBRATION,Constants.UUID_CHAR.VIBRATION,Constants.PROTOCOL.VIBRATION_WITHOUT_LED);
-    }
-
-    /**
-     * Vibration 10 times with led.
-     * REQUIREMENT: TODO - PAIR ????.
-     */
-    public void vibration10TimesWithLed() {
-        writeCharacteristic(Constants.UUID_SERVICE.VIBRATION,Constants.UUID_CHAR.VIBRATION,Constants.PROTOCOL.VIBRATION_10_TIMES_WITH_LED);
-    }
-
-
 
 }

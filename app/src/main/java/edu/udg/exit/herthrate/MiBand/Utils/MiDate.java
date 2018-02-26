@@ -1,4 +1,4 @@
-package edu.udg.exit.herthrate.MiBand;
+package edu.udg.exit.herthrate.MiBand.Utils;
 
 import android.util.Log;
 

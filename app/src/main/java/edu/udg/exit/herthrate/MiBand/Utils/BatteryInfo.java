@@ -1,6 +1,4 @@
-package edu.udg.exit.herthrate.MiBand;
-
-import java.util.GregorianCalendar;
+package edu.udg.exit.herthrate.MiBand.Utils;
 
 /**
  * Class to handle battery information reading.
