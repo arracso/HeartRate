@@ -9,13 +9,13 @@ public class BatteryInfo {
     // Constants //
     ///////////////
 
-    private static final int UNKNOWN = -1;
+    public static final int UNKNOWN = -1;
 
-    private static final int NORMAL = 0;
-    private static final int LOW = 1;
-    private static final int CHARGING = 2;
-    private static final int CHARGING_FULL = 3;
-    private static final int CHARGE_OFF = 4;
+    public static final int NORMAL = 0;
+    public static final int LOW = 1;
+    public static final int CHARGING = 2;
+    public static final int CHARGING_FULL = 3;
+    public static final int CHARGE_OFF = 4;
 
     ////////////////
     // Attributes //
