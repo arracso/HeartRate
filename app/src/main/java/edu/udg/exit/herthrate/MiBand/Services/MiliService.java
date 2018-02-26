@@ -55,7 +55,7 @@ public class MiliService extends MiBandService {
 
     /**
      * Read date time
-     * REQUIREMENT: TODO - It isn't reading.
+     * REQUIREMENT : TODO - It isn't reading.
      */
     public void readDate() {
         readCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.DATE_TIME);
@@ -63,7 +63,7 @@ public class MiliService extends MiBandService {
 
     /**
      * Write Pair
-     * REQUIREMENT: TODO - Read data time???? (for the moment seems to be working).
+     * REQUIREMENT : TODO - Read data time???? (for the moment seems to be working).
      */
     public void pair() {
         writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.PAIR,Constants.PROTOCOL.PAIR);
@@ -79,16 +79,32 @@ public class MiliService extends MiBandService {
 
     /**
      * Read battery
-     * REQUIREMENT: ANY
+     * REQUIREMENT : ANY
      */
     public void readBattery() {
         readCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.BATTERY);
     }
 
     /**
+     * Read Device Information
+     * REQUIREMENT : TODO
+     */
+    public void requestDeviceInformation() {
+        readCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.DEVICE_INFO);
+    }
+
+    /**
+     * Read Device Name
+     * REQUIREMENT : TODO
+     */
+    public void requestDeviceName() {
+        readCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.DEVICE_NAME);
+    }
+
+    /**
      * Self test - Mi Band will do crazy things.
-     * REQUIREMENT -> TODO - PAIR ???? Maybe another service.
-     * WARNING -> Will need to unlink miband from bluetooth.
+     * REQUIREMENT : TODO - PAIR ???? Maybe another service.
+     * WARNING : Will need to unlink miband from bluetooth.
      */
     public void selfTest() {
         writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.TEST,Constants.PROTOCOL.SELF_TEST);

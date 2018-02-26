@@ -16,6 +16,7 @@ import edu.udg.exit.herthrate.MiBand.Services.MiBandService;
 import edu.udg.exit.herthrate.MiBand.Services.MiliService;
 import edu.udg.exit.herthrate.MiBand.Services.VibrationService;
 import edu.udg.exit.herthrate.MiBand.Utils.BatteryInfo;
+import edu.udg.exit.herthrate.MiBand.Utils.DeviceInfo;
 import edu.udg.exit.herthrate.MiBand.Utils.Latency;
 import edu.udg.exit.herthrate.MiBand.Utils.MiDate;
 
@@ -281,9 +282,14 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     UUID characteristicUUID = characteristic.getUuid();
                     if (Constants.UUID_CHAR.DEVICE_INFO.equals(characteristicUUID)) {
-                        Log.d("GATTread", "Info: " + characteristic.getValue());
+                        DeviceInfo deviceInfo = new DeviceInfo(characteristic.getValue());
+                        Log.d("GATTread", "Info: " + deviceInfo);
+
+                        // TODO - Extract
+                        miliService.requestDeviceName();
                     } else if (Constants.UUID_CHAR.DEVICE_NAME.equals(characteristicUUID)) {
-                        Log.d("GATTread", "Name: " + characteristic.getValue());
+                        String name = new String(characteristic.getValue());
+                        Log.d("GATTread", "Name: " + name);
                     } else if (Constants.UUID_CHAR.BATTERY.equals(characteristicUUID)) {
                         BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
                         Log.d("GATTread", "Battery: " + batteryInfo);
@@ -327,7 +333,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                         Log.d("GATTwrite", "PAIR: " + characteristic.getValue()[0]);
 
                         // TODO - extract
-                        miliService.readPair();
+                        miliService.requestDeviceInformation();
                     }else if(Constants.UUID_CHAR.DATE_TIME.equals(characteristic.getUuid())){
                         MiDate miDate = new MiDate(characteristic.getValue());
                         Log.d("GATTwrite", "Date: " + miDate);
