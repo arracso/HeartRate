@@ -1,5 +1,7 @@
 package edu.udg.exit.herthrate.MiBand.Utils;
 
+import java.util.Arrays;
+
 public class UserInfo {
 
     ///////////////
@@ -131,16 +133,16 @@ public class UserInfo {
 
         int aliasFrom = 9;
         if (!deviceInfo.isMili1()) {
-            data[9] = (byte) (deviceInfo.feature & 255);
-            data[10] = (byte) (deviceInfo.appearance & 255);
+            data[9] = (byte) (deviceInfo.getFeature() & 255);
+            data[10] = (byte) (deviceInfo.getAppearance() & 255);
             aliasFrom = 11;
         }
 
-        byte[] aliasBytes = alias.substring(0, Math.min(alias.length(), 19 - aliasFrom)).getBytes();
-        System.arraycopy(aliasBytes, 0, sequence, aliasFrom, aliasBytes.length);
+        byte[] aliasBytes = username.substring(0, Math.min(username.length(), 19 - aliasFrom)).getBytes();
+        System.arraycopy(aliasBytes, 0, data, aliasFrom, aliasBytes.length);
 
-        byte[] crcSequence = Arrays.copyOf(sequence, 19);
-        data[19] = (byte) ((CheckSums.getCRC8(crcSequence) ^ Integer.parseInt(this.btAddress.substring(this.btAddress.length() - 2), 16)) & 0xff);
+        byte[] crcSequence = Arrays.copyOf(data, 19);
+        data[19] = (byte) ((CheckSums.getCRC8(crcSequence) ^ Integer.parseInt(this.blueToothAddress.substring(this.blueToothAddress.length() - 2), 16)) & 0xff);
 
 
         return data;
