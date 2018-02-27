@@ -43,6 +43,22 @@ public class UserInfo {
         type = 0;
     }
 
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+
+    /**
+     * Calculate the user id from username.
+     * @return userID
+     */
+    private int getUserID() {
+        try {
+            return Integer.parseInt(username);
+        } catch (NumberFormatException e) {
+            return username.hashCode();
+        }
+    }
+
     ////////////////////
     // Public Methods //
     ////////////////////
@@ -111,10 +127,15 @@ public class UserInfo {
     /* Getters */
     /*---------*/
 
+    /**
+     * Gets the data bytes for user information.
+     * @param deviceInfo information of the connected device
+     * @return some deviceInfo and userInfo in Bytes
+     */
     public byte[] getData(DeviceInfo deviceInfo) {
         byte[] data = new byte[20];
 
-        int userID = Integer.parseInt(username);
+        int userID = getUserID();
 
         // Put userID
         data[0] = (byte) userID;
@@ -131,19 +152,21 @@ public class UserInfo {
         // Put type ??? mi band ???
         data[8] = (byte) (type & 0xff);
 
-        int aliasFrom = 9;
+        int usernameFrom = 9;
+        // Put feature and appearance
         if (!deviceInfo.isMili1()) {
             data[9] = (byte) (deviceInfo.getFeature() & 255);
             data[10] = (byte) (deviceInfo.getAppearance() & 255);
-            aliasFrom = 11;
+            usernameFrom = 11;
         }
 
-        byte[] aliasBytes = username.substring(0, Math.min(username.length(), 19 - aliasFrom)).getBytes();
-        System.arraycopy(aliasBytes, 0, data, aliasFrom, aliasBytes.length);
+        // Put username
+        byte[] usernameBytes = username.substring(0, Math.min(username.length(), 19 - usernameFrom)).getBytes();
+        System.arraycopy(usernameBytes, 0, data, usernameFrom, usernameBytes.length);
 
-        byte[] crcSequence = Arrays.copyOf(data, 19);
-        data[19] = (byte) ((CheckSums.getCRC8(crcSequence) ^ Integer.parseInt(this.blueToothAddress.substring(this.blueToothAddress.length() - 2), 16)) & 0xff);
-
+        // Put crc8
+        byte[] crc = Arrays.copyOf(data, 19);
+        data[19] = (byte) ((CheckSums.getCRC8(crc) ^ Integer.parseInt(this.blueToothAddress.substring(this.blueToothAddress.length() - 2), 16)) & 0xff);
 
         return data;
     }

@@ -297,7 +297,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                         Log.d("GATTread", "Name: " + name);
 
                         // TODO - Extract
-                        //miliService.sendUserInfo(n);
+                        userInfo = new UserInfo();
+                        userInfo.setUsername("Oscar");
+                        userInfo.setBlueToothAddress(connectGATT.getDevice().getAddress());
+                        miliService.sendUserInfo(userInfo.getData(deviceInfo));
                     } else if (Constants.UUID_CHAR.BATTERY.equals(characteristicUUID)) {
                         BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
                         Log.d("GATTread", "Battery: " + batteryInfo);
@@ -341,7 +344,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                         Log.d("GATTwrite", "PAIR: " + characteristic.getValue()[0]);
 
                         // TODO - extract
-                        miliService.requestDeviceInformation();
+                        if(characteristic.getValue()[0] == 2) miliService.requestDeviceInformation();
                     }else if(Constants.UUID_CHAR.DATE_TIME.equals(characteristic.getUuid())){
                         MiDate miDate = new MiDate(characteristic.getValue());
                         Log.d("GATTwrite", "Date: " + miDate);
@@ -368,7 +371,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                     Log.d("GATTchange", "Device name: " + characteristic.getValue());
                 }else if(Constants.UUID_CHAR.NOTIFICATION.equals(characteristic.getUuid())){
                     Log.d("GATTchange", "Notification: " + characteristic.getValue()[0]);
-                    miliService.pair();
+
+                    // TODO - Extract
+                    if(characteristic.getValue()[0] == 8) miliService.pair();
+                    else if(characteristic.getValue()[0] == 5) miliService.unpair();
                 }else if(Constants.UUID_CHAR.USER_INFO.equals(characteristic.getUuid())){
                     Log.d("GATTchange", "User information: " + characteristic.getValue());
                 }else if(Constants.UUID_CHAR.CONTROL_POINT.equals(characteristic.getUuid())){

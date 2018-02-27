@@ -71,11 +71,19 @@ public class MiliService extends MiBandService {
     }
 
     /**
-     * Write Pair.
+     * Pair.
      * REQUIREMENT : TODO - Read data time???? (for the moment seems to be working).
      */
     public void pair() {
         writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.PAIR,Constants.PROTOCOL.PAIR);
+    }
+
+    /**
+     * Unpair.
+     * REQUIREMENT : ANY
+     */
+    public void unpair() {
+        writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.PAIR,Constants.PROTOCOL.REMOTE_DISCONNECT);
     }
 
     /**
@@ -112,7 +120,7 @@ public class MiliService extends MiBandService {
 
     /**
      * Send User information to the device.
-     * REQUIREMENT : Read Device Information TODO
+     * REQUIREMENT : Read Device Information
      */
     public void sendUserInfo(byte[] data){
         writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.USER_INFO,data);
