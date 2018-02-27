@@ -15,10 +15,7 @@ import edu.udg.exit.herthrate.Constants;
 import edu.udg.exit.herthrate.MiBand.Services.MiBandService;
 import edu.udg.exit.herthrate.MiBand.Services.MiliService;
 import edu.udg.exit.herthrate.MiBand.Services.VibrationService;
-import edu.udg.exit.herthrate.MiBand.Utils.BatteryInfo;
-import edu.udg.exit.herthrate.MiBand.Utils.DeviceInfo;
-import edu.udg.exit.herthrate.MiBand.Utils.Latency;
-import edu.udg.exit.herthrate.MiBand.Utils.MiDate;
+import edu.udg.exit.herthrate.MiBand.Utils.*;
 
 import java.util.*;
 
@@ -52,6 +49,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     private MiliService miliService;
     private VibrationService vibrationService;
 
+    // Info
+    private DeviceInfo deviceInfo;
+    private UserInfo userInfo;
+
     ////////////////////////////
     // Service implementation //
     ////////////////////////////
@@ -71,6 +72,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         // MiBandService
         miliService = null;
         vibrationService = null;
+
+        // Info
+        deviceInfo = null;
+        userInfo = null;
 
         // Log
         Log.d("BluetoothService", "onCreate()");
@@ -282,7 +287,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     UUID characteristicUUID = characteristic.getUuid();
                     if (Constants.UUID_CHAR.DEVICE_INFO.equals(characteristicUUID)) {
-                        DeviceInfo deviceInfo = new DeviceInfo(characteristic.getValue());
+                        deviceInfo = new DeviceInfo(characteristic.getValue());
                         Log.d("GATTread", "Info: " + deviceInfo);
 
                         // TODO - Extract
@@ -290,6 +295,9 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                     } else if (Constants.UUID_CHAR.DEVICE_NAME.equals(characteristicUUID)) {
                         String name = new String(characteristic.getValue());
                         Log.d("GATTread", "Name: " + name);
+
+                        // TODO - Extract
+                        //miliService.sendUserInfo(n);
                     } else if (Constants.UUID_CHAR.BATTERY.equals(characteristicUUID)) {
                         BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
                         Log.d("GATTread", "Battery: " + batteryInfo);

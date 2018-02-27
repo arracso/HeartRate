@@ -27,11 +27,20 @@ public class MiliService extends MiBandService {
     ////////////////////
 
     /**
-     * Enables notifications
+     * Enables notifications.
      * REQUIREMENT : ANY
      */
     public void enableNotifications() {
         setCharacteristicNotification(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.NOTIFICATION,Constants.UUID_DESC.UPDATE_NOTIFICATION,true);
+    }
+
+    /**
+     * Disables notifications.
+     * REQUIREMENT : ANY
+     * WARNING :  IT doesn't reply
+     */
+    public void disableNotifications() {
+        setCharacteristicNotification(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.NOTIFICATION,Constants.UUID_DESC.UPDATE_NOTIFICATION,false);
     }
 
     /**
@@ -54,7 +63,7 @@ public class MiliService extends MiBandService {
     }
 
     /**
-     * Read date time
+     * Read date time.
      * REQUIREMENT : TODO - It isn't reading.
      */
     public void readDate() {
@@ -62,7 +71,7 @@ public class MiliService extends MiBandService {
     }
 
     /**
-     * Write Pair
+     * Write Pair.
      * REQUIREMENT : TODO - Read data time???? (for the moment seems to be working).
      */
     public void pair() {
@@ -70,7 +79,7 @@ public class MiliService extends MiBandService {
     }
 
     /**
-     * Read pair
+     * Read pair.
      * REQUIREMENT : ANY
      */
     public void readPair() {
@@ -78,7 +87,7 @@ public class MiliService extends MiBandService {
     }
 
     /**
-     * Read battery
+     * Read battery.
      * REQUIREMENT : ANY
      */
     public void readBattery() {
@@ -86,19 +95,27 @@ public class MiliService extends MiBandService {
     }
 
     /**
-     * Read Device Information
-     * REQUIREMENT : TODO
+     * Read Device Information.
+     * REQUIREMENT : ANY
      */
     public void requestDeviceInformation() {
         readCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.DEVICE_INFO);
     }
 
     /**
-     * Read Device Name
-     * REQUIREMENT : TODO
+     * Read Device Name.
+     * REQUIREMENT : ANY
      */
     public void requestDeviceName() {
         readCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.DEVICE_NAME);
+    }
+
+    /**
+     * Send User information to the device.
+     * REQUIREMENT : Read Device Information TODO
+     */
+    public void sendUserInfo(byte[] data){
+        writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.USER_INFO,data);
     }
 
     /**
