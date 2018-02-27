@@ -100,6 +100,84 @@ public class DeviceInfo {
     // Public Methods //
     ////////////////////
 
+    /*---------*/
+    /* Getters */
+    /*---------*/
+
+    /**
+     * Gets the profile version of the device.
+     * @return profileVersion
+     */
+    public Integer getProfileVersion() {
+        return profileVersion;
+    }
+
+    /**
+     * Gets the firmware version of the device.
+     * @return firmwareVersion
+     */
+    public Integer getFirmwareVersion() {
+        return firmwareVersion;
+    }
+
+    /**
+     * Gets the firmware version for heart rate.
+     * @return firmwareVersion or firmwareVersion2
+     */
+    public Integer getHeartRateFirmwareVersion() {
+        if(test1AHRMode) return firmwareVersion;
+        return firmwareVersion2;
+    }
+
+    /**
+     * Gets the hardware version of the device.
+     * @return hardwareVersion
+     */
+    public Integer getHardwareVersion() {
+        return hardwareVersion;
+    }
+
+    /**
+     * Gets the feature of the device.
+     * @return feature
+     */
+    public Integer getFeature() {
+        return feature;
+    }
+
+    /**
+     * Gets the appearance of the device.
+     * @return appearance
+     */
+    public Integer getAppearance() {
+        return appearance;
+    }
+
+    /**
+     * Checks device model.
+     * @return true if the device is a Mi Band 1
+     */
+    public boolean isMili1() {
+        return hardwareVersion == 2 || (feature == 0 && appearance == 0 && hardwareVersion == 8 && firmwareVersion2 == -1);
+    }
+
+    /**
+     * Checks device model.
+     * @return true if the device is a Mi Band 1A
+     */
+    public boolean isMili1A() {
+        return feature == 5 && appearance == 0 || feature == 0 && hardwareVersion == 208;
+    }
+
+    /**
+     * Checks device model.
+     * @return true if the device is a Mi Band 1S
+     * TODO : this is probably not quite correct, but sufficient for early 1S support
+     */
+    public boolean isMili1S() {
+        return (feature == 4 && appearance == 0) || hardwareVersion == 4;
+    }
+
     @Override
     public String toString() {
         return "\n\tID: " + id + " | Version: " + profileVersion + " / " + firmwareVersion + " / " + hardwareVersion +
