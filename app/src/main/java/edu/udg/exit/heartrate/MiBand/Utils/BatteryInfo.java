@@ -1,4 +1,4 @@
-package edu.udg.exit.herthrate.MiBand.Utils;
+package edu.udg.exit.heartrate.MiBand.Utils;
 
 /**
  * Class to handle battery information reading.

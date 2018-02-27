@@ -1,4 +1,4 @@
-package edu.udg.exit.herthrate.Activities;
+package edu.udg.exit.heartrate.Activities;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 
-import edu.udg.exit.herthrate.Services.BluetoothService;
+import edu.udg.exit.heartrate.Services.BluetoothService;
 
 /**
  * Activity class that handles the connection with bluetooth service.

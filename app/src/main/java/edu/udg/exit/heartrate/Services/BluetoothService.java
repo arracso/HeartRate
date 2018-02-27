@@ -1,4 +1,4 @@
-package edu.udg.exit.herthrate.Services;
+package edu.udg.exit.heartrate.Services;
 
 import android.app.Service;
 import android.bluetooth.*;
@@ -8,14 +8,14 @@ import android.os.Handler;
 
 import android.os.IBinder;
 import android.util.Log;
-import edu.udg.exit.herthrate.Interfaces.IBluetoothService;
-import edu.udg.exit.herthrate.Interfaces.IScanService;
-import edu.udg.exit.herthrate.Interfaces.IScanView;
-import edu.udg.exit.herthrate.Constants;
-import edu.udg.exit.herthrate.MiBand.Services.MiBandService;
-import edu.udg.exit.herthrate.MiBand.Services.MiliService;
-import edu.udg.exit.herthrate.MiBand.Services.VibrationService;
-import edu.udg.exit.herthrate.MiBand.Utils.*;
+import edu.udg.exit.heartrate.Interfaces.IBluetoothService;
+import edu.udg.exit.heartrate.Interfaces.IScanService;
+import edu.udg.exit.heartrate.Interfaces.IScanView;
+import edu.udg.exit.heartrate.Constants;
+import edu.udg.exit.heartrate.MiBand.Services.MiBandService;
+import edu.udg.exit.heartrate.MiBand.Services.MiliService;
+import edu.udg.exit.heartrate.MiBand.Services.VibrationService;
+import edu.udg.exit.heartrate.MiBand.Utils.*;
 
 import java.util.*;
 

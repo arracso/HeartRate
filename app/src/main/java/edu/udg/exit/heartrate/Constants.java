@@ -1,4 +1,4 @@
-package edu.udg.exit.herthrate;
+package edu.udg.exit.heartrate;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package edu.udg.exit.herthrate.Views;
+package edu.udg.exit.heartrate.Views;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
@@ -7,11 +7,11 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
-import edu.udg.exit.herthrate.Activities.BluetoothActivity;
-import edu.udg.exit.herthrate.Global;
-import edu.udg.exit.herthrate.Interfaces.IScanView;
-import edu.udg.exit.herthrate.R;
-import edu.udg.exit.herthrate.Services.BluetoothService;
+import edu.udg.exit.heartrate.Activities.BluetoothActivity;
+import edu.udg.exit.heartrate.Global;
+import edu.udg.exit.heartrate.Interfaces.IScanView;
+import edu.udg.exit.heartrate.R;
+import edu.udg.exit.heartrate.Services.BluetoothService;
 
 import java.util.ArrayList;
 import java.util.HashMap;

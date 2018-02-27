@@ -1,13 +1,13 @@
-package edu.udg.exit.herthrate.Views;
+package edu.udg.exit.heartrate.Views;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import edu.udg.exit.herthrate.Global;
-import edu.udg.exit.herthrate.R;
-import edu.udg.exit.herthrate.Services.BluetoothService;
+import edu.udg.exit.heartrate.Global;
+import edu.udg.exit.heartrate.R;
+import edu.udg.exit.heartrate.Services.BluetoothService;
 
 public class MainActivity extends AppCompatActivity {
 

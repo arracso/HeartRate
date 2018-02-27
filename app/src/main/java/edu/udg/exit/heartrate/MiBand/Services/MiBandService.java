@@ -1,4 +1,4 @@
-package edu.udg.exit.herthrate.MiBand.Services;
+package edu.udg.exit.heartrate.MiBand.Services;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;

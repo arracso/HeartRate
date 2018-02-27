@@ -1,4 +1,4 @@
-package edu.udg.exit.herthrate;
+package edu.udg.exit.heartrate;
 
 /**
  * Global class to save global variables and constants.

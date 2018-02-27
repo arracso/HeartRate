@@ -1,8 +1,8 @@
-package edu.udg.exit.herthrate.MiBand.Services;
+package edu.udg.exit.heartrate.MiBand.Services;
 
 import android.bluetooth.BluetoothGatt;
-import edu.udg.exit.herthrate.Constants;
-import edu.udg.exit.herthrate.MiBand.Utils.Latency;
+import edu.udg.exit.heartrate.Constants;
+import edu.udg.exit.heartrate.MiBand.Utils.Latency;
 
 public class MiliService extends MiBandService {
 

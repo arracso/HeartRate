@@ -1,4 +1,4 @@
-package edu.udg.exit.herthrate.Interfaces;
+package edu.udg.exit.heartrate.Interfaces;
 
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
