@@ -67,28 +67,7 @@ public class DeviceInfo {
      * @return
      */
     private boolean isChecksumCorrect(byte[] data) {
-        class CheckSum {
-            public int getCRC8(byte[] data){
-                int len = data.length;
-                int i = 0;
-                byte crc = 0x00;
-
-                while (len-- > 0) {
-                    byte extract = data[i++];
-                    for (byte tempI = 8; tempI != 0; tempI--) {
-                        byte sum = (byte) ((crc & 0xff) ^ (extract & 0xff));
-                        sum = (byte) ((sum & 0xff) & 0x01);
-                        crc = (byte) ((crc & 0xff) >>> 1);
-                        if (sum != 0) crc = (byte) ((crc & 0xff) ^ 0x8c);
-                        extract = (byte) ((extract & 0xff) >>> 1);
-                    }
-                }
-                return (crc & 0xff);
-            }
-        }
-        CheckSum checkSum = new CheckSum();
-
-        int crc8 = checkSum.getCRC8(new byte[]{data[0], data[1], data[2], data[3], data[4], data[5], data[6]});
+        int crc8 = CheckSums.getCRC8(new byte[]{data[0], data[1], data[2], data[3], data[4], data[5], data[6]});
         return (data[7] & 255) == (crc8 ^ data[3] & 255);
     }
 
