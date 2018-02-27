@@ -1,4 +1,4 @@
-# HerthRate
+# HeartRate
 
 ## Android Sdk
 
