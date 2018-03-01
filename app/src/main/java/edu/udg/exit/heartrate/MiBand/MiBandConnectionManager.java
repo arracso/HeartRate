@@ -14,7 +14,7 @@ import edu.udg.exit.heartrate.MiBand.Utils.MiDate;
 import edu.udg.exit.heartrate.MiBand.Utils.UserInfo;
 
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import java.util.*;
 
 public class MiBandConnectionManager extends BluetoothGattCallback {
 
@@ -22,7 +22,13 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     // Constants //
     ///////////////
 
-
+    private static final int SET_LOW_LATENCY = 0;
+    private static final int ENABLE_NOTIFICATIONS = 1;
+    private static final int PAIR = 2;
+    private static final int READ_DATE = 3;
+    private static final int REQUEST_DEVICE_INFO = 4;
+    private static final int REQUEST_DEVICE_NAME = 5;
+    private static final int SEND_USER_INFO = 6;
 
     ////////////////
     // Attributes //
@@ -34,6 +40,11 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     // MiBandServices
     private MiliService miliService;
     private VibrationService vibrationService;
+
+    // Calls Queue
+    private final Queue<Integer> callQueue;
+    private boolean allWorkIsDone;
+    private boolean working;
 
     // Info
     private DeviceInfo deviceInfo;
@@ -55,6 +66,11 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         // MiBandService
         miliService = null;
         vibrationService = null;
+
+        // Calls Queue
+        callQueue = new PriorityQueue<>();
+        allWorkIsDone = true;
+        working = false;
 
         // Info
         deviceInfo = null;
@@ -82,12 +98,23 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             Log.d("GATT", "Services discovered");
 
+            userInfo = new UserInfo();
+            userInfo.setUsername("Oscar");
+            userInfo.setBlueToothAddress(connectGATT.getDevice().getAddress());
+
             // Init Services
             miliService = new MiliService(gatt);
             vibrationService = new VibrationService(gatt);
 
             // Initialize - TODO
-            miliService.setLowLatency(); // Very important to obtain a faster connection
+            addCall(SET_LOW_LATENCY);
+            addCall(ENABLE_NOTIFICATIONS);
+            addCall(PAIR);
+            addCall(REQUEST_DEVICE_INFO);
+            addCall(REQUEST_DEVICE_NAME);
+            addCall(SEND_USER_INFO); // deviceInfo will be set
+
+            run();
         }
     }
 
@@ -102,16 +129,13 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 Log.d("GATTread", "Info: " + deviceInfo);
 
                 // TODO - Extract
-                miliService.requestDeviceName();
+                //miliService.requestDeviceName();
             } else if (Constants.UUID_CHAR.DEVICE_NAME.equals(characteristicUUID)) {
                 String name = new String(characteristic.getValue(), StandardCharsets.UTF_8); // TODO - Stop reading ���� at the beginning
                 Log.d("GATTread", "Name: " + name);
 
                 // TODO - Extract
-                userInfo = new UserInfo();
-                userInfo.setUsername("Oscar");
-                userInfo.setBlueToothAddress(connectGATT.getDevice().getAddress());
-                miliService.sendUserInfo(userInfo.getData(deviceInfo));
+                //miliService.sendUserInfo(userInfo.getData(deviceInfo));
             } else if (Constants.UUID_CHAR.BATTERY.equals(characteristicUUID)) {
                 BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
                 Log.d("GATTread", "Battery: " + batteryInfo);
@@ -125,6 +149,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                     Log.d("GATTread", "Characteristic: " + characteristic.getValue());
                 }
             }
+            working = false;
+            run();
         }
 
     }
@@ -150,12 +176,12 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 Log.d("GATTwrite", "Latency: " + characteristic.getValue()[0]);
 
                 //TODO - extract
-                miliService.enableNotifications();
+                //miliService.enableNotifications();
             }else if(Constants.UUID_CHAR.PAIR.equals(characteristic.getUuid())){
                 Log.d("GATTwrite", "PAIR: " + characteristic.getValue()[0]);
 
                 // TODO - extract
-                if(characteristic.getValue()[0] == 2) miliService.requestDeviceInformation();
+                //if(characteristic.getValue()[0] == 2) miliService.requestDeviceInformation();
             }else if(Constants.UUID_CHAR.DATE_TIME.equals(characteristic.getUuid())){
                 MiDate miDate = new MiDate(characteristic.getValue());
                 Log.d("GATTwrite", "Date: " + miDate);
@@ -169,6 +195,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                     Log.d("GATTread", "Characteristic: " + characteristic.getValue());
                 }
             }
+            working = false;
+            run();
         }
     }
 
@@ -184,8 +212,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             Log.d("GATTchange", "Notification: " + characteristic.getValue()[0]);
 
             // TODO - Extract
-            if(characteristic.getValue()[0] == 8) miliService.pair();
-            else if(characteristic.getValue()[0] == 5) miliService.readDate();
+            //if(characteristic.getValue()[0] == 8) miliService.pair();
+           // else if(characteristic.getValue()[0] == 5) miliService.readDate();
         }else if(Constants.UUID_CHAR.USER_INFO.equals(characteristic.getUuid())){
             Log.d("GATTchange", "User information: " + characteristic.getValue());
         }else if(Constants.UUID_CHAR.CONTROL_POINT.equals(characteristic.getUuid())){
@@ -206,10 +234,58 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             Log.d("GATTchange", "Characteristic: " + characteristic.getValue());
         }
 
+        working = false;
+        run();
     }
 
     ////////////////////
     // Public Methods //
     ////////////////////
+
+    public void addCall(int call) {
+        allWorkIsDone = false;
+        callQueue.add(call);
+    }
+
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+
+    private void run() {
+        if(callQueue.isEmpty()){
+            allWorkIsDone = true;
+        }else if(!working){
+            makeCall(callQueue.poll());
+        }
+    }
+
+    private void makeCall(int call) {
+        working = true;
+        switch (call) {
+            case SET_LOW_LATENCY:
+                miliService.setLowLatency();
+                break;
+            case ENABLE_NOTIFICATIONS:
+                miliService.enableNotifications();
+                break;
+            case PAIR:
+                miliService.pair();
+                break;
+            case REQUEST_DEVICE_INFO:
+                miliService.requestDeviceInformation();
+                break;
+            case REQUEST_DEVICE_NAME:
+                miliService.requestDeviceName();
+                break;
+            case SEND_USER_INFO:
+                miliService.sendUserInfo(userInfo.getData(deviceInfo));
+                break;
+        }
+    }
+
+    private void handleResponse(){
+        working = false;
+        run();
+    }
 
 }
