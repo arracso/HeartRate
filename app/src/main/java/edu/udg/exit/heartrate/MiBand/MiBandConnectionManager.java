@@ -13,6 +13,7 @@ import edu.udg.exit.heartrate.MiBand.Utils.DeviceInfo;
 import edu.udg.exit.heartrate.MiBand.Utils.MiDate;
 import edu.udg.exit.heartrate.MiBand.Utils.UserInfo;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class MiBandConnectionManager extends BluetoothGattCallback {
@@ -103,7 +104,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 // TODO - Extract
                 miliService.requestDeviceName();
             } else if (Constants.UUID_CHAR.DEVICE_NAME.equals(characteristicUUID)) {
-                String name = new String(characteristic.getValue());
+                String name = new String(characteristic.getValue(), StandardCharsets.UTF_8); // TODO - Stop reading ���� at the beginning
                 Log.d("GATTread", "Name: " + name);
 
                 // TODO - Extract
@@ -184,7 +185,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
             // TODO - Extract
             if(characteristic.getValue()[0] == 8) miliService.pair();
-            else if(characteristic.getValue()[0] == 5) vibrationService.vibration10TimesWithLed();
+            else if(characteristic.getValue()[0] == 5) miliService.readDate();
         }else if(Constants.UUID_CHAR.USER_INFO.equals(characteristic.getUuid())){
             Log.d("GATTchange", "User information: " + characteristic.getValue());
         }else if(Constants.UUID_CHAR.CONTROL_POINT.equals(characteristic.getUuid())){

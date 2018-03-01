@@ -44,7 +44,7 @@ public class MiDate extends GregorianCalendar {
     public MiDate(byte[] data, int offset, int baseYear) {
         super();
         if (data.length - offset >= 6){
-            this.set(data[0 + offset] + baseYear, data[1 + offset], data[2 + offset], data[3 + offset], data[4 + offset], data[5 + offset]);
+            this.set(data[offset] + baseYear, data[offset+1], data[offset+2], data[offset+3], data[offset+4], data[offset+5]);
             Log.d("Date", "Year: " + data[offset]);
         }
     }

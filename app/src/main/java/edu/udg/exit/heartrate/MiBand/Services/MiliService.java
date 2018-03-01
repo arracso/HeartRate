@@ -80,7 +80,8 @@ public class MiliService extends MiBandService {
 
     /**
      * Unpair.
-     * REQUIREMENT : ANY
+     * REQUIREMENT : TODO - ANY ??
+     * TODO - Not working
      */
     public void unpair() {
         writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.PAIR,Constants.PROTOCOL.REMOTE_DISCONNECT);
@@ -121,6 +122,7 @@ public class MiliService extends MiBandService {
     /**
      * Send User information to the device.
      * REQUIREMENT : Read Device Information
+     * User may need to put his finger on the device to confirm.
      */
     public void sendUserInfo(byte[] data){
         writeCharacteristic(Constants.UUID_SERVICE.MILI,Constants.UUID_CHAR.USER_INFO,data);
