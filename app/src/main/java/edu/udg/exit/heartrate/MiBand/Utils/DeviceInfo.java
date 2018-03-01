@@ -178,6 +178,14 @@ public class DeviceInfo {
         return (feature == 4 && appearance == 0) || hardwareVersion == 4;
     }
 
+    /**
+     * Checks support for heart rate measurement.
+     * @return true if device is 1S or 1A (in test mode)
+     */
+    public boolean supportsHeartRate() {
+        return isMili1S() || (test1AHRMode && isMili1A());
+    }
+
     @Override
     public String toString() {
         return "\n\tID: " + id + " | Version: " + profileVersion + " / " + firmwareVersion + " / " + hardwareVersion +

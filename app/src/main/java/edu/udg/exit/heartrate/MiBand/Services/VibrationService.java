@@ -43,7 +43,7 @@ public class VibrationService extends MiBandService {
 
     /**
      * Vibration 10 times with led.
-     * REQUIREMENT: TODO - PAIR ????.
+     * REQUIREMENT: PAIR successful.
      */
     public void vibration10TimesWithLed() {
         writeCharacteristic(Constants.UUID_SERVICE.VIBRATION,Constants.UUID_CHAR.VIBRATION,Constants.PROTOCOL.VIBRATION_10_TIMES_WITH_LED);
