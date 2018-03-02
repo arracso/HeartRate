@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     // Constants //
     ///////////////
 
-    private static final int REQUEST_ENABLE_BT_TO_START_SERVICE = Global.REQUEST_ENABLE_BT_TO_START_SERVICE;
+    private static final int REQUEST_ENABLE_BT_TO_START_SERVICE = BluetoothService.REQUEST_ENABLE_BT_TO_START_SERVICE;
 
     ///////////////////////
     // LifeCicle methods //

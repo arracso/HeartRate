@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class UserInfo {
 
     ///////////////
-    // Constants //
+    // MiBandConstants //
     ///////////////
 
     public static final int GENDER_FEMALE = 0;

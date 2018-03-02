@@ -24,7 +24,7 @@ public class ScanActivity extends BluetoothActivity implements IScanView {
     // Constants //
     ///////////////
 
-    private static final int REQUEST_ENABLE_BT_TO_SCAN = Global.REQUEST_ENABLE_BT_TO_SCAN;
+    private static final int REQUEST_ENABLE_BT_TO_SCAN = BluetoothService.REQUEST_ENABLE_BT_TO_SCAN;
 
     private static final String ATTRIBUTE_DEVICE_NAME = "device_name";
     private static final String ATTRIBUTE_DEVICE_ADDRESS = "device_address";

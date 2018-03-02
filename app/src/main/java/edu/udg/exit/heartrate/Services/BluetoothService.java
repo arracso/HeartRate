@@ -11,11 +11,7 @@ import android.util.Log;
 import edu.udg.exit.heartrate.Interfaces.IBluetoothService;
 import edu.udg.exit.heartrate.Interfaces.IScanService;
 import edu.udg.exit.heartrate.Interfaces.IScanView;
-import edu.udg.exit.heartrate.Constants;
 import edu.udg.exit.heartrate.MiBand.MiBandConnectionManager;
-import edu.udg.exit.heartrate.MiBand.Services.MiliService;
-import edu.udg.exit.heartrate.MiBand.Services.VibrationService;
-import edu.udg.exit.heartrate.MiBand.Utils.*;
 
 import java.util.*;
 
@@ -23,6 +19,13 @@ import java.util.*;
  * Bluetooth Low Energy Service
  */
 public class BluetoothService extends Service implements IBluetoothService, IScanService {
+
+    ///////////////
+    // Constants //
+    ///////////////
+
+    public static final int REQUEST_ENABLE_BT_TO_START_SERVICE = 1;
+    public static final int REQUEST_ENABLE_BT_TO_SCAN = 2;
 
     ////////////////
     // Attributes //

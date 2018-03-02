@@ -3,7 +3,7 @@ package edu.udg.exit.heartrate.Interfaces;
 public interface IScanService {
 
     ///////////////
-    // Constants //
+    // MiBandConstants //
     ///////////////
 
     int SCAN_PERIOD = 3000; // delayMillis

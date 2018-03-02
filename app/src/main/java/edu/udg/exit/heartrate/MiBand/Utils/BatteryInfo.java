@@ -6,7 +6,7 @@ package edu.udg.exit.heartrate.MiBand.Utils;
 public class BatteryInfo {
 
     ///////////////
-    // Constants //
+    // MiBandConstants //
     ///////////////
 
     public static final int UNKNOWN = -1;

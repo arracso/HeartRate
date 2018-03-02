@@ -6,15 +6,11 @@ package edu.udg.exit.heartrate;
 public class Global {
 
     ///////////////
-    // Constants //
+    // MiBandConstants //
     ///////////////
-
-    public static final int REQUEST_ENABLE_BT_TO_START_SERVICE = 1;
-    public static final int REQUEST_ENABLE_BT_TO_SCAN = 2;
 
     ///////////////
     // Variables //
     ///////////////
-
 
 }
