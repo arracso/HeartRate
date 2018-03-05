@@ -46,13 +46,16 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     private VibrationService vibrationService;
 
     // Calls Queue
-    private final Queue<Action> callQueue;
+    private final Queue<Action> actionQueue;
     private boolean allWorkIsDone;
     private boolean working;
 
     // Info
     private DeviceInfo deviceInfo;
     private UserInfo userInfo;
+
+    // Auth
+    private boolean authenticated;
 
     ////////////////////////
     // Life Cycle Methods //
@@ -72,13 +75,16 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         vibrationService = null;
 
         // Calls Queue
-        callQueue = new Queue<>();
+        actionQueue = new Queue<>();
         allWorkIsDone = true;
         working = false;
 
         // Info
         deviceInfo = null;
         userInfo = null;
+
+        // Auth
+        authenticated = false;
     }
 
     @Override
@@ -171,7 +177,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             }else if(MiBandConstants.UUID_CHAR.NOTIFICATION.equals(characteristic.getUuid())){
                 Log.d("GATTwrite", "Notification: " + characteristic.getValue());
             }else if(MiBandConstants.UUID_CHAR.USER_INFO.equals(characteristic.getUuid())){
-                Log.d("GATTwrite", "User information: " + characteristic.getValue());
+                UserInfo userInfo = new UserInfo(characteristic.getValue());
+                Log.d("GATTwrite", "User information: " + userInfo);
             }else if(MiBandConstants.UUID_CHAR.CONTROL_POINT.equals(characteristic.getUuid())){
                 Log.d("GATTwrite", "Control point: " + characteristic.getValue());
             }else if(MiBandConstants.UUID_CHAR.REALTIME_STEPS.equals(characteristic.getUuid())){
@@ -180,9 +187,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 Log.d("GATTwrite", "Latency: " + characteristic.getValue()[0]);
             }else if(MiBandConstants.UUID_CHAR.PAIR.equals(characteristic.getUuid())){
                 Log.d("GATTwrite", "PAIR: " + characteristic.getValue()[0]);
-
-                // TODO - extract
-                //if(characteristic.getValue()[0] == 2) miliService.requestDeviceInformation();
             }else if(MiBandConstants.UUID_CHAR.DATE_TIME.equals(characteristic.getUuid())){
                 MiDate miDate = new MiDate(characteristic.getValue());
                 Log.d("GATTwrite", "Date: " + miDate);
@@ -239,18 +243,35 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     // Public Methods //
     ////////////////////
 
-    public void addCall(int call) {
-        addCall(call, true, null);
+    /**
+     * Adds a call to the actionQueue.
+     * @param call to be added to the actionQueue
+     */
+    public void addCall(Action call) {
+        allWorkIsDone = false;
+        actionQueue.add(call);
     }
 
-    public void addCall(final int call, boolean expectsResult, byte[] data) {
-        allWorkIsDone = false;
+    /**
+     * Adds a call to the actionQueue.
+     * @param callCode code of the call to be added
+     */
+    public void addCall(int callCode) {
+        addCall(callCode, true, null);
+    }
 
+    /**
+     * Adds a call to the actionQueue.
+     * @param callCode code of the call to bhe added
+     * @param expectsResult True to add an ActionWithResponse | False to add an ActionWithoutResponse
+     * @param data to be write on write calls (not always needed)
+     */
+    public void addCall(final int callCode, boolean expectsResult, byte[] data) {
         if(expectsResult){
-            callQueue.add(new ActionWithResponse() {
+            addCall(new ActionWithResponse() {
                 @Override
                 public void run() {
-                    switch (call) {
+                    switch (callCode) {
                         case SET_LOW_LATENCY: miliService.setLowLatency();
                             Log.d("Call", "latency");
                             break;
@@ -267,7 +288,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                             Log.d("Call", "devNam");
                             break;
                         case SEND_USER_INFO:
-                            Log.d("Call", "sendUser");
+                            Log.d("Call", "sendUser" + userInfo);
                             if(userInfo != null && deviceInfo != null)
                                 miliService.sendUserInfo(userInfo.getData(deviceInfo));
                             break;
@@ -275,10 +296,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 }
             });
         }else{
-            callQueue.add(new ActionWithoutResponse() {
+            addCall(new ActionWithoutResponse() {
                 @Override
                 public void run() {
-                    switch (call) {
+                    switch (callCode) {
 
                     }
                 }
@@ -290,11 +311,14 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     // Private Methods //
     /////////////////////
 
+    /**
+     * Runs the first action of the queue.
+     */
     private void run() {
-        if(callQueue.isEmpty()){
+        if(actionQueue.isEmpty()){
             allWorkIsDone = true;
         }else if(!working){
-            Action action = callQueue.poll();
+            Action action = actionQueue.poll();
             action.run();
             if(!action.expectsResult()) run(); // TODO - Maybe will need to apply a timer
             else working = true;
@@ -316,32 +340,50 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             return ;
         }
 
-        // Log value
-        Log.d("Notification", "Value: " + value[0]);
-
         // Handle value
         switch (value[0]) {
+            case MiBandConstants.NOTIFICATION.UNKNOWN:
+                Log.d("Notification", "Unknown");
+                break;
             case MiBandConstants.NOTIFICATION.NORMAL:
+                Log.d("Notification", "Normal");
                 break;
             case MiBandConstants.NOTIFICATION.FIRMWARE_UPDATE_FAILED:
+                Log.d("Notification", "Firmware update failed");
                 break;
             case MiBandConstants.NOTIFICATION.FIRMWARE_UPDATE_SUCCESS:
+                Log.d("Notification", "Firmware update success");
                 break;
             case MiBandConstants.NOTIFICATION.CONN_PARAM_UPDATE_FAILED:
+                Log.d("Notification", "Connection param update failed");
                 break;
             case MiBandConstants.NOTIFICATION.CONN_PARAM_UPDATE_SUCCESS:
+                Log.d("Notification", "Connection param update success");
                 break;
             case MiBandConstants.NOTIFICATION.AUTHENTICATION_SUCCESS:
-                Log.d("Notification", "Success");
+                Log.d("Notification", "Authentication Success");
+                authenticated = true;
                 break;
             case MiBandConstants.NOTIFICATION.AUTHENTICATION_FAILED:
+                Log.d("Notification", "Authentication Failed");
+                authenticated = false;
+                break;
+            case MiBandConstants.NOTIFICATION.FITNESS_GOAL_ACHIEVED:
+                Log.d("Notification", "Fitness goal achieved");
                 break;
             case MiBandConstants.NOTIFICATION.SET_LATENCY_SUCCESS:
+                Log.d("Notification", "Set Latency Success");
                 break;
             case MiBandConstants.NOTIFICATION.RESET_AUTHENTICATION_FAILED:
+                Log.d("Notification", "Reset Authentication Failed");
+                authenticated = false;
                 break;
             case MiBandConstants.NOTIFICATION.RESET_AUTHENTICATION_SUCCESS:
+                Log.d("Notification", "Reset Authentication Success");
+                authenticated = true;
                 break;
+            default:
+                Log.d("Notification", "Code " + value[0]);
         }
     }
 

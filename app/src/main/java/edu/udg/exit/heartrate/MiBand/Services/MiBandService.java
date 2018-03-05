@@ -8,6 +8,9 @@ import android.util.Log;
 
 import java.util.UUID;
 
+/**
+ * Class representing a Mi Band Service.
+ */
 public abstract class MiBandService {
 
     ////////////////

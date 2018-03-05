@@ -10,10 +10,6 @@ public class MiliService extends MiBandService {
     // Life Cycle Methods //
     ////////////////////////
 
-    public MiliService() {
-        super();
-    }
-
     /**
      * Constructor.
      * @param gatt

@@ -9,10 +9,6 @@ public class VibrationService extends MiBandService {
     // Life Cycle Methods //
     ////////////////////////
 
-    public VibrationService() {
-        super();
-    }
-
     /**
      * Constructor.
      * @param gatt

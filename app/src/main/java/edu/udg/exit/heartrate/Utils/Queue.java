@@ -1,16 +1,27 @@
 package edu.udg.exit.heartrate.Utils;
 
-public class Queue<O> {
+/**
+ *
+ * @param <T> Type of the queue.
+ */
+public class Queue<T> {
 
+    /**
+     * Class Node that contains an object and a reference to the next node.
+     */
     private class Node {
-        public O obj;
+        public T obj;
         public Node next;
 
-        public Node(O obj, Node next){
+        public Node(T obj, Node next){
             this.obj = obj;
             this.next = next;
         }
     }
+
+    ////////////////
+    // Attributes //
+    ////////////////
 
     private Node start;
     private Node end;
@@ -18,7 +29,19 @@ public class Queue<O> {
     /**
      * Default constructor.
      */
-    public Queue(){
+    public Queue() {
+        start = null;
+        end = null;
+    }
+
+    /////////////
+    // Methods //
+    /////////////
+
+    /**
+     * Remove all elements from the queue.
+     */
+    public void clear() {
         start = null;
         end = null;
     }
@@ -27,7 +50,7 @@ public class Queue<O> {
      * Add an object to the end of the queue.
      * @param obj Object to be added to the queue
      */
-    public void add(O obj){
+    public void add(T obj) {
         Node node = new Node(obj,null);
         if(isEmpty()){
             start = node;
@@ -42,11 +65,19 @@ public class Queue<O> {
      * Gets the first object of the queue and remove it.
      * @return First object of the queue
      */
-    public O poll(){
-        O obj = start.obj;
+    public T poll() {
+        T obj = start.obj;
         start = start.next;
         if(start == null) end = null;
         return obj;
+    }
+
+    /**
+     * Gets the first object of the queue.
+     * @return First object of the queue
+     */
+    public T first() {
+        return start.obj;
     }
 
     /**

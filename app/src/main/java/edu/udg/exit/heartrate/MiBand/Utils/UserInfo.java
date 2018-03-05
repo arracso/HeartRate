@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class UserInfo {
 
     ///////////////
-    // MiBandConstants //
+    // Constants //
     ///////////////
 
     public static final int GENDER_FEMALE = 0;
@@ -33,7 +33,7 @@ public class UserInfo {
     /**
      * Default Constructor.
      */
-    public UserInfo(){
+    public UserInfo() {
         blueToothAddress = null;
         username = null;
         gender = GENDER_OTHER;
@@ -41,6 +41,18 @@ public class UserInfo {
         height = 175;
         weight = 70;
         type = 0;
+    }
+
+    /**
+     * Constructor.
+     */
+    public UserInfo(byte[] data) {
+        username = getUsername(data);
+        gender = (int) (data[4] & 0xff);
+        age = (int) (data[5] & 0xff);
+        height = (int) (data[6] & 0xff);
+        weight = (int) (data[7] & 0xff);
+        type = (int) (data[8] & 0xff);
     }
 
     /////////////////////
@@ -57,6 +69,27 @@ public class UserInfo {
         } catch (NumberFormatException e) {
             return username.hashCode();
         }
+    }
+
+    /**
+     * Gets the username from raw data.
+     * @param data
+     * @return
+     * TODO - Correct
+     */
+    private String getUsername(byte[] data) {
+        int id = ((int) data[3] << 24);
+        if(id < 0){
+            id = id - (int) data[0];
+            id = id - ((int) data[1] << 8);
+            id = id - ((int) data[2] << 16);
+        }else{
+            id = id + (int) data[0];
+            id = id + ((int) data[1] << 8);
+            id = id + ((int) data[2] << 16);
+        }
+
+        return Integer.toHexString(id);
     }
 
     ////////////////////
@@ -169,6 +202,12 @@ public class UserInfo {
         data[19] = (byte) ((CheckSums.getCRC8(crc) ^ Integer.parseInt(this.blueToothAddress.substring(this.blueToothAddress.length() - 2), 16)) & 0xff);
 
         return data;
+    }
+
+    @Override
+    public String toString() {
+        return "Username: " + username + " | Gender: " + gender + "\n"
+                + "Age: " + age + " | Height: " + height + " | Weight: " + weight;
     }
 
 }
