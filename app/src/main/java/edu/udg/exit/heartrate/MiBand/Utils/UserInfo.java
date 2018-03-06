@@ -1,5 +1,7 @@
 package edu.udg.exit.heartrate.MiBand.Utils;
 
+import android.util.Log;
+
 import java.util.Arrays;
 
 public class UserInfo {
@@ -19,6 +21,7 @@ public class UserInfo {
     private String blueToothAddress; // address of the mi band
 
     private String username;
+    private Integer userID;
     private Integer gender;
     private Integer age;
     private Integer height;
@@ -36,6 +39,7 @@ public class UserInfo {
     public UserInfo() {
         blueToothAddress = null;
         username = null;
+        userID = null;
         gender = GENDER_OTHER;
         age = 20;
         height = 175;
@@ -43,16 +47,19 @@ public class UserInfo {
         type = 0;
     }
 
+
+
     /**
-     * Constructor.
+     * Constructor by data.
      */
     public UserInfo(byte[] data) {
-        username = getUsername(data);
-        gender = (int) (data[4] & 0xff);
-        age = (int) (data[5] & 0xff);
-        height = (int) (data[6] & 0xff);
-        weight = (int) (data[7] & 0xff);
-        type = (int) (data[8] & 0xff);
+        userID = getUserID(data);
+        username = null;
+        gender = (int) (data[4] & 0x0ff);
+        age = (int) (data[5] & 0x0ff);
+        height = (int) (data[6] & 0x0ff);
+        weight = (int) (data[7] & 0x0ff);
+        type = (int) (data[8] & 0x0ff);
     }
 
     /////////////////////
@@ -60,36 +67,38 @@ public class UserInfo {
     /////////////////////
 
     /**
-     * Calculate the user id from username.
+     * Gets user ID or calculate the user id from username if needed.
      * @return userID
      */
     private int getUserID() {
-        try {
-            return Integer.parseInt(username);
-        } catch (NumberFormatException e) {
-            return username.hashCode();
-        }
+        if(userID != null) return userID;
+        return calculateUserID();
     }
 
     /**
-     * Gets the username from raw data.
-     * @param data
-     * @return
-     * TODO - Correct
+     * Gets the user id from raw data.
+     * @param data - 4 bytes of data containing the user id
+     * @return userID
      */
-    private String getUsername(byte[] data) {
-        int id = ((int) data[3] << 24);
-        if(id < 0){
-            id = id - (int) data[0];
-            id = id - ((int) data[1] << 8);
-            id = id - ((int) data[2] << 16);
-        }else{
-            id = id + (int) data[0];
-            id = id + ((int) data[1] << 8);
-            id = id + ((int) data[2] << 16);
-        }
+    private int getUserID(byte[] data) {
+        int id = (int) data[0] & 0x0ff;
+        id = id + (int) ((data[1] & 0x0ff) << 8);
+        id = id + (int) ((data[2] & 0x0ff) << 16);
+        id = id + (int) ((data[3] & 0x0ff) << 24);
+        return id;
+    }
 
-        return Integer.toHexString(id);
+    /**
+     * Calculate user ID from username.
+     * @return userID
+     */
+    private int calculateUserID() {
+        try {
+            return Integer.parseInt(username,8);
+        } catch (NumberFormatException e) {
+            Log.w("UserInfo", "Using hash code.");
+            return username.hashCode();
+        }
     }
 
     ////////////////////
@@ -114,6 +123,7 @@ public class UserInfo {
      */
     public void setUsername(String username) {
         this.username = username;
+        this.userID = calculateUserID();
     }
 
     /**
@@ -168,9 +178,8 @@ public class UserInfo {
     public byte[] getData(DeviceInfo deviceInfo) {
         byte[] data = new byte[20];
 
-        int userID = getUserID();
-
         // Put userID
+        int userID = calculateUserID();
         data[0] = (byte) userID;
         data[1] = (byte) (userID >>> 8);
         data[2] = (byte) (userID >>> 16);
@@ -206,7 +215,7 @@ public class UserInfo {
 
     @Override
     public String toString() {
-        return "Username: " + username + " | Gender: " + gender + "\n"
+        return "UserID: " + userID + " | Gender: " + gender + "\n"
                 + "Age: " + age + " | Height: " + height + " | Weight: " + weight;
     }
 
