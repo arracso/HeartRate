@@ -1,7 +1,15 @@
 package edu.udg.exit.heartrate.MiBand.Utils;
 
+/**
+ * Class to obtain different check sums.
+ */
 public class CheckSums {
 
+    /**
+     * Get CRC8 from data
+     * @param data - data to check
+     * @return return the CRC8
+     */
     public static int getCRC8(byte[] data){
         int len = data.length;
         int i = 0;

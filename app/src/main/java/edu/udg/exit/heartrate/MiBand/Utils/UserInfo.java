@@ -4,6 +4,9 @@ import android.util.Log;
 
 import java.util.Arrays;
 
+/**
+ * Class to handle user information from mi band.
+ */
 public class UserInfo {
 
     ///////////////

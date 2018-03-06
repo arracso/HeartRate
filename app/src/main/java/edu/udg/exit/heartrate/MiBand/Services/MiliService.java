@@ -60,7 +60,7 @@ public class MiliService extends MiBandService {
 
     /**
      * Read date time.
-     * REQUIREMENT : TODO - It isn't reading.
+     * REQUIREMENT : TODO - NOT READING ANYTHING
      */
     public void readDate() {
         readCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.DATE_TIME);
@@ -126,7 +126,7 @@ public class MiliService extends MiBandService {
 
     /**
      * Self test - Mi Band will do crazy things.
-     * REQUIREMENT : TODO - PAIR ???? Maybe another service.
+     * REQUIREMENT : TODO - NOT WORKING.
      * WARNING : Will need to unlink miband from bluetooth.
      */
     public void selfTest() {

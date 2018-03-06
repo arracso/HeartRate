@@ -1,7 +1,7 @@
 package edu.udg.exit.heartrate.MiBand.Utils;
 
 /**
- * Class to handle battery information reading.
+ * Class that stores battery information.
  */
 public class BatteryInfo {
 

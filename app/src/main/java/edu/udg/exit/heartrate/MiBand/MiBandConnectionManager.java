@@ -310,12 +310,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                         case REQUEST_DEVICE_NAME:  miliService.requestDeviceName();
                             break;
                         case SEND_USER_INFO:
-                            Log.d("SEND","INFO");
                             if(userInfo != null && deviceInfo != null)
                                 miliService.sendUserInfo(userInfo.getData(deviceInfo));
                             break;
-                        case SELF_TEST:
-                            Log.d("TEST","TEST");
+                        case SELF_TEST: // TODO - NOT WORKING
                             miliService.selfTest();
                             break;
                     }

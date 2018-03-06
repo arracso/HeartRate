@@ -1,5 +1,8 @@
 package edu.udg.exit.heartrate.MiBand.Utils;
 
+/**
+ * MiBand Latency.
+ */
 public class Latency {
 
     ////////////////

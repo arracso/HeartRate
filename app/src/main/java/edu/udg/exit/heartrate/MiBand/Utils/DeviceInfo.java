@@ -1,5 +1,8 @@
 package edu.udg.exit.heartrate.MiBand.Utils;
 
+/**
+ * Class that stores device information.
+ */
 public class DeviceInfo {
 
     ////////////////
@@ -188,7 +191,7 @@ public class DeviceInfo {
 
     @Override
     public String toString() {
-        return "\n\tID: " + id + " | Version: " + profileVersion + " / " + firmwareVersion + " / " + hardwareVersion +
-                "\n\tFeature: " + feature + " | Appearance: " + appearance;
+        return "DeviceID: " + id + " | Feature: " + feature + " | Appearance: " + appearance +
+        "\n Version: " + profileVersion + " / " + firmwareVersion + " / " + hardwareVersion;
     }
 }
