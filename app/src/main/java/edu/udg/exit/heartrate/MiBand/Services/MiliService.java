@@ -120,8 +120,12 @@ public class MiliService extends MiBandService {
      * REQUIREMENT : Read Device Information
      * User may need to put his finger on the device to confirm.
      */
-    public void sendUserInfo(byte[] data){
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.USER_INFO,data);
+    public void sendUserInfo(byte[] data) {
+        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.USER_INFO, data);
+    }
+
+    public void setWearLocation(byte[] data) {
+        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.CONTROL_POINT, data);
     }
 
     /**

@@ -58,9 +58,9 @@ public final class MiBandConstants {
         public static final UUID UPDATE_NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "2902"));
     }
 
-    ////////////
-    // Values //
-    ////////////
+    //////////////
+    // PROTOCOL //
+    //////////////
 
     public static final class PROTOCOL {
         public static final byte[] PAIR = {2};
@@ -81,7 +81,21 @@ public final class MiBandConstants {
         public static final byte[] REBOOT = {12};
         public static final byte[] REMOTE_DISCONNECT = {1};
         public static final byte[] FACTORY_RESET = {9};
-        public static final byte[] SELF_TEST = {2}; // Doesn't works (unpaired)
+        public static final byte[] SELF_TEST = {2}; // TODO - Doesn't works
+    }
+
+    //////////////
+    // COMMANDS //
+    //////////////
+
+    /**
+     * Commands: Usually send to {@link UUID_CHAR#CONTROL_POINT CONTROL_POINT} characteristic.
+     */
+    public static  final class COMMAND {
+        // WEAR LOCATION //
+        public static final byte[] SET_WEAR_LOCATION_LEFT = {0xf, 0x0};
+        public static final byte[] SET_WEAR_LOCATION_RIGHT = {0xf, 0x1};
+        public static final byte[] SET_WEAR_LOCATION_NECK = {0xf, 0x2};
     }
 
     ///////////////////////////

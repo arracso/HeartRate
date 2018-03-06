@@ -36,6 +36,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     private static final int REQUEST_DEVICE_NAME = 5;
     private static final int SEND_USER_INFO = 6;
     private static final int CHECK_AUTHENTICATION = 7;
+    private static final int SET_WEAR_LOCATION = 8;
 
 
     ////////////////
@@ -57,6 +58,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     // Info
     private DeviceInfo deviceInfo;
     private UserInfo userInfo;
+    private boolean userInfoSend;
 
     // Auth
     private boolean authenticated;
@@ -86,6 +88,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         // Info
         deviceInfo = null;
         userInfo = null;
+        userInfoSend = false;
 
         // Auth
         authenticated = false;
@@ -128,6 +131,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             addCall(REQUEST_DEVICE_NAME);
             addCall(SEND_USER_INFO); // deviceInfo will be set
             addCall(CHECK_AUTHENTICATION, false);
+            addCall(SET_WEAR_LOCATION, MiBandConstants.COMMAND.SET_WEAR_LOCATION_RIGHT);
 
             // Start
             run();
@@ -181,8 +185,9 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             }else if(MiBandConstants.UUID_CHAR.USER_INFO.equals(characteristic.getUuid())){
                 UserInfo userInfo = new UserInfo(characteristic.getValue());
                 Log.d("GATTwrite","" + userInfo);
+                userInfoSend = true;
             }else if(MiBandConstants.UUID_CHAR.CONTROL_POINT.equals(characteristic.getUuid())){
-                Log.d("GATTwrite", "Control point: " + characteristic.getValue());
+                Log.d("GATTwrite", "Control point: " + characteristic.getValue()[0]);
             }else if(MiBandConstants.UUID_CHAR.REALTIME_STEPS.equals(characteristic.getUuid())){
                 Log.d("GATTwrite", "Realtime steps: " + characteristic.getValue());
             }else if(MiBandConstants.UUID_CHAR.LE_PARAMS.equals(characteristic.getUuid())){
@@ -203,7 +208,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 }
             }
 
-            if(!MiBandConstants.UUID_CHAR.USER_INFO.equals(characteristic.getUuid())){
+            if(!(MiBandConstants.UUID_CHAR.USER_INFO.equals(characteristic.getUuid()) && !authenticated)){
                 working = false;
             }
 
@@ -293,7 +298,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      * @param expectsResult True to add an ActionWithResponse | False to add an ActionWithoutResponse
      * @param data to be write on write calls (not always needed)
      */
-    public void addCall(final int callCode, boolean expectsResult, byte[] data) {
+    public void addCall(final int callCode, boolean expectsResult, final byte[] data) {
         if(expectsResult){
             addCall(new ActionWithResponse() {
                 @Override
@@ -312,6 +317,9 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                         case SEND_USER_INFO:
                             if(userInfo != null && deviceInfo != null)
                                 miliService.sendUserInfo(userInfo.getData(deviceInfo));
+                            break;
+                        case SET_WEAR_LOCATION: miliService.setWearLocation(data);
+                            Log.d("WEAR", "WEAR");
                             break;
                         case SELF_TEST: // TODO - NOT WORKING
                             miliService.selfTest();
@@ -388,7 +396,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             case MiBandConstants.NOTIFICATION.AUTHENTICATION_SUCCESS:
                 Log.d("Notification", "Authentication Success");
                 authenticated = true;
-                working = false;
+                if(userInfoSend) working = false;
                 break;
             case MiBandConstants.NOTIFICATION.AUTHENTICATION_FAILED:
                 Log.d("Notification", "Authentication Failed");
