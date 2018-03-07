@@ -12,6 +12,7 @@ import edu.udg.exit.heartrate.Interfaces.IBluetoothService;
 import edu.udg.exit.heartrate.Interfaces.IScanService;
 import edu.udg.exit.heartrate.Interfaces.IScanView;
 import edu.udg.exit.heartrate.MiBand.MiBandConnectionManager;
+import edu.udg.exit.heartrate.MiBand.MiBandConstants;
 
 import java.util.*;
 
@@ -176,7 +177,11 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         return new BluetoothAdapter.LeScanCallback() {
             @Override
             public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-                if(!devices.containsKey(device.toString())) {
+                boolean supportedDevice = false;
+                if(device.getAddress().startsWith(MiBandConstants.MODEL.MI1A)) supportedDevice = false;// TODO - Support (or remove)
+                if(device.getAddress().startsWith(MiBandConstants.MODEL.MI1S)) supportedDevice = true;
+
+                if(supportedDevice && !devices.containsKey(device.toString())) {
                     devices.put(device.getAddress(),device);
                     if(scanView != null) scanView.addDevice(device);
                 }
