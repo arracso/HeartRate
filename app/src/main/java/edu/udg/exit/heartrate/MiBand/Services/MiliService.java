@@ -4,6 +4,9 @@ import android.bluetooth.BluetoothGatt;
 import edu.udg.exit.heartrate.MiBand.MiBandConstants;
 import edu.udg.exit.heartrate.MiBand.Utils.Latency;
 
+/**
+ * Mi Band Mili Service.
+ */
 public class MiliService extends MiBandService {
 
     ////////////////////////
@@ -62,7 +65,7 @@ public class MiliService extends MiBandService {
      * Read date time.
      * REQUIREMENT : TODO - NOT READING ANYTHING
      */
-    public void readDate() {
+    public void requestDate() {
         readCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.DATE_TIME);
     }
 
@@ -95,7 +98,7 @@ public class MiliService extends MiBandService {
      * Read battery.
      * REQUIREMENT : ANY
      */
-    public void readBattery() {
+    public void requestBattery() {
         readCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.BATTERY);
     }
 

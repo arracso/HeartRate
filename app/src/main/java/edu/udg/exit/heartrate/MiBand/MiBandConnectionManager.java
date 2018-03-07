@@ -305,6 +305,15 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    private Action requestDate() {
+        return new ActionWithResponse() {
+            @Override
+            public void run() {
+                miliService.requestDate();
+            }
+        };
+    }
+
     private Action pair() {
         return new ActionWithResponse() {
             @Override
@@ -357,6 +366,15 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             @Override
             public void run() {
                 miliService.sendCommand(command);
+            }
+        };
+    }
+
+    private Action requestBattery() {
+        return new ActionWithResponse() {
+            @Override
+            public void run() {
+                miliService.requestBattery();
             }
         };
     }
