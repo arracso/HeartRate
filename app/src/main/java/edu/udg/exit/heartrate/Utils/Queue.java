@@ -1,7 +1,9 @@
 package edu.udg.exit.heartrate.Utils;
 
 /**
- *
+ * Simple queue of type T objects.
+ * It just have two "references" (start & end) referencing to two nodes.
+ *  Each node contains and object and a "reference" to the next node.
  * @param <T> Type of the queue.
  */
 public class Queue<T> {

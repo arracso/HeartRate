@@ -124,7 +124,12 @@ public class MiliService extends MiBandService {
         writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.USER_INFO, data);
     }
 
-    public void setWearLocation(byte[] data) {
+    /**
+     * Send a command to the Mi Band via CONTROL_POINT characteristic
+     * REQUIREMENT : PAIR
+     * @param data - Bytes to be write on control Point
+     */
+    public void sendCommand(byte[] data) {
         writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.CONTROL_POINT, data);
     }
 
