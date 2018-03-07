@@ -115,12 +115,17 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             // Initialize - TODO
             addCall(setLowLatency()); // Set low latency to do a faster initialization
             addCall(enableNotifications());
+            //addCall(requestDate()); // Reading date for stability - TODO - Check this
             addCall(pair());
-            addCall(requestDeviceInformation());
+            addCall(requestDeviceInformation()); // Needed to send user info to the device
             addCall(requestDeviceName());
-            addCall(sendUserInfo());
+            addCall(sendUserInfo()); // Needed to authenticate
             addCall(checkAuthentication());
             addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT)); // Set wear location
+
+            addCall(requestBattery());
+            //addCall(setHighLatency()); // Set high latency for an stable connection
+            //addCall(setInitialized()); // Device is ready to make other calls
 
             // Start
             run();
