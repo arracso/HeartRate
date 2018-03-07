@@ -47,7 +47,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     private DeviceInfo deviceInfo;
     private UserInfo userInfo;
 
-
     // Auth
     private boolean userInfoSended;
     private boolean authenticated;
