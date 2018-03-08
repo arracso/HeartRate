@@ -89,14 +89,31 @@ public final class MiBandConstants {
     //////////////
 
     /**
-     * Commands: Usually send to {@link UUID_CHAR#CONTROL_POINT CONTROL_POINT} characteristic.
+     * Commands usually send to {@link UUID_CHAR#CONTROL_POINT CONTROL_POINT} characteristic.
+     * Some commands are send to {@link UUID_CHAR#HEARTRATE_CONTROL_POINT HEARTRATE_CONTROL_POINT} characteristic.
      */
     public static  final class COMMAND {
         // WEAR LOCATION //
         public static final byte[] SET_WEAR_LOCATION_LEFT = {0xf, 0x0};
         public static final byte[] SET_WEAR_LOCATION_RIGHT = {0xf, 0x1};
         public static final byte[] SET_WEAR_LOCATION_NECK = {0xf, 0x2};
+
+        // HEART RATE COMMANDS //
+        public static final byte[] START_HEART_RATE_MEASUREMENT_SLEEP = {0xf, 0x0, 0x1};
+        public static final byte[] STOP_HEART_RATE_MEASUREMENT_SLEEP = {0xf, 0x0, 0x0};
+        public static final byte[] START_HEART_RATE_MEASUREMENT_CONTINUOUS = {0xf, 0x1, 0x1};
+        public static final byte[] STOP_HEART_RATE_MEASUREMENT_CONTINUOUS = {0xf, 0x1, 0x0};
+        public static final byte[] START_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 0x1};
+        public static final byte[] STOP_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 0x0};
     }
+
+    /*
+     static final byte[] startRealTimeStepsNotifications = new byte[]{MiBandService.COMMAND_SET_REALTIME_STEPS_NOTIFICATION, 1};
+     static final byte[] stopRealTimeStepsNotifications = new byte[]{MiBandService.COMMAND_SET_REALTIME_STEPS_NOTIFICATION, 0};
+
+     private static final byte[] startSensorRead = new byte[]{MiBandService.COMMAND_GET_SENSOR_DATA, 1};
+     private static final byte[] stopSensorRead = new byte[]{MiBandService.COMMAND_GET_SENSOR_DATA, 0};
+     */
 
     ///////////////////////////
     // NOTIFICATION PROTOCOL //

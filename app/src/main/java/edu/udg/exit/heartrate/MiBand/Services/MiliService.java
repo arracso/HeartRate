@@ -150,12 +150,21 @@ public class MiliService extends MiBandService {
     }
 
     /**
-     * Send a command to the Mi Band via CONTROL_POINT characteristic
+     * Send a command to the Mi Band via CONTROL_POINT characteristic.
      * REQUIREMENT : PAIR
-     * @param data - Bytes to be write on control Point
+     * @param data - Bytes to be written on Control Point
      */
     public void sendCommand(byte[] data) {
         writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.CONTROL_POINT, data);
+    }
+
+    /**
+     * Send a hearth rate command to the Mi Band via HEARTRATE_CONTROL_POINT characteristic.
+     * REQUIREMENT : TODO (Maybe pair)
+     * @param data - Byte to be written on Heartrate Control Point
+     */
+    public void sendHRCommand(byte[] data) {
+        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.HEARTRATE_CONTROL_POINT, data);
     }
 
     /**
