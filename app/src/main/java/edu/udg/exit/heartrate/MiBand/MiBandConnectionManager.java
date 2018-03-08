@@ -8,6 +8,8 @@ import android.util.Log;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import android.os.Handler;
+import java.util.logging.LogRecord;
 
 import edu.udg.exit.heartrate.MiBand.Actions.Action;
 import edu.udg.exit.heartrate.MiBand.Actions.ActionWithResponse;
@@ -110,9 +112,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             vibrationService = new VibrationService(gatt);
 
             // Initialize - TODO
-            addCall(setHighLatency());
-            //addCall(setLowLatency()); // Set low latency to do a faster initialization
             addCall(enableNotifications());
+            addCall(setLowLatency()); // Set low latency to do a faster initialization
             //addCall(requestDate()); // Reading date for stability - TODO - Check this
             addCall(pair());
             addCall(requestDeviceInformation()); // Needed to send user info to the device
@@ -122,7 +123,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT)); // Set wear location
 
             addCall(requestBattery());
-            // TODO
             addCall(setHighLatency()); // Set high latency for an stable connection
             //addCall(setInitialized()); // Device is ready to make other calls
 
@@ -272,17 +272,32 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     // Private Methods //
     /////////////////////
 
+    Handler handler = new Handler();
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            working = false;
+            MiBandConnectionManager.this.run();
+        }
+    };
+
     /**
      * Runs the first action of the queue.
      */
     private void run() {
+        handler.removeCallbacks(runnable);
+
         if(actionQueue.isEmpty()){
             allWorkIsDone = true;
         }else if(!working){
             Action action = actionQueue.poll();
             action.run();
-            if(!action.expectsResult()) run(); // TODO - Maybe will need to apply a timer
-            else working = true;
+            if(!action.expectsResult())
+                handler.postDelayed(runnable,100); // TODO - Check
+            else {
+                working = true;
+                handler.postDelayed(runnable,500); // TODO - Check
+            }
         }
     }
 
@@ -323,10 +338,17 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      * @return EnableNotifications Action
      */
     private Action enableNotifications() {
-        return new ActionWithResponse() {
+        return new Action() {
+            private boolean expectsResult = true;
+
             @Override
             public void run() {
-                miliService.enableNotifications();
+                this.expectsResult = miliService.enableNotifications();
+            }
+
+            @Override
+            public boolean expectsResult() {
+                return expectsResult;
             }
         };
     }
@@ -521,7 +543,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 break;
             case NOTIFICATION.SET_LATENCY_SUCCESS:
                 Log.d("Notification", "Set Latency Success");
-                working = false;
+                //working = false;
                 break;
             case NOTIFICATION.RESET_AUTHENTICATION_FAILED:
                 Log.d("Notification", "Reset Authentication Failed");

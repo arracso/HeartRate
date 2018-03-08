@@ -72,19 +72,19 @@ public abstract class MiBandService {
      * @param descriptorUUID
      * @param enable
      */
-    protected void setCharacteristicNotification(UUID serviceUUID, UUID characteristicUUID, UUID descriptorUUID, boolean enable){
+    protected boolean setCharacteristicNotification(UUID serviceUUID, UUID characteristicUUID, UUID descriptorUUID, boolean enable){
         // Retrieve the service
         BluetoothGattService service = connectGATT.getService(serviceUUID);
         if(service == null) {
             Log.w("MiBandService", "Service not found: " + serviceUUID);
-            return;
+            return false;
         }
 
         // Retrieve  the characteristic
         BluetoothGattCharacteristic characteristic = service.getCharacteristic(characteristicUUID);
         if(characteristic == null) {
             Log.w("MiBandService", "Characteristic not found: " + characteristicUUID);
-            return;
+            return false;
         }
 
         // Enable or disable the notification
@@ -93,7 +93,7 @@ public abstract class MiBandService {
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(descriptorUUID);
             if (descriptor == null) {
                 Log.w("MiBandService","Descriptor not found:" + descriptorUUID);
-                return;
+                return false;
             }
 
             // Sets descriptor value
@@ -102,12 +102,15 @@ public abstract class MiBandService {
                 descriptor.setValue(enable ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
             } else if ((properties & BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) {
                 descriptor.setValue(enable ? BluetoothGattDescriptor.ENABLE_INDICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-            } else return;
+            } else return false;
 
             // Write the descriptor to the device
             connectGATT.writeDescriptor(descriptor);
+
+            return true;
         }else{
             Log.e("MiBandService", "Unable to enable notifications.");
+            return false;
         }
     }
 

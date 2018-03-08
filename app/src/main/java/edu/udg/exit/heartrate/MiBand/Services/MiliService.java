@@ -28,18 +28,19 @@ public class MiliService extends MiBandService {
     /**
      * Enables notifications.
      * REQUIREMENT : ANY
+     * WARNING : It doesn't reply
      */
-    public void enableNotifications() {
-        setCharacteristicNotification(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,true);
+    public boolean enableNotifications() {
+        return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,true);
     }
 
     /**
      * Disables notifications.
      * REQUIREMENT : ANY
-     * WARNING :  IT doesn't reply
+     * WARNING :  It doesn't reply
      */
-    public void disableNotifications() {
-        setCharacteristicNotification(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,false);
+    public boolean disableNotifications() {
+        return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,false);
     }
 
     /**
