@@ -124,7 +124,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT)); // Set wear location
 
             addCall(requestBattery());
-            //addCall(setHighLatency()); // Set high latency for an stable connection
+            // TODO
+            addCall(setHighLatency()); // Set high latency for an stable connection
             //addCall(setInitialized()); // Device is ready to make other calls
 
             // Start
@@ -292,6 +293,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
     /* With response */
 
+    /**
+     * Get an action to set the lowest latency possible.
+     * @return SetLowLatency Action
+     */
     private Action setLowLatency() {
         return new ActionWithResponse() {
             @Override
@@ -301,6 +306,23 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    /**
+     * Get an action to set the highest latency possible.
+     * @return SetHighLatency Action
+     */
+    private Action setHighLatency() {
+        return new ActionWithResponse() {
+            @Override
+            public void run() {
+                miliService.setHighLatency();
+            }
+        };
+    }
+
+    /**
+     * Get an action to enable notifications from MiBand.
+     * @return EnableNotifications Action
+     */
     private Action enableNotifications() {
         return new ActionWithResponse() {
             @Override
@@ -310,6 +332,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    /**
+     * Get an action to request the date from MiBand.
+     * @return RequestDate Action
+     */
     private Action requestDate() {
         return new ActionWithResponse() {
             @Override
@@ -319,6 +345,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    /**
+     * Get an action to start pairing with the MiBand.
+     * @return Pair Action
+     */
     private Action pair() {
         return new ActionWithResponse() {
             @Override
@@ -328,6 +358,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    /**
+     * Get an action to request the MiBand device information.
+     * @return RequestDeviceInformation Action
+     */
     private Action requestDeviceInformation() {
         return new ActionWithResponse() {
             @Override
@@ -337,6 +371,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    /**
+     * Get an action to request the name of the MiBand device.
+     * @return RequestDeviceName Action
+     */
     private Action requestDeviceName() {
         return new ActionWithResponse() {
             @Override
@@ -346,6 +384,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    /**
+     * Get an action to send the user information to the MiBand.
+     * @return SendUserInfo Action
+     */
     private Action sendUserInfo() {
         return new ActionWithResponse() {
             @Override
@@ -355,6 +397,12 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    /**
+     * Get an action to send the user information to the MiBand.
+     * @param userInfo - Contains data to send.
+     * @param deviceInfo - Contains data to send.
+     * @return SendUserInfo Action
+     */
     private Action sendUserInfo(final UserInfo userInfo, final DeviceInfo deviceInfo) {
         return new ActionWithResponse() {
             @Override
@@ -366,6 +414,11 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    /**
+     * Get an action to send a command to the MiBand.
+     * @param command - Command to be sended to the MiBand
+     * @return SendCommand Action
+     */
     private Action sendCommand(final byte[] command) {
         return new ActionWithResponse() {
             @Override
@@ -375,6 +428,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    /**
+     * Get an action to request the battery of the MiBand.
+     * @return RequestBattery Action
+     */
     private Action requestBattery() {
         return new ActionWithResponse() {
             @Override
@@ -386,6 +443,11 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
     /* Without response */
 
+    /**
+     * Get an action that checks if the authentication was successful.
+     * If authentication wasn't successful it aborts all operations to initialize the connection.
+     * @return CheckAuthentication Action
+     */
     private Action checkAuthentication() {
         return new ActionWithoutResponse() {
             @Override
@@ -398,8 +460,9 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     /* Not tested yet */
 
     /**
-     * TODO - Not working!!
-     * @return
+     * TODO - Not working!! (But not even necessary)
+     * Get an action to make the MiBand do "crazy" things.
+     * @return SelfTest Action
      */
     private Action selfTest() {
         return new ActionWithResponse() {

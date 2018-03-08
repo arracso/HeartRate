@@ -62,6 +62,25 @@ public class MiliService extends MiBandService {
     }
 
     /**
+     * Sets the highest latency possible.
+     * REQUIREMENT : ANY
+     */
+    public void setHighLatency() {
+        // High latency params
+        int minConnectionInterval = 460;
+        int maxConnectionInterval = 500;
+        int latency = 0;
+        int timeout = 500;
+        int advertisementInterval = 0;
+
+        // Get high latency params in bytes
+        byte[] latencyBytes = new Latency(minConnectionInterval, maxConnectionInterval, latency, timeout, advertisementInterval).getLatencyBytes();
+
+        // Write latency bytes to miBand
+        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.LE_PARAMS,latencyBytes);
+    }
+
+    /**
      * Read date time.
      * REQUIREMENT : TODO - NOT READING ANYTHING
      */
@@ -144,5 +163,6 @@ public class MiliService extends MiBandService {
     public void selfTest() {
         writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.TEST, MiBandConstants.PROTOCOL.SELF_TEST);
     }
+
 
 }
