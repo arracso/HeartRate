@@ -293,10 +293,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             Action action = actionQueue.poll();
             action.run();
             if(!action.expectsResult())
-                handler.postDelayed(runnable,100); // TODO - Check
+                handler.postDelayed(runnable,100); // TODO - Check (for the moment seems to be working nice)
             else {
                 working = true;
-                handler.postDelayed(runnable,500); // TODO - Check
+                handler.postDelayed(runnable,5000); // TODO - Check if timer is too short or too large
             }
         }
     }
@@ -334,6 +334,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     }
 
     /**
+     * TODO - Check expect result (I think the best would be to not expect any result when enable notifications)
      * Get an action to enable notifications from MiBand.
      * @return EnableNotifications Action
      */
@@ -348,7 +349,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
             @Override
             public boolean expectsResult() {
-                return expectsResult;
+                return false;
             }
         };
     }
