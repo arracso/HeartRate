@@ -1,7 +1,5 @@
 package edu.udg.exit.heartrate.MiBand.Utils;
 
-import android.util.Log;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -45,7 +43,6 @@ public class MiDate extends GregorianCalendar {
         super();
         if (data.length - offset >= 6){
             this.set(data[offset] + baseYear, data[offset+1], data[offset+2], data[offset+3], data[offset+4], data[offset+5]);
-            Log.d("Date", "Year: " + data[offset]);
         }
     }
 
