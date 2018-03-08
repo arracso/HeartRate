@@ -1,19 +1,20 @@
-# HeartRate
-
+# HeartRate #
 ## Android Sdk
 
-Min: 21
+- Min: 21
+- Target: 25
 
-Target: 25
-
-## Supported device
-
-MiBand 1s
+## Supported devices
+- MiBand 1s - In progress
+- MiBand A1 - Not supported
 
 ## Local Properties
-
-Local properties on eXiT:
-
+On eXiT lab:
 ```
 sdk.dir=C\:\\Users\\eXIt\\AppData\\Local\\Android\\android-sdk
+```
+
+On any other machine:
+```
+sdk.dir=PATH_TO_YOUR_ANDROID_SDK
 ```
