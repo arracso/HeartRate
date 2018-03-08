@@ -50,13 +50,11 @@ public class UserInfo {
         type = 0;
     }
 
-
-
     /**
      * Constructor by data.
      */
     public UserInfo(byte[] data) {
-        userID = getUserID(data);
+        userID = Parse.BytesToInt(data,0,4);
         username = null;
         gender = (int) (data[4] & 0x0ff);
         age = (int) (data[5] & 0x0ff);
@@ -68,28 +66,6 @@ public class UserInfo {
     /////////////////////
     // Private Methods //
     /////////////////////
-
-    /**
-     * Gets user ID or calculate the user id from username if needed.
-     * @return userID
-     */
-    private int getUserID() {
-        if(userID != null) return userID;
-        return calculateUserID();
-    }
-
-    /**
-     * Gets the user id from raw data.
-     * @param data - 4 bytes of data containing the user id
-     * @return userID
-     */
-    private int getUserID(byte[] data) {
-        int id = (int) data[0] & 0x0ff;
-        id = id + (int) ((data[1] & 0x0ff) << 8);
-        id = id + (int) ((data[2] & 0x0ff) << 16);
-        id = id + (int) ((data[3] & 0x0ff) << 24);
-        return id;
-    }
 
     /**
      * Calculate user ID from username.

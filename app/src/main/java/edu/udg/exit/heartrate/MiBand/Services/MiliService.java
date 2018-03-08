@@ -52,10 +52,11 @@ public class MiliService extends MiBandService {
         int maxConnectionInterval = 49;
         int latency = 0;
         int timeout = 500;
+        int connectionInterval = 0;
         int advertisementInterval = 0;
 
         // Get low latency params in bytes
-        byte[] latencyBytes = new Latency(minConnectionInterval, maxConnectionInterval, latency, timeout, advertisementInterval).getLatencyBytes();
+        byte[] latencyBytes = new Latency(minConnectionInterval, maxConnectionInterval, latency, timeout, connectionInterval, advertisementInterval).getLatencyBytes();
 
         // Write latency bytes to miBand
         writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.LE_PARAMS,latencyBytes);
@@ -71,10 +72,11 @@ public class MiliService extends MiBandService {
         int maxConnectionInterval = 500;
         int latency = 0;
         int timeout = 500;
+        int connectionInterval = 0;
         int advertisementInterval = 0;
 
         // Get high latency params in bytes
-        byte[] latencyBytes = new Latency(minConnectionInterval, maxConnectionInterval, latency, timeout, advertisementInterval).getLatencyBytes();
+        byte[] latencyBytes = new Latency(minConnectionInterval, maxConnectionInterval, latency, timeout, connectionInterval, advertisementInterval).getLatencyBytes();
 
         // Write latency bytes to miBand
         writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.LE_PARAMS,latencyBytes);

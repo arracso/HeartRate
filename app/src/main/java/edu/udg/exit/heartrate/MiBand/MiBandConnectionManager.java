@@ -14,10 +14,7 @@ import edu.udg.exit.heartrate.MiBand.Actions.ActionWithResponse;
 import edu.udg.exit.heartrate.MiBand.Actions.ActionWithoutResponse;
 import edu.udg.exit.heartrate.MiBand.Services.MiliService;
 import edu.udg.exit.heartrate.MiBand.Services.VibrationService;
-import edu.udg.exit.heartrate.MiBand.Utils.BatteryInfo;
-import edu.udg.exit.heartrate.MiBand.Utils.DeviceInfo;
-import edu.udg.exit.heartrate.MiBand.Utils.MiDate;
-import edu.udg.exit.heartrate.MiBand.Utils.UserInfo;
+import edu.udg.exit.heartrate.MiBand.Utils.*;
 import edu.udg.exit.heartrate.Utils.Queue;
 
 import static edu.udg.exit.heartrate.MiBand.MiBandConstants.*;
@@ -113,7 +110,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             vibrationService = new VibrationService(gatt);
 
             // Initialize - TODO
-            addCall(setLowLatency()); // Set low latency to do a faster initialization
+            addCall(setHighLatency());
+            //addCall(setLowLatency()); // Set low latency to do a faster initialization
             addCall(enableNotifications());
             //addCall(requestDate()); // Reading date for stability - TODO - Check this
             addCall(pair());
@@ -188,7 +186,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             }else if(UUID_CHAR.REALTIME_STEPS.equals(characteristic.getUuid())){
                 Log.d("GATTw", "Realtime steps -> " + characteristic.getValue());
             }else if(UUID_CHAR.LE_PARAMS.equals(characteristic.getUuid())){
-                Log.d("GATTw", "Latency -> " + characteristic.getValue()[0]);
+                Latency latency = new Latency(characteristic.getValue());
+                Log.d("GATTw", "Latency -> " + latency);
             }else if(UUID_CHAR.PAIR.equals(characteristic.getUuid())){
                 Log.d("GATTw", "PAIR -> " + characteristic.getValue()[0]);
             }else if(UUID_CHAR.DATE_TIME.equals(characteristic.getUuid())){
