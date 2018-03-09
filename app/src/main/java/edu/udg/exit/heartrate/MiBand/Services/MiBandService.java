@@ -17,7 +17,7 @@ public abstract class MiBandService {
     // Attributes //
     ////////////////
 
-    BluetoothGatt connectGATT;
+    private BluetoothGatt connectGATT;
 
     ////////////////////////
     // Life Cycle Methods //
@@ -32,7 +32,7 @@ public abstract class MiBandService {
 
     /**
      * Constructor.
-     * @param gatt
+     * @param gatt - Connected GATT
      */
     public MiBandService(BluetoothGatt gatt) {
         connectGATT = gatt;
@@ -44,7 +44,7 @@ public abstract class MiBandService {
 
     /**
      * Sets connected GATT.
-     * @param gatt
+     * @param gatt - Connected GATT
      */
     public void setConnectGATT(BluetoothGatt gatt) {
         connectGATT = gatt;
@@ -52,7 +52,7 @@ public abstract class MiBandService {
 
     /**
      * Gets the connected GATT.
-     * @return
+     * @return Connected GATT
      */
     public BluetoothGatt getConnectGATT() {
         return connectGATT;

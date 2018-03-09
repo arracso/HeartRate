@@ -50,17 +50,23 @@ public class Queue<T> {
 
     /**
      * Add an object to the end of the queue.
-     * @param obj Object to be added to the queue
+     * @param obj - Object to be added to the queue
      */
     public void add(T obj) {
         Node node = new Node(obj,null);
-        if(isEmpty()){
-            start = node;
-            end = node;
-        }else{
-            end.next = node;
-            end = node;
-        }
+        if(isEmpty()) start = node;
+        else end.next = node;
+        end = node;
+    }
+
+    /**
+     * Add an object to the start of the queue.
+     * @param obj - Object to be added to the queue
+     */
+    public void addFirst(T obj) {
+        Node node = new Node(obj, start);
+        if(isEmpty()) end = node;
+        start = node;
     }
 
     /**

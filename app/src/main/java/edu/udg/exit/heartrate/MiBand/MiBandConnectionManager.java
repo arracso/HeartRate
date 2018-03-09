@@ -1,15 +1,11 @@
 package edu.udg.exit.heartrate.MiBand;
 
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothProfile;
+import android.bluetooth.*;
 import android.util.Log;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import android.os.Handler;
-import java.util.logging.LogRecord;
 
 import edu.udg.exit.heartrate.MiBand.Actions.Action;
 import edu.udg.exit.heartrate.MiBand.Actions.ActionWithResponse;
@@ -39,7 +35,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
     // Calls Queue
     private final Queue<Action> actionQueue;
-    private boolean allWorkIsDone;
     private boolean working;
 
     // Info
@@ -47,7 +42,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     private UserInfo userInfo;
 
     // Auth
-    private boolean userInfoSended;
     private boolean authenticated;
 
     ////////////////////////
@@ -69,7 +63,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
         // Calls Queue
         actionQueue = new Queue<>();
-        allWorkIsDone = true;
         working = false;
 
         // Info
@@ -77,7 +70,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         userInfo = null;
 
         // Auth
-        userInfoSended = false;
         authenticated = false;
     }
 
@@ -112,6 +104,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             vibrationService = new VibrationService(gatt);
 
             // Initialize - TODO
+
             addCall(enableNotifications());
             addCall(setLowLatency()); // Set low latency to do a faster initialization
             //addCall(requestDate()); // Reading date for stability - TODO - Check this
@@ -153,7 +146,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 if(characteristic.getValue().length>0){
                     Log.d("GATTr", "Characteristic -> " + characteristic.getValue()[0]);
                 }else{
-                    Log.d("GATTr", "Characteristic -> " + characteristic.getValue());
+                    Log.d("GATTr", "Characteristic -> " + characteristic.getValue().length);
                 }
             }
 
@@ -176,15 +169,14 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             }else if(UUID_CHAR.DEVICE_NAME.equals(characteristic.getUuid())){
                 Log.d("GATTw", "Device name -> " + characteristic.getValue());
             }else if(UUID_CHAR.NOTIFICATION.equals(characteristic.getUuid())){
-                Log.d("GATTw", "Notification -> " + characteristic.getValue());
+                Log.d("GATTw", "Notification -> " + characteristic.getValue().length);
             }else if(UUID_CHAR.USER_INFO.equals(characteristic.getUuid())){
                 UserInfo userInfo = new UserInfo(characteristic.getValue());
                 Log.d("GATTw","" + userInfo);
-                userInfoSended = true;
             }else if(UUID_CHAR.CONTROL_POINT.equals(characteristic.getUuid())){
                 Log.d("GATTw", "Control point -> " + characteristic.getValue()[0]);
             }else if(UUID_CHAR.REALTIME_STEPS.equals(characteristic.getUuid())){
-                Log.d("GATTw", "Realtime steps -> " + characteristic.getValue());
+                Log.d("GATTw", "Realtime steps -> " + characteristic.getValue().length);
             }else if(UUID_CHAR.LE_PARAMS.equals(characteristic.getUuid())){
                 Latency latency = new Latency(characteristic.getValue());
                 Log.d("GATTw", "Latency -> " + latency);
@@ -204,10 +196,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 }
             }
 
-            if(!(UUID_CHAR.USER_INFO.equals(characteristic.getUuid()) && !authenticated)){
-                working = false;
-            }
-
+            working = false;
             run();
         }else{
             Log.w("GATTw", "Failed to write characteristic");
@@ -249,10 +238,34 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         }
 
         if(!UUID_CHAR.NOTIFICATION.equals(characteristic.getUuid())){
-            working = false;
+            //working = false;
         }
 
         run();
+    }
+
+    @Override
+    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+        super.onDescriptorRead(gatt,descriptor,status);
+
+        if(status == BluetoothGatt.GATT_SUCCESS){
+            Log.d("GATTd", "Read " + descriptor.getUuid());
+
+            working = false;
+            run();
+        }
+    }
+
+    @Override
+    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+        super.onDescriptorWrite(gatt,descriptor,status);
+
+        if(status == BluetoothGatt.GATT_SUCCESS){
+            Log.d("GATTd", "Write " + descriptor.getUuid());
+
+            working = false;
+            run();
+        }
     }
 
     ////////////////////
@@ -264,7 +277,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      * @param call to be added to the actionQueue
      */
     public void addCall(Action call) {
-        allWorkIsDone = false;
         actionQueue.add(call);
     }
 
@@ -272,11 +284,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     // Private Methods //
     /////////////////////
 
-    Handler handler = new Handler();
-    Runnable runnable = new Runnable() {
+    private Handler handler = new Handler();
+    private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            working = false;
             MiBandConnectionManager.this.run();
         }
     };
@@ -286,19 +297,18 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      */
     private void run() {
         handler.removeCallbacks(runnable);
+        int delayMilis = 10000; // TODO - Check if timer is too short or too large
 
         if(actionQueue.isEmpty()){
-            allWorkIsDone = true;
+            return;
         }else if(!working){
             Action action = actionQueue.poll();
             action.run();
-            if(!action.expectsResult())
-                handler.postDelayed(runnable,100); // TODO - Check (for the moment seems to be working nice)
-            else {
-                working = true;
-                handler.postDelayed(runnable,5000); // TODO - Check if timer is too short or too large
-            }
+            if(!action.expectsResult()) delayMilis = 200; // TODO - Check (for the moment seems to be working nice)
+            else working = true;
         }
+
+        handler.postDelayed(runnable, delayMilis);
     }
 
     /////////////
@@ -334,7 +344,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     }
 
     /**
-     * TODO - Check expect result (I think the best would be to not expect any result when enable notifications)
      * Get an action to enable notifications from MiBand.
      * @return EnableNotifications Action
      */
@@ -349,7 +358,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
             @Override
             public boolean expectsResult() {
-                return false;
+                return expectsResult;
             }
         };
     }
@@ -472,9 +481,16 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      */
     private Action checkAuthentication() {
         return new ActionWithoutResponse() {
+            // We will try 10 times to check the Authentication
+            private int timesOut = 10;
+
             @Override
             public void run() {
-                if(!authenticated) actionQueue.clear();
+                if(!authenticated){
+                    timesOut = timesOut - 1;
+                    if(timesOut == 0) actionQueue.clear();
+                    else actionQueue.addFirst(this);
+                }
             }
         };
     }
@@ -501,7 +517,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
     /**
      * Handles notification response.
-     * @param value
+     * @param value - Notification value
      */
     private void handleNotification(byte[] value) {
         // Check if value is 1 byte long.
@@ -533,7 +549,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             case NOTIFICATION.AUTHENTICATION_SUCCESS:
                 Log.d("Notification", "Authentication Success");
                 authenticated = true;
-                if(userInfoSended) working = false;
+                //if(userInfoSended) working = false;
                 break;
             case NOTIFICATION.AUTHENTICATION_FAILED:
                 Log.d("Notification", "Authentication Failed");
@@ -549,12 +565,12 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             case NOTIFICATION.RESET_AUTHENTICATION_FAILED:
                 Log.d("Notification", "Reset Authentication Failed");
                 authenticated = false;
-                working = false;
+                //working = false;
                 break;
             case NOTIFICATION.RESET_AUTHENTICATION_SUCCESS:
                 Log.d("Notification", "Reset Authentication Success");
                 authenticated = true;
-                working = false;
+                //working = false;
                 break;
             case NOTIFICATION.FIRMWARE_CHECK_FAILED:
                 Log.d("Notification", "Firmware Check Failed");
@@ -591,7 +607,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             case NOTIFICATION.STATUS_MOTOR_AUTH_SUCCESS:
                 Log.d("Notification", "Motor AUTH SUCCESS");
                 authenticated = true;
-                working = false;
+                //working = false;
                 break;
             case NOTIFICATION.STATUS_MOTOR_TEST:
                 Log.d("Notification", "Motor TEST");
