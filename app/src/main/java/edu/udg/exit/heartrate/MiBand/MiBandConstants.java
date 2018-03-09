@@ -18,10 +18,10 @@ public final class MiBandConstants {
         public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "1802"));
         public static final UUID HEARTRATE = UUID.fromString(String.format(BASE_UUID, "180D")); // TODO - check
         // Unknown services
-        public static final UUID UNKNOWN1 = UUID.fromString("00001800-0000-1000-8000-00805f9b34fb");
-        public static final UUID UNKNOWN2 = UUID.fromString("00001801-0000-1000-8000-00805f9b34fb");
-        public static final UUID UNKNOWN4 = UUID.fromString("0000fee1-0000-1000-8000-00805f9b34fb");
-        public static final UUID UNKNOWN5 = UUID.fromString("0000fee7-0000-1000-8000-00805f9b34fb");
+        public static final UUID UNKNOWN1 = UUID.fromString(String.format(BASE_UUID, "1800"));
+        public static final UUID UNKNOWN2 = UUID.fromString(String.format(BASE_UUID, "1801"));
+        public static final UUID UNKNOWN4 = UUID.fromString(String.format(BASE_UUID, "FEE1"));
+        public static final UUID UNKNOWN5 = UUID.fromString(String.format(BASE_UUID, "FEE7"));
     }
 
     /////////////////////
@@ -49,9 +49,9 @@ public final class MiBandConstants {
         // VIBRATION SERVICE //
         public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "2A06"));
 
-        // OTHER //
-        public static final UUID HEARTRATE_NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "2a37"));
-        public static final UUID HEARTRATE_CONTROL_POINT = UUID.fromString(String.format(BASE_UUID, "2a39"));
+        // HEART RATE SERVICE //
+        public static final UUID HEARTRATE_NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "2A37")); // Read & Notify
+        public static final UUID HEARTRATE_CONTROL_POINT = UUID.fromString(String.format(BASE_UUID, "2A39")); // Write
     }
 
     /////////////////
@@ -109,6 +109,9 @@ public final class MiBandConstants {
         public static final byte[] STOP_HEART_RATE_MEASUREMENT_CONTINUOUS = {0xf, 0x1, 0x0};
         public static final byte[] START_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 0x1};
         public static final byte[] STOP_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 0x0};
+
+        // VIBRATION COMMANDS //
+        public static final byte[] START_VIBRATION = {0x8, 0x2};
     }
 
     /*

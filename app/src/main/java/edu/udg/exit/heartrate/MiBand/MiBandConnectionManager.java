@@ -10,6 +10,7 @@ import android.os.Handler;
 import edu.udg.exit.heartrate.MiBand.Actions.Action;
 import edu.udg.exit.heartrate.MiBand.Actions.ActionWithResponse;
 import edu.udg.exit.heartrate.MiBand.Actions.ActionWithoutResponse;
+import edu.udg.exit.heartrate.MiBand.Services.HeartRateService;
 import edu.udg.exit.heartrate.MiBand.Services.MiliService;
 import edu.udg.exit.heartrate.MiBand.Services.VibrationService;
 import edu.udg.exit.heartrate.MiBand.Utils.*;
@@ -22,6 +23,13 @@ import static edu.udg.exit.heartrate.MiBand.MiBandConstants.*;
  */
 public class MiBandConnectionManager extends BluetoothGattCallback {
 
+    ///////////////
+    // Constants //
+    ///////////////
+
+    private final static int DELAY_MAX = 10000;
+    private final static int DELAY_MIN = 500;
+
     ////////////////
     // Attributes //
     ////////////////
@@ -32,6 +40,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     // MiBandServices
     private MiliService miliService;
     private VibrationService vibrationService;
+    private HeartRateService heartRateService;
 
     // Calls Queue
     private final Queue<Action> actionQueue;
@@ -60,6 +69,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         // MiBandService
         miliService = null;
         vibrationService = null;
+        heartRateService = null;
 
         // Calls Queue
         actionQueue = new Queue<>();
@@ -102,6 +112,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             // Init Services
             miliService = new MiliService(gatt);
             vibrationService = new VibrationService(gatt);
+            heartRateService = new HeartRateService(gatt);
 
             // Initialize - TODO
 
@@ -114,6 +125,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             addCall(sendUserInfo()); // Needed to authenticate
             addCall(checkAuthentication());
             addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT)); // Set wear location
+
+            addCall(setHeartRateSleepSupport());
 
             addCall(requestBattery());
             addCall(setHighLatency()); // Set high latency for an stable connection
@@ -291,14 +304,14 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      */
     private void run() {
         handler.removeCallbacks(runnable);
-        int delayMilis = 10000;
+        int delayMilis = DELAY_MAX;
 
         if(actionQueue.isEmpty()){
             return;
         }else if(!working){
             Action action = actionQueue.poll();
             action.run();
-            if(!action.expectsResult()) delayMilis = 500; // TODO - Check (for the moment seems to be working nice)
+            if(!action.expectsResult()) delayMilis = DELAY_MIN; // TODO - Check (for the moment seems to be working nice)
             else working = true;
         }
 
@@ -421,7 +434,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
     /**
      * Get an action to send a command to the MiBand.
-     * @param command - Command to be sended to the MiBand
+     * @param command - Command to be send to the MiBand
      * @return SendCommand Action
      */
     private Action sendCommand(final byte[] command) {
@@ -429,6 +442,20 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             @Override
             public void run() {
                 miliService.sendCommand(command);
+            }
+        };
+    }
+
+    /**
+     * Get an action to send a heart rate command to the MiBand.
+     * @param command - Command to be send to the MiBand
+     * @return SendHRCommand Action
+     */
+    private Action sendHRCommand(final byte[] command) {
+        return new ActionWithResponse() {
+            @Override
+            public void run() {
+                heartRateService.sendCommand(command);
             }
         };
     }
@@ -468,6 +495,34 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             }
         };
     }
+
+    /**
+     * Wait for an especific time before running the next action.
+     * @param delayMilis - Time to be waiting in miliseconds
+     * @return Wait Action
+     */
+    private Action waitFor(final int delayMilis) {
+        return new ActionWithoutResponse() {
+            @Override
+            public void run() {
+                if(delayMilis > 0) actionQueue.addFirst(waitFor(delayMilis - DELAY_MIN));
+            }
+        };
+    }
+
+    /**
+     *
+     * @return
+     */
+    private Action setHeartRateSleepSupport() {
+        return new ActionWithoutResponse() {
+            @Override
+            public void run() {
+                if(deviceInfo.isMili1S()) actionQueue.addFirst(sendHRCommand(COMMAND.START_HEART_RATE_MEASUREMENT_SLEEP));
+            }
+        };
+    }
+
 
     /* With response when needed */
 

@@ -160,15 +160,6 @@ public class MiliService extends MiBandService {
     }
 
     /**
-     * Send a hearth rate command to the Mi Band via HEARTRATE_CONTROL_POINT characteristic.
-     * REQUIREMENT : PAIR
-     * @param data - Byte to be written on Heartrate Control Point
-     */
-    public void sendHRCommand(byte[] data) {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.HEARTRATE_CONTROL_POINT, data);
-    }
-
-    /**
      * Self test - Mi Band will do crazy things.
      * REQUIREMENT : TODO - NOT WORKING.
      * WARNING : Will need to unlink miband from bluetooth.
