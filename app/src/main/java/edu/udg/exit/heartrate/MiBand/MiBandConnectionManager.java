@@ -236,12 +236,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 Log.d("GATTc", "Characteristic -> " + characteristic.getValue());
             }
         }
-
-        if(!UUID_CHAR.NOTIFICATION.equals(characteristic.getUuid())){
-            //working = false;
-        }
-
-        run();
     }
 
     @Override
@@ -297,14 +291,14 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      */
     private void run() {
         handler.removeCallbacks(runnable);
-        int delayMilis = 10000; // TODO - Check if timer is too short or too large
+        int delayMilis = 10000;
 
         if(actionQueue.isEmpty()){
             return;
         }else if(!working){
             Action action = actionQueue.poll();
             action.run();
-            if(!action.expectsResult()) delayMilis = 200; // TODO - Check (for the moment seems to be working nice)
+            if(!action.expectsResult()) delayMilis = 500; // TODO - Check (for the moment seems to be working nice)
             else working = true;
         }
 
@@ -339,26 +333,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             @Override
             public void run() {
                 miliService.setHighLatency();
-            }
-        };
-    }
-
-    /**
-     * Get an action to enable notifications from MiBand.
-     * @return EnableNotifications Action
-     */
-    private Action enableNotifications() {
-        return new Action() {
-            private boolean expectsResult = true;
-
-            @Override
-            public void run() {
-                this.expectsResult = miliService.enableNotifications();
-            }
-
-            @Override
-            public boolean expectsResult() {
-                return expectsResult;
             }
         };
     }
@@ -481,8 +455,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      */
     private Action checkAuthentication() {
         return new ActionWithoutResponse() {
-            // We will try 10 times to check the Authentication
-            private int timesOut = 10;
+            // We will try 50 times to check the Authentication (about 25 seconds)
+            private int timesOut = 20;
 
             @Override
             public void run() {
@@ -491,6 +465,28 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                     if(timesOut == 0) actionQueue.clear();
                     else actionQueue.addFirst(this);
                 }
+            }
+        };
+    }
+
+    /* With response when needed */
+
+    /**
+     * Get an action to enable notifications from MiBand.
+     * @return EnableNotifications Action
+     */
+    private Action enableNotifications() {
+        return new Action() {
+            private boolean expectsResult = true;
+
+            @Override
+            public void run() {
+                this.expectsResult = miliService.enableNotifications();
+            }
+
+            @Override
+            public boolean expectsResult() {
+                return expectsResult;
             }
         };
     }
@@ -549,7 +545,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             case NOTIFICATION.AUTHENTICATION_SUCCESS:
                 Log.d("Notification", "Authentication Success");
                 authenticated = true;
-                //if(userInfoSended) working = false;
                 break;
             case NOTIFICATION.AUTHENTICATION_FAILED:
                 Log.d("Notification", "Authentication Failed");
@@ -560,17 +555,14 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 break;
             case NOTIFICATION.SET_LATENCY_SUCCESS:
                 Log.d("Notification", "Set Latency Success");
-                //working = false;
                 break;
             case NOTIFICATION.RESET_AUTHENTICATION_FAILED:
                 Log.d("Notification", "Reset Authentication Failed");
                 authenticated = false;
-                //working = false;
                 break;
             case NOTIFICATION.RESET_AUTHENTICATION_SUCCESS:
                 Log.d("Notification", "Reset Authentication Success");
                 authenticated = true;
-                //working = false;
                 break;
             case NOTIFICATION.FIRMWARE_CHECK_FAILED:
                 Log.d("Notification", "Firmware Check Failed");
@@ -607,7 +599,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             case NOTIFICATION.STATUS_MOTOR_AUTH_SUCCESS:
                 Log.d("Notification", "Motor AUTH SUCCESS");
                 authenticated = true;
-                //working = false;
                 break;
             case NOTIFICATION.STATUS_MOTOR_TEST:
                 Log.d("Notification", "Motor TEST");

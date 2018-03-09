@@ -15,7 +15,7 @@ public class MiliService extends MiBandService {
 
     /**
      * Constructor.
-     * @param gatt
+     * @param gatt - Connected GATT
      */
     public MiliService(BluetoothGatt gatt) {
         super(gatt);
@@ -93,7 +93,7 @@ public class MiliService extends MiBandService {
 
     /**
      * Pair.
-     * REQUIREMENT : TODO - Read data time???? (for the moment seems to be working).
+     * REQUIREMENT : ANY
      */
     public void pair() {
         writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.PAIR, MiBandConstants.PROTOCOL.PAIR);
@@ -143,7 +143,8 @@ public class MiliService extends MiBandService {
     /**
      * Send User information to the device.
      * REQUIREMENT : Read Device Information
-     * User may need to put his finger on the device to confirm.
+     * REQUIREMENT : Needs notifications to authenticate
+     * User may need to put his finger on the device to confirm (only if not authenticated already).
      */
     public void sendUserInfo(byte[] data) {
         writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.USER_INFO, data);
@@ -160,7 +161,7 @@ public class MiliService extends MiBandService {
 
     /**
      * Send a hearth rate command to the Mi Band via HEARTRATE_CONTROL_POINT characteristic.
-     * REQUIREMENT : TODO (Maybe pair)
+     * REQUIREMENT : PAIR
      * @param data - Byte to be written on Heartrate Control Point
      */
     public void sendHRCommand(byte[] data) {

@@ -16,7 +16,7 @@ public final class MiBandConstants {
     public static final class UUID_SERVICE {
         public static final UUID MILI = UUID.fromString(String.format(BASE_UUID, "FEE0"));
         public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "1802"));
-        public static final UUID HEARTRATE = UUID.fromString("0000180d-0000-1000-8000-00805f9b34fb");
+        public static final UUID HEARTRATE = UUID.fromString(String.format(BASE_UUID, "180D")); // TODO - check
         // Unknown services
         public static final UUID UNKNOWN1 = UUID.fromString("00001800-0000-1000-8000-00805f9b34fb");
         public static final UUID UNKNOWN2 = UUID.fromString("00001801-0000-1000-8000-00805f9b34fb");
@@ -29,23 +29,27 @@ public final class MiBandConstants {
     /////////////////////
 
     public static final class UUID_CHAR {
-        public static final UUID DEVICE_INFO = UUID.fromString(String.format(BASE_UUID, "FF01"));
-        public static final UUID DEVICE_NAME = UUID.fromString(String.format(BASE_UUID, "FF02"));
-        public static final UUID NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "FF03"));
-        public static final UUID USER_INFO = UUID.fromString(String.format(BASE_UUID, "FF04"));
-        public static final UUID CONTROL_POINT = UUID.fromString(String.format(BASE_UUID, "FF05"));
-        public static final UUID REALTIME_STEPS = UUID.fromString(String.format(BASE_UUID, "FF06"));
-        public static final UUID ACTIVITY_DATA = UUID.fromString(String.format(BASE_UUID, "FF07"));
-        public static final UUID FIRMWARE_DATA = UUID.fromString(String.format(BASE_UUID, "FF08"));
-        public static final UUID LE_PARAMS = UUID.fromString(String.format(BASE_UUID, "FF09"));
-        public static final UUID DATE_TIME = UUID.fromString(String.format(BASE_UUID, "FF0A"));
-        public static final UUID STATISTICS = UUID.fromString(String.format(BASE_UUID, "FF0B"));
-        public static final UUID BATTERY = UUID.fromString(String.format(BASE_UUID, "FF0C"));
-        public static final UUID TEST = UUID.fromString(String.format(BASE_UUID, "FF0D"));
-        public static final UUID SENSOR_DATA = UUID.fromString(String.format(BASE_UUID, "FF0E"));
-        public static final UUID PAIR = UUID.fromString(String.format(BASE_UUID, "FF0F"));
+        // MILI SERVICE //
+        public static final UUID DEVICE_INFO = UUID.fromString(String.format(BASE_UUID, "FF01")); // Read
+        public static final UUID DEVICE_NAME = UUID.fromString(String.format(BASE_UUID, "FF02")); // Read & Write
+        public static final UUID NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "FF03")); // Read & Notify
+        public static final UUID USER_INFO = UUID.fromString(String.format(BASE_UUID, "FF04")); // Read & Write
+        public static final UUID CONTROL_POINT = UUID.fromString(String.format(BASE_UUID, "FF05")); // Write
+        public static final UUID REALTIME_STEPS = UUID.fromString(String.format(BASE_UUID, "FF06")); // Read & Notify
+        public static final UUID ACTIVITY_DATA = UUID.fromString(String.format(BASE_UUID, "FF07")); // Read & Indicate
+        public static final UUID FIRMWARE_DATA = UUID.fromString(String.format(BASE_UUID, "FF08")); // Write without response
+        public static final UUID LE_PARAMS = UUID.fromString(String.format(BASE_UUID, "FF09")); // Read & Write
+        public static final UUID DATE_TIME = UUID.fromString(String.format(BASE_UUID, "FF0A")); // Read & Write
+        public static final UUID STATISTICS = UUID.fromString(String.format(BASE_UUID, "FF0B")); // Read & Write
+        public static final UUID BATTERY = UUID.fromString(String.format(BASE_UUID, "FF0C")); // Read & Notify
+        public static final UUID TEST = UUID.fromString(String.format(BASE_UUID, "FF0D")); // Read & Write
+        public static final UUID SENSOR_DATA = UUID.fromString(String.format(BASE_UUID, "FF0E")); // Read & Notify
+        public static final UUID PAIR = UUID.fromString(String.format(BASE_UUID, "FF0F")); // Read & Write
 
+        // VIBRATION SERVICE //
         public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "2A06"));
+
+        // OTHER //
         public static final UUID HEARTRATE_NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "2a37"));
         public static final UUID HEARTRATE_CONTROL_POINT = UUID.fromString(String.format(BASE_UUID, "2a39"));
     }
@@ -65,7 +69,7 @@ public final class MiBandConstants {
     public static final class PROTOCOL {
         public static final byte[] PAIR = {2};
         public static final byte[] VIBRATION_WITH_LED = {1}; // Works
-        public static final byte[] VIBRATION_10_TIMES_WITH_LED = {2}; // Doesn't works (unpaired)
+        public static final byte[] VIBRATION_10_TIMES_WITH_LED = {2}; // Works
         public static final byte[] VIBRATION_WITHOUT_LED = {4}; // Works
         public static final byte[] STOP_VIBRATION = {0};
         public static final byte[] ENABLE_REALTIME_STEPS_NOTIFY = {3, 1};
