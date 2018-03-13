@@ -4,6 +4,74 @@ import java.util.UUID;
 
 public final class MiBandConstants {
 
+    /*
+    UUID
+    Permissions
+    Properties
+        0x01 (1)   - Broadcast
+        0x02 (2)   - Read
+        0x04 (4)   - Write Without Response
+        0x08 (8)   - Write
+        0x10 (16)  - Notify
+        0x20 (32)  - Indicate
+        0x40 (64)  - Authenticated Signed Writes
+        0x80 (128) - Extended Properties
+
+    SERVICE: 00001800-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	00002a00-0000-1000-8000-00805f9b34fb - 0 - 2
+        CHARACTERISTIC: 	00002a01-0000-1000-8000-00805f9b34fb - 0 - 2
+        CHARACTERISTIC: 	00002a02-0000-1000-8000-00805f9b34fb - 0 - 10
+        CHARACTERISTIC: 	00002a04-0000-1000-8000-00805f9b34fb - 0 - 2
+
+    SERVICE: 00001801-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	00002a05-0000-1000-8000-00805f9b34fb - 0 - 34
+            DESCRIPTOR: 		00002902-0000-1000-8000-00805f9b34fb
+
+    MILI: 0000fee0-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	0000ff01-0000-1000-8000-00805f9b34fb - 0 - 2
+        CHARACTERISTIC: 	0000ff02-0000-1000-8000-00805f9b34fb - 0 - 10
+        CHARACTERISTIC: 	0000ff03-0000-1000-8000-00805f9b34fb - 0 - 18
+            DESCRIPTOR: 		00002902-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	0000ff04-0000-1000-8000-00805f9b34fb - 0 - 10
+        CHARACTERISTIC: 	0000ff05-0000-1000-8000-00805f9b34fb - 0 - 8
+        CHARACTERISTIC: 	0000ff06-0000-1000-8000-00805f9b34fb - 0 - 18
+            DESCRIPTOR: 		00002902-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	0000ff07-0000-1000-8000-00805f9b34fb - 0 - 18
+            DESCRIPTOR: 		00002902-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	0000ff08-0000-1000-8000-00805f9b34fb - 0 - 4
+        CHARACTERISTIC: 	0000ff09-0000-1000-8000-00805f9b34fb - 0 - 26
+            DESCRIPTOR: 		00002902-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	0000ff0a-0000-1000-8000-00805f9b34fb - 0 - 10
+        CHARACTERISTIC: 	0000ff0b-0000-1000-8000-00805f9b34fb - 0 - 10
+        CHARACTERISTIC: 	0000ff0c-0000-1000-8000-00805f9b34fb - 0 - 18
+            DESCRIPTOR: 		00002902-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	0000ff0d-0000-1000-8000-00805f9b34fb - 0 - 10
+        CHARACTERISTIC: 	0000ff0e-0000-1000-8000-00805f9b34fb - 0 - 26
+            DESCRIPTOR: 		00002902-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	0000ff0f-0000-1000-8000-00805f9b34fb - 0 - 10
+        CHARACTERISTIC: 	0000ff10-0000-1000-8000-00805f9b34fb - 0 - 16
+            DESCRIPTOR: 		00002902-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	0000fec9-0000-1000-8000-00805f9b34fb - 0 - 2
+
+    SERVICE: 0000fee1-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	0000fedd-0000-1000-8000-00805f9b34fb - 0 - 8
+        CHARACTERISTIC: 	0000fede-0000-1000-8000-00805f9b34fb - 0 - 2
+        CHARACTERISTIC: 	0000fedf-0000-1000-8000-00805f9b34fb - 0 - 2
+        CHARACTERISTIC: 	0000fed0-0000-1000-8000-00805f9b34fb - 0 - 8
+        CHARACTERISTIC: 	0000fed1-0000-1000-8000-00805f9b34fb - 0 - 8
+        CHARACTERISTIC: 	0000fed2-0000-1000-8000-00805f9b34fb - 0 - 2
+        CHARACTERISTIC: 	0000fed3-0000-1000-8000-00805f9b34fb - 0 - 8
+
+    HEARTRATE: 0000180d-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	00002a37-0000-1000-8000-00805f9b34fb - 0 - 16
+            DESCRIPTOR: 		00002902-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	00002a39-0000-1000-8000-00805f9b34fb - 0 - 10
+
+    VIBRATION: 00001802-0000-1000-8000-00805f9b34fb
+        CHARACTERISTIC: 	00002a06-0000-1000-8000-00805f9b34fb - 0 - 4
+     */
+
+
     /**
      * Common on BLE devices.
      */
@@ -16,12 +84,12 @@ public final class MiBandConstants {
     public static final class UUID_SERVICE {
         public static final UUID MILI = UUID.fromString(String.format(BASE_UUID, "FEE0"));
         public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "1802"));
-        public static final UUID HEARTRATE = UUID.fromString(String.format(BASE_UUID, "180D")); // TODO - check
+        public static final UUID HEARTRATE = UUID.fromString(String.format(BASE_UUID, "180D"));
+
         // Unknown services
         public static final UUID UNKNOWN1 = UUID.fromString(String.format(BASE_UUID, "1800"));
         public static final UUID UNKNOWN2 = UUID.fromString(String.format(BASE_UUID, "1801"));
-        public static final UUID UNKNOWN4 = UUID.fromString(String.format(BASE_UUID, "FEE1"));
-        public static final UUID UNKNOWN5 = UUID.fromString(String.format(BASE_UUID, "FEE7"));
+        public static final UUID UNKNOWN3 = UUID.fromString(String.format(BASE_UUID, "FEE1"));
     }
 
     /////////////////////
@@ -32,26 +100,47 @@ public final class MiBandConstants {
         // MILI SERVICE //
         public static final UUID DEVICE_INFO = UUID.fromString(String.format(BASE_UUID, "FF01")); // Read
         public static final UUID DEVICE_NAME = UUID.fromString(String.format(BASE_UUID, "FF02")); // Read & Write
-        public static final UUID NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "FF03")); // Read & Notify
+        public static final UUID NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "FF03")); // Read & Notify (DESC)
         public static final UUID USER_INFO = UUID.fromString(String.format(BASE_UUID, "FF04")); // Read & Write
         public static final UUID CONTROL_POINT = UUID.fromString(String.format(BASE_UUID, "FF05")); // Write
-        public static final UUID REALTIME_STEPS = UUID.fromString(String.format(BASE_UUID, "FF06")); // Read & Notify
-        public static final UUID ACTIVITY_DATA = UUID.fromString(String.format(BASE_UUID, "FF07")); // Read & Indicate
+        public static final UUID REALTIME_STEPS = UUID.fromString(String.format(BASE_UUID, "FF06")); // Read & Notify (DESC)
+        public static final UUID ACTIVITY_DATA = UUID.fromString(String.format(BASE_UUID, "FF07")); // Read & Notify (DESC)
         public static final UUID FIRMWARE_DATA = UUID.fromString(String.format(BASE_UUID, "FF08")); // Write without response
-        public static final UUID LE_PARAMS = UUID.fromString(String.format(BASE_UUID, "FF09")); // Read & Write
+        public static final UUID LE_PARAMS = UUID.fromString(String.format(BASE_UUID, "FF09")); // Read, Write & Notify (DESC)
         public static final UUID DATE_TIME = UUID.fromString(String.format(BASE_UUID, "FF0A")); // Read & Write
         public static final UUID STATISTICS = UUID.fromString(String.format(BASE_UUID, "FF0B")); // Read & Write
-        public static final UUID BATTERY = UUID.fromString(String.format(BASE_UUID, "FF0C")); // Read & Notify
+        public static final UUID BATTERY = UUID.fromString(String.format(BASE_UUID, "FF0C")); // Read & Notify (DESC)
         public static final UUID TEST = UUID.fromString(String.format(BASE_UUID, "FF0D")); // Read & Write
-        public static final UUID SENSOR_DATA = UUID.fromString(String.format(BASE_UUID, "FF0E")); // Read & Notify
+        public static final UUID SENSOR_DATA = UUID.fromString(String.format(BASE_UUID, "FF0E")); // Read, Write & Notify (DESC)
         public static final UUID PAIR = UUID.fromString(String.format(BASE_UUID, "FF0F")); // Read & Write
 
+        public static final UUID UNKNOWN_CHAR1 = UUID.fromString(String.format(BASE_UUID, "FF10")); // Notify (DESC)
+        public static final UUID UNKNOWN_CHAR2 = UUID.fromString(String.format(BASE_UUID, "FFc9")); // Read
+
         // VIBRATION SERVICE //
-        public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "2A06"));
+        public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "2A06")); // Write without response
 
         // HEART RATE SERVICE //
-        public static final UUID HEARTRATE_NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "2A37")); // Read & Notify
-        public static final UUID HEARTRATE_CONTROL_POINT = UUID.fromString(String.format(BASE_UUID, "2A39")); // Write
+        public static final UUID HEARTRATE_NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "2A37")); // Notify (DESC)
+        public static final UUID HEARTRATE_CONTROL_POINT = UUID.fromString(String.format(BASE_UUID, "2A39")); // Read & Write
+
+        // UNKNOWN1 SERVICE //
+        public static final UUID UNKNOWN1_CHAR1 = UUID.fromString(String.format(BASE_UUID, "2A00")); // Read
+        public static final UUID UNKNOWN1_CHAR2 = UUID.fromString(String.format(BASE_UUID, "2A01")); // Read
+        public static final UUID UNKNOWN1_CHAR3 = UUID.fromString(String.format(BASE_UUID, "2A02")); // Read & Write
+        public static final UUID UNKNOWN1_CHAR4 = UUID.fromString(String.format(BASE_UUID, "2A04")); // Read
+
+        // UNKNOWN2 SERVICE //
+        public static final UUID UNKNOWN2_CHAR1 = UUID.fromString(String.format(BASE_UUID, "2A05")); // Read & Indicate (DESC)
+
+        // UNKNOWN3 SERVICE //
+        public static final UUID UNKNOWN3_CHAR1 = UUID.fromString(String.format(BASE_UUID, "FEDD")); // Write
+        public static final UUID UNKNOWN3_CHAR2 = UUID.fromString(String.format(BASE_UUID, "FEDE")); // Read
+        public static final UUID UNKNOWN3_CHAR3 = UUID.fromString(String.format(BASE_UUID, "FEDF")); // Read
+        public static final UUID UNKNOWN3_CHAR4 = UUID.fromString(String.format(BASE_UUID, "FED0")); // Write
+        public static final UUID UNKNOWN3_CHAR5 = UUID.fromString(String.format(BASE_UUID, "FED1")); // Write
+        public static final UUID UNKNOWN3_CHAR6 = UUID.fromString(String.format(BASE_UUID, "FED2")); // Read
+        public static final UUID UNKNOWN3_CHAR7 = UUID.fromString(String.format(BASE_UUID, "FED3")); // Write
     }
 
     /////////////////
@@ -59,7 +148,10 @@ public final class MiBandConstants {
     /////////////////
 
     public static final class UUID_DESC {
-        public static final UUID UPDATE_NOTIFICATION = UUID.fromString(String.format(BASE_UUID, "2902"));
+        public static final UUID UPDATE_NOTIFICATION = UUID_DESC.GATT_CLIENT_CHARACTERISTIC_CONFIGURATION; // Used to enable or disable different notifications.
+
+        // GATT descriptors
+        public static final UUID GATT_CLIENT_CHARACTERISTIC_CONFIGURATION = UUID.fromString(String.format(BASE_UUID, "2902"));
     }
 
     //////////////
@@ -98,20 +190,24 @@ public final class MiBandConstants {
      */
     public static  final class COMMAND {
         // WEAR LOCATION //
-        public static final byte[] SET_WEAR_LOCATION_LEFT = {0xf, 0x0};
-        public static final byte[] SET_WEAR_LOCATION_RIGHT = {0xf, 0x1};
-        public static final byte[] SET_WEAR_LOCATION_NECK = {0xf, 0x2};
+        public static final byte[] SET_WEAR_LOCATION_LEFT = {0xf, 0};
+        public static final byte[] SET_WEAR_LOCATION_RIGHT = {0xf, 1};
+        public static final byte[] SET_WEAR_LOCATION_NECK = {0xf, 2};
+
+        // FITNESS GOAL //
+        public static final byte[] SET_FITNESS_GOAL = {0x5, 0x0, 0x0, 0x0}; // {0x5, 0x0, (GOAL & 0xff), ((GOAL >>> 8) & 0xff)}
 
         // HEART RATE COMMANDS //
-        public static final byte[] START_HEART_RATE_MEASUREMENT_SLEEP = {0xf, 0x0, 0x1};
-        public static final byte[] STOP_HEART_RATE_MEASUREMENT_SLEEP = {0xf, 0x0, 0x0};
-        public static final byte[] START_HEART_RATE_MEASUREMENT_CONTINUOUS = {0xf, 0x1, 0x1};
-        public static final byte[] STOP_HEART_RATE_MEASUREMENT_CONTINUOUS = {0xf, 0x1, 0x0};
-        public static final byte[] START_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 0x1};
-        public static final byte[] STOP_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 0x0};
+        public static final byte[] START_HEART_RATE_MEASUREMENT_SLEEP = {0xf, 0x0, 1};
+        public static final byte[] STOP_HEART_RATE_MEASUREMENT_SLEEP = {0xf, 0x0, 0};
+        public static final byte[] START_HEART_RATE_MEASUREMENT_CONTINUOUS = {0xf, 0x1, 1};
+        public static final byte[] STOP_HEART_RATE_MEASUREMENT_CONTINUOUS = {0xf, 0x1, 0};
+        public static final byte[] START_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 1};
+        public static final byte[] STOP_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 0};
 
         // VIBRATION COMMANDS //
-        public static final byte[] START_VIBRATION = {0x8, 0x2};
+        public static final byte[] START_VIBRATION = {0x8, 2};
+        public static final byte[] STOP_VIBRATION = {0x8, 2};
     }
 
     /*

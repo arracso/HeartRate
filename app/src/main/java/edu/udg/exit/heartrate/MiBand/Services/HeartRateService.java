@@ -24,9 +24,17 @@ public class HeartRateService extends MiBandService {
     /**
      * Send a hearth rate command to the Mi Band via HEARTRATE_CONTROL_POINT characteristic.
      * REQUIREMENT : PAIR
-     * @param data - Byte to be written on Heartrate Control Point
+     * @param command - Bytes to be written on Heartrate Control Point
      */
-    public void sendCommand(byte[] data) {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.HEARTRATE, MiBandConstants.UUID_CHAR.HEARTRATE_CONTROL_POINT, data);
+    public void sendCommand(byte[] command) {
+        writeCharacteristic(MiBandConstants.UUID_SERVICE.HEARTRATE, MiBandConstants.UUID_CHAR.HEARTRATE_CONTROL_POINT, command);
+    }
+
+    /**
+     * Enables notifications.
+     * REQUIREMENT : Heart Rate Support
+     */
+    public boolean enableNotifications() {
+        return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.HEARTRATE, MiBandConstants.UUID_CHAR.HEARTRATE_NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,true);
     }
 }

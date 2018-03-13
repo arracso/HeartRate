@@ -8,6 +8,7 @@ import java.util.*;
 import android.os.Handler;
 
 import edu.udg.exit.heartrate.MiBand.Actions.Action;
+import edu.udg.exit.heartrate.MiBand.Actions.ActionWithConditionalResponse;
 import edu.udg.exit.heartrate.MiBand.Actions.ActionWithResponse;
 import edu.udg.exit.heartrate.MiBand.Actions.ActionWithoutResponse;
 import edu.udg.exit.heartrate.MiBand.Services.HeartRateService;
@@ -114,8 +115,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             vibrationService = new VibrationService(gatt);
             heartRateService = new HeartRateService(gatt);
 
-            // Initialize - TODO
+            showServices(gatt);
 
+            // Initialize
+            /*
             addCall(enableNotifications());
             addCall(setLowLatency()); // Set low latency to do a faster initialization
             //addCall(requestDate()); // Reading date for stability - TODO - Check this
@@ -124,16 +127,31 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             addCall(requestDeviceName());
             addCall(sendUserInfo()); // Needed to authenticate
             addCall(checkAuthentication());
-            addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT)); // Set wear location
+            addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT)); // Set wear location // TODO - Check
 
-            addCall(setHeartRateSleepSupport());
+            addCall(setHeartRateSleepSupport()); // TODO - Check
+            addCall(setFitnessGoal(1000)); // TODO - Check and set fitnes
+
+            // Enable other notifications
+            addCall(enableNotificationsFrom(UUID_CHAR.REALTIME_STEPS));
+            addCall(enableNotificationsFrom(UUID_CHAR.ACTIVITY_DATA));
+            addCall(enableNotificationsFrom(UUID_CHAR.BATTERY));
+            addCall(enableNotificationsFrom(UUID_CHAR.SENSOR_DATA));
+
+            // Enable Heart Rate notifications
+            addCall(enableHeartRateNotifications());
 
             addCall(requestBattery());
             addCall(setHighLatency()); // Set high latency for an stable connection
-            //addCall(setInitialized()); // Device is ready to make other calls
+            //addCall(setInitialized()); // Device is ready to make other calls // TODO
+
+            // Test
+            addCall(sendVibrationCommand(COMMAND.START_VIBRATION));
+            addCall(waitFor(10000));
+            addCall(sendVibrationCommand(COMMAND.STOP_VIBRATION));
 
             // Start
-            run();
+            run();*/
         }
     }
 
@@ -187,7 +205,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 UserInfo userInfo = new UserInfo(characteristic.getValue());
                 Log.d("GATTw","" + userInfo);
             }else if(UUID_CHAR.CONTROL_POINT.equals(characteristic.getUuid())){
-                Log.d("GATTw", "Control point -> " + characteristic.getValue()[0]);
+                Log.d("GATTw", "Control point -> " + convertBytesToString(characteristic.getValue()));
             }else if(UUID_CHAR.REALTIME_STEPS.equals(characteristic.getUuid())){
                 Log.d("GATTw", "Realtime steps -> " + characteristic.getValue().length);
             }else if(UUID_CHAR.LE_PARAMS.equals(characteristic.getUuid())){
@@ -202,11 +220,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
                 Log.d("GATTw", "Battery -> " + batteryInfo);
             }else{
-                if(characteristic.getValue().length>0){
-                    Log.d("GATTw", "Characteristic -> " + characteristic.getValue()[0]);
-                }else{
-                    Log.d("GATTw", "Characteristic -> " + characteristic.getValue());
-                }
+                Log.d("GATTw", "Characteristic -> " + convertBytesToString(characteristic.getValue()));
             }
 
             working = false;
@@ -441,6 +455,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         return new ActionWithResponse() {
             @Override
             public void run() {
+                Log.d("COMMAND", convertBytesToString(command));
                 miliService.sendCommand(command);
             }
         };
@@ -455,7 +470,23 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         return new ActionWithResponse() {
             @Override
             public void run() {
+                Log.d("COMMAND_HR", convertBytesToString(command));
                 heartRateService.sendCommand(command);
+            }
+        };
+    }
+
+    /**
+     * Get an action to send a heart rate command to the MiBand.
+     * @param command - Command to be send to the MiBand
+     * @return SendHRCommand Action
+     */
+    private Action sendVibrationCommand(final byte[] command) {
+        return new ActionWithResponse() {
+            @Override
+            public void run() {
+                Log.d("COMMAND_VB", convertBytesToString(command));
+                vibrationService.sendCommand(command);
             }
         };
     }
@@ -511,8 +542,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     }
 
     /**
-     *
-     * @return
+     * Starts hearth rate measurement while sleep.
+     * @return Action to support hearth rate mesurement on sleep
      */
     private Action setHeartRateSleepSupport() {
         return new ActionWithoutResponse() {
@@ -523,6 +554,24 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    /**
+     * Sets the number of steps that the user have as a Goal.
+     * @return Action to set fitness goal
+     */
+    private Action setFitnessGoal(final int fitnessGoal) {
+        return new ActionWithoutResponse() {
+            @Override
+            public void run() {
+                byte [] command = {
+                    COMMAND.SET_FITNESS_GOAL[0],
+                    0x0,
+                    (byte) (fitnessGoal & 0xff),
+                    (byte) ((fitnessGoal >>> 8) & 0xff)
+                };
+                actionQueue.addFirst(sendCommand(command));
+            }
+        };
+    }
 
     /* With response when needed */
 
@@ -531,17 +580,28 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      * @return EnableNotifications Action
      */
     private Action enableNotifications() {
-        return new Action() {
-            private boolean expectsResult = true;
-
+        return new ActionWithConditionalResponse() {
             @Override
             public void run() {
                 this.expectsResult = miliService.enableNotifications();
             }
+        };
+    }
 
+    private Action enableNotificationsFrom(final UUID characteristic) {
+        return new ActionWithConditionalResponse() {
             @Override
-            public boolean expectsResult() {
-                return expectsResult;
+            public void run() {
+                this.expectsResult = miliService.enableNotificationsFrom(characteristic);
+            }
+        };
+    }
+
+    private Action enableHeartRateNotifications() {
+        return new ActionWithConditionalResponse() {
+            @Override
+            public void run() {
+                if(deviceInfo.isMili1S()) this.expectsResult = heartRateService.enableNotifications();
             }
         };
     }
@@ -663,4 +723,27 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         }
     }
 
+
+    // DEBUG
+    private String convertBytesToString(byte[] data) {
+        String str = "[";
+        for(int i = 0; i < data.length; i++){
+            if(i != 0) str = str + ", ";
+            str = str + (data[i] & 0x0ff);
+        }
+        str = str + "]";
+        return str;
+    }
+
+    private void showServices(BluetoothGatt gatt) {
+        for(BluetoothGattService service : gatt.getServices()) {
+            Log.d("SERVICE", "" + service.getUuid());
+            for(BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
+                Log.d("CHARACTERISTIC", "\t" + characteristic.getUuid() + " - " + characteristic.getPermissions() + " - " +  characteristic.getProperties());
+                for(BluetoothGattDescriptor descriptor : characteristic.getDescriptors()) {
+                    Log.d("DESCRIPTOR", "\t\t" + descriptor.getUuid());
+                }
+            }
+        }
+    }
 }

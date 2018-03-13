@@ -160,4 +160,5 @@ public abstract class MiBandService {
         // Write the characteristic to the device
         connectGATT.writeCharacteristic(characteristic);
     }
+
 }

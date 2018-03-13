@@ -44,4 +44,9 @@ public class VibrationService extends MiBandService {
     public void vibration10TimesWithLed() {
         writeCharacteristic(MiBandConstants.UUID_SERVICE.VIBRATION, MiBandConstants.UUID_CHAR.VIBRATION, MiBandConstants.PROTOCOL.VIBRATION_10_TIMES_WITH_LED);
     }
+
+
+    public void sendCommand(byte[] command) {
+        writeCharacteristic(MiBandConstants.UUID_SERVICE.VIBRATION, MiBandConstants.UUID_CHAR.CONTROL_POINT, command);
+    }
 }

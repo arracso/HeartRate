@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothGatt;
 import edu.udg.exit.heartrate.MiBand.MiBandConstants;
 import edu.udg.exit.heartrate.MiBand.Utils.Latency;
 
+import java.util.UUID;
+
 /**
  * Mi Band Mili Service.
  */
@@ -28,10 +30,9 @@ public class MiliService extends MiBandService {
     /**
      * Enables notifications.
      * REQUIREMENT : ANY
-     * WARNING : It doesn't reply
      */
     public boolean enableNotifications() {
-        return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,true);
+        return enableNotificationsFrom(MiBandConstants.UUID_CHAR.NOTIFICATION);
     }
 
     /**
@@ -40,7 +41,24 @@ public class MiliService extends MiBandService {
      * WARNING :  It doesn't reply
      */
     public boolean disableNotifications() {
-        return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,false);
+        return disableNotificationsFrom(MiBandConstants.UUID_CHAR.NOTIFICATION);
+    }
+
+    /**
+     * Enables notifications from a characteristic.
+     * REQUIREMENT : ANY
+     */
+    public boolean enableNotificationsFrom(UUID characteristic) {
+        return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.MILI, characteristic, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,true);
+    }
+
+    /**
+     * Disables notifications from a characteristic.
+     * REQUIREMENT : ANY
+     * WARNING :  It doesn't reply
+     */
+    public boolean disableNotificationsFrom(UUID characteristic) {
+        return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.MILI, characteristic, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,false);
     }
 
     /**
@@ -153,10 +171,10 @@ public class MiliService extends MiBandService {
     /**
      * Send a command to the Mi Band via CONTROL_POINT characteristic.
      * REQUIREMENT : PAIR
-     * @param data - Bytes to be written on Control Point
+     * @param command - Bytes to be written on Control Point
      */
-    public void sendCommand(byte[] data) {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.CONTROL_POINT, data);
+    public void sendCommand(byte[] command) {
+        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.CONTROL_POINT, command);
     }
 
     /**
