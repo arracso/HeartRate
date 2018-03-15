@@ -1,8 +1,10 @@
 package edu.udg.exit.heartrate.MiBand.Services;
 
 import android.bluetooth.BluetoothGatt;
-import edu.udg.exit.heartrate.MiBand.MiBandConstants;
+
+import edu.udg.exit.heartrate.MiBand.MiBandConstants.*;
 import edu.udg.exit.heartrate.MiBand.Utils.Latency;
+import edu.udg.exit.heartrate.MiBand.Utils.MiDate;
 
 import java.util.UUID;
 
@@ -32,7 +34,7 @@ public class MiliService extends MiBandService {
      * REQUIREMENT : ANY
      */
     public boolean enableNotifications() {
-        return enableNotificationsFrom(MiBandConstants.UUID_CHAR.NOTIFICATION);
+        return enableNotificationsFrom(UUID_CHAR.NOTIFICATION);
     }
 
     /**
@@ -41,7 +43,7 @@ public class MiliService extends MiBandService {
      * WARNING :  It doesn't reply
      */
     public boolean disableNotifications() {
-        return disableNotificationsFrom(MiBandConstants.UUID_CHAR.NOTIFICATION);
+        return disableNotificationsFrom(UUID_CHAR.NOTIFICATION);
     }
 
     /**
@@ -49,7 +51,7 @@ public class MiliService extends MiBandService {
      * REQUIREMENT : ANY
      */
     public boolean enableNotificationsFrom(UUID characteristic) {
-        return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.MILI, characteristic, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,true);
+        return setCharacteristicNotification(UUID_SERVICE.MILI, characteristic, UUID_DESC.UPDATE_NOTIFICATION,true);
     }
 
     /**
@@ -58,7 +60,7 @@ public class MiliService extends MiBandService {
      * WARNING :  It doesn't reply
      */
     public boolean disableNotificationsFrom(UUID characteristic) {
-        return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.MILI, characteristic, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,false);
+        return setCharacteristicNotification(UUID_SERVICE.MILI, characteristic, UUID_DESC.UPDATE_NOTIFICATION,false);
     }
 
     /**
@@ -78,7 +80,7 @@ public class MiliService extends MiBandService {
         byte[] latencyBytes = new Latency(minConnectionInterval, maxConnectionInterval, latency, timeout, connectionInterval, advertisementInterval).getLatencyBytes();
 
         // Write latency bytes to miBand
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.LE_PARAMS,latencyBytes);
+        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.LE_PARAMS,latencyBytes);
     }
 
     /**
@@ -98,15 +100,25 @@ public class MiliService extends MiBandService {
         byte[] latencyBytes = new Latency(minConnectionInterval, maxConnectionInterval, latency, timeout, connectionInterval, advertisementInterval).getLatencyBytes();
 
         // Write latency bytes to miBand
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.LE_PARAMS,latencyBytes);
+        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.LE_PARAMS,latencyBytes);
     }
 
     /**
      * Read date time.
-     * REQUIREMENT : TODO - NOT READING ANYTHING
+     * REQUIREMENT : Write date.
+     * WARNING : If date isn't set this will return empty byte array.
      */
-    public void requestDate() {
-        readCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.DATE_TIME);
+    public void readDate() {
+        readCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.DATE_TIME);
+    }
+
+    /**
+     * Write date time.
+     * REQUIREMENT : ANY
+     * @param data - Data to be written
+     */
+    public void writeDate(byte[] data) {
+        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.DATE_TIME, data);
     }
 
     /**
@@ -114,7 +126,7 @@ public class MiliService extends MiBandService {
      * REQUIREMENT : ANY
      */
     public void pair() {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.PAIR, MiBandConstants.PROTOCOL.PAIR);
+        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.PAIR, PROTOCOL.PAIR);
     }
 
     /**
@@ -123,7 +135,7 @@ public class MiliService extends MiBandService {
      * TODO - Not working
      */
     public void unpair() {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.PAIR, MiBandConstants.PROTOCOL.REMOTE_DISCONNECT);
+        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.PAIR, PROTOCOL.REMOTE_DISCONNECT);
     }
 
     /**
@@ -131,7 +143,7 @@ public class MiliService extends MiBandService {
      * REQUIREMENT : ANY
      */
     public void readPair() {
-        readCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.PAIR);
+        readCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.PAIR);
     }
 
     /**
@@ -139,7 +151,7 @@ public class MiliService extends MiBandService {
      * REQUIREMENT : ANY
      */
     public void requestBattery() {
-        readCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.BATTERY);
+        readCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.BATTERY);
     }
 
     /**
@@ -147,7 +159,7 @@ public class MiliService extends MiBandService {
      * REQUIREMENT : ANY
      */
     public void requestDeviceInformation() {
-        readCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.DEVICE_INFO);
+        readCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.DEVICE_INFO);
     }
 
     /**
@@ -155,7 +167,7 @@ public class MiliService extends MiBandService {
      * REQUIREMENT : ANY
      */
     public void requestDeviceName() {
-        readCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.DEVICE_NAME);
+        readCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.DEVICE_NAME);
     }
 
     /**
@@ -165,7 +177,7 @@ public class MiliService extends MiBandService {
      * User may need to put his finger on the device to confirm (only if not authenticated already).
      */
     public void sendUserInfo(byte[] data) {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.USER_INFO, data);
+        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.USER_INFO, data);
     }
 
     /**
@@ -174,17 +186,25 @@ public class MiliService extends MiBandService {
      * @param command - Bytes to be written on Control Point
      */
     public void sendCommand(byte[] command) {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.CONTROL_POINT, command);
+        writeCharacteristic(UUID_SERVICE.MILI,UUID_CHAR.CONTROL_POINT, command);
     }
 
     /**
      * Self test - Mi Band will do crazy things.
      * REQUIREMENT : TODO - NOT WORKING.
-     * WARNING : Will need to unlink miband from bluetooth.
+     * WARNING : Will need to unlink Mi Band from bluetooth.
      */
     public void selfTest() {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.MILI, MiBandConstants.UUID_CHAR.TEST, MiBandConstants.PROTOCOL.SELF_TEST);
+        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.TEST, PROTOCOL.SELF_TEST);
     }
 
+    /**
+     * Remote disconnect from the Mi Band.
+     * REQUIREMENT :  TODO - NOT WORKING
+     * WARNING : Will need to unlink Mi Band from bluetooth.
+     */
+    public void remoteDisconnect() {
+        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.TEST, PROTOCOL.REMOTE_DISCONNECT);
+    }
 
 }

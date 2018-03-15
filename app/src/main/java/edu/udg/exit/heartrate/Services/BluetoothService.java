@@ -61,7 +61,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         scanView = null;
         scanCallback = initScanCallback();
 
-        // Caller manager
+        // Connection
         miBandConnectionManager = new MiBandConnectionManager();
     }
 
@@ -82,6 +82,9 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         scanning = null;
         scanView = null;
         scanCallback = null;
+
+        // Connection
+        miBandConnectionManager = null;
 
         super.onDestroy();
     }

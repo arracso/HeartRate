@@ -83,12 +83,12 @@ public final class MiBandConstants {
 
     public static final class UUID_SERVICE {
         public static final UUID MILI = UUID.fromString(String.format(BASE_UUID, "FEE0"));
-        public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "1802"));
-        public static final UUID HEARTRATE = UUID.fromString(String.format(BASE_UUID, "180D"));
+        public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "1802")); // Inmediate Alert
+        public static final UUID HEARTRATE = UUID.fromString(String.format(BASE_UUID, "180D")); // Heart Rate
 
         // Unknown services
-        public static final UUID UNKNOWN1 = UUID.fromString(String.format(BASE_UUID, "1800"));
-        public static final UUID UNKNOWN2 = UUID.fromString(String.format(BASE_UUID, "1801"));
+        public static final UUID UNKNOWN1 = UUID.fromString(String.format(BASE_UUID, "1800")); // Generic Access
+        public static final UUID UNKNOWN2 = UUID.fromString(String.format(BASE_UUID, "1801")); // Generic Attribute
         public static final UUID UNKNOWN3 = UUID.fromString(String.format(BASE_UUID, "FEE1"));
     }
 
@@ -148,10 +148,11 @@ public final class MiBandConstants {
     /////////////////
 
     public static final class UUID_DESC {
-        public static final UUID UPDATE_NOTIFICATION = UUID_DESC.GATT_CLIENT_CHARACTERISTIC_CONFIGURATION; // Used to enable or disable different notifications.
-
         // GATT descriptors
         public static final UUID GATT_CLIENT_CHARACTERISTIC_CONFIGURATION = UUID.fromString(String.format(BASE_UUID, "2902"));
+
+        // Mi Band
+        public static final UUID UPDATE_NOTIFICATION = UUID_DESC.GATT_CLIENT_CHARACTERISTIC_CONFIGURATION; // Used to enable or disable different notifications.
     }
 
     //////////////
@@ -159,10 +160,8 @@ public final class MiBandConstants {
     //////////////
 
     public static final class PROTOCOL {
-        public static final byte[] PAIR = {2};
-        public static final byte[] VIBRATION_WITH_LED = {1}; // Works
-        public static final byte[] VIBRATION_10_TIMES_WITH_LED = {2}; // Works
-        public static final byte[] VIBRATION_WITHOUT_LED = {4}; // Works
+        public static final byte[] PAIR = {2}; // Works
+
         public static final byte[] STOP_VIBRATION = {0};
         public static final byte[] ENABLE_REALTIME_STEPS_NOTIFY = {3, 1};
         public static final byte[] DISABLE_REALTIME_STEPS_NOTIFY = {3, 0};
@@ -174,10 +173,16 @@ public final class MiBandConstants {
         public static final byte[] SET_COLOR_GREEN = {14, 4, 5, 0, 1}; // 1s has no colors
         public static final byte[] START_HEART_RATE_SCAN = {21, 2, 1};
 
+
         public static final byte[] REBOOT = {12};
         public static final byte[] REMOTE_DISCONNECT = {1};
         public static final byte[] FACTORY_RESET = {9};
         public static final byte[] SELF_TEST = {2}; // TODO - Doesn't works
+
+        // VIBRATION //
+        public static final byte[] VIBRATION_WITH_LED = {1}; // Works
+        public static final byte[] VIBRATION_10_TIMES_WITH_LED = {2}; // Works
+        public static final byte[] VIBRATION_WITHOUT_LED = {4}; // Works
     }
 
     //////////////
@@ -197,6 +202,10 @@ public final class MiBandConstants {
         // FITNESS GOAL //
         public static final byte[] SET_FITNESS_GOAL = {0x5, 0x0, 0x0, 0x0}; // {0x5, 0x0, (GOAL & 0xff), ((GOAL >>> 8) & 0xff)}
 
+        // VIBRATION //
+        public static final byte[] START_VIBRATION = {0x8, 2};
+        public static final byte[] STOP_VIBRATION = {0x8, 1};  // Don't know if this is correct.
+
         // HEART RATE COMMANDS //
         public static final byte[] START_HEART_RATE_MEASUREMENT_SLEEP = {0xf, 0x0, 1};
         public static final byte[] STOP_HEART_RATE_MEASUREMENT_SLEEP = {0xf, 0x0, 0};
@@ -204,10 +213,6 @@ public final class MiBandConstants {
         public static final byte[] STOP_HEART_RATE_MEASUREMENT_CONTINUOUS = {0xf, 0x1, 0};
         public static final byte[] START_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 1};
         public static final byte[] STOP_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 0};
-
-        // VIBRATION COMMANDS //
-        public static final byte[] START_VIBRATION = {0x8, 2};
-        public static final byte[] STOP_VIBRATION = {0x8, 2};
     }
 
     /*

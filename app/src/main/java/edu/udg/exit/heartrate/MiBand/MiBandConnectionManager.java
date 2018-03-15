@@ -115,43 +115,20 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             vibrationService = new VibrationService(gatt);
             heartRateService = new HeartRateService(gatt);
 
-            showServices(gatt);
+            // Show discovered services with their characteristics & descriptors (DEBUG)
+            //showServices(gatt);
 
             // Initialize
-            /*
-            addCall(enableNotifications());
-            addCall(setLowLatency()); // Set low latency to do a faster initialization
-            //addCall(requestDate()); // Reading date for stability - TODO - Check this
-            addCall(pair());
-            addCall(requestDeviceInformation()); // Needed to send user info to the device
-            addCall(requestDeviceName());
-            addCall(sendUserInfo()); // Needed to authenticate
-            addCall(checkAuthentication());
-            addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT)); // Set wear location // TODO - Check
-
-            addCall(setHeartRateSleepSupport()); // TODO - Check
-            addCall(setFitnessGoal(1000)); // TODO - Check and set fitnes
-
-            // Enable other notifications
-            addCall(enableNotificationsFrom(UUID_CHAR.REALTIME_STEPS));
-            addCall(enableNotificationsFrom(UUID_CHAR.ACTIVITY_DATA));
-            addCall(enableNotificationsFrom(UUID_CHAR.BATTERY));
-            addCall(enableNotificationsFrom(UUID_CHAR.SENSOR_DATA));
-
-            // Enable Heart Rate notifications
-            addCall(enableHeartRateNotifications());
-
-            addCall(requestBattery());
-            addCall(setHighLatency()); // Set high latency for an stable connection
-            //addCall(setInitialized()); // Device is ready to make other calls // TODO
+            initialize();
 
             // Test
-            addCall(sendVibrationCommand(COMMAND.START_VIBRATION));
-            addCall(waitFor(10000));
-            addCall(sendVibrationCommand(COMMAND.STOP_VIBRATION));
+            //test();
+
+            // Vibration test
+            testVibration();
 
             // Start
-            run();*/
+            run();
         }
     }
 
@@ -172,7 +149,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                 Log.d("GATTr", "Battery -> " + batteryInfo);
             } else if (UUID_CHAR.DATE_TIME.equals(characteristicUUID)) {
                 MiDate miDate = new MiDate(characteristic.getValue());
-                Log.d("GATTr", "Date -> " + miDate);
+                Log.d("GATTr", "Date -> " + miDate + " - " + convertBytesToString(characteristic.getValue()));
             } else {
                 if(characteristic.getValue().length>0){
                     Log.d("GATTr", "Characteristic -> " + characteristic.getValue()[0]);
@@ -325,11 +302,66 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         }else if(!working){
             Action action = actionQueue.poll();
             action.run();
-            if(!action.expectsResult()) delayMilis = DELAY_MIN; // TODO - Check (for the moment seems to be working nice)
+            if(!action.expectsResult()) delayMilis = DELAY_MIN;
             else working = true;
         }
 
         handler.postDelayed(runnable, delayMilis);
+    }
+
+    /**
+     * Adds initialization calls to the actionQueue.
+     */
+    private void initialize() {
+        // Enable notifications
+        addCall(enableNotifications());
+
+        // Set low latency to do a faster initialization
+        addCall(setLowLatency());
+
+        // Reading date for stability - TODO - Check if this is really necessary
+        addCall(requestDate());
+
+        // Authentication
+        addCall(pair());
+        addCall(requestDeviceInformation()); // Needed to send user info to the device
+        addCall(requestDeviceName());
+        addCall(sendUserInfo()); // Needed to authenticate
+        addCall(checkAuthentication()); // Clear the queue when not authenticated
+
+        // Other Initializations
+        addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT)); // Set wear location // TODO - Check
+        addCall(setHeartRateSleepSupport()); // TODO - Check
+        addCall(setFitnessGoal(1000)); // TODO - Check and set fitness by the app
+
+        // Enable other notifications // TODO - Check
+        addCall(enableNotificationsFrom(UUID_CHAR.REALTIME_STEPS));
+        addCall(enableNotificationsFrom(UUID_CHAR.ACTIVITY_DATA));
+        addCall(enableNotificationsFrom(UUID_CHAR.BATTERY));
+        addCall(enableNotificationsFrom(UUID_CHAR.SENSOR_DATA));
+
+        // Enable Heart Rate notifications
+        addCall(enableHeartRateNotifications());
+
+        // Other Initializations
+        addCall(setCurrentDate());
+        addCall(requestBattery());
+
+        // Set high latency to get an stable connection
+        addCall(setHighLatency());
+
+        // Finish initialization - device is ready to make other calls
+        //addCall(setInitialized()); // TODO
+    }
+
+    private void test() {
+        addCall(remoteDisconect());
+    }
+
+    private void testVibration() {
+        addCall(sendCommand(COMMAND.START_VIBRATION));
+        addCall(waitFor(10000));
+        addCall(sendCommand(COMMAND.STOP_VIBRATION));
     }
 
     /////////////
@@ -372,7 +404,29 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         return new ActionWithResponse() {
             @Override
             public void run() {
-                miliService.requestDate();
+                miliService.readDate();
+            }
+        };
+    }
+
+    /**
+     * Get an action to write the actual date on the Mi Band.
+     * @return WriteDate Action
+     */
+    private Action setCurrentDate() {
+        return writeDate(new MiDate());
+    }
+
+    /**
+     * Get an action to write the date on the Mi Band.
+     * @param date - Date to be written
+     * @return WriteDate Action
+     */
+    private Action writeDate(final MiDate date) {
+        return new ActionWithResponse() {
+            @Override
+            public void run() {
+                miliService.writeDate(date.getData());
             }
         };
     }
@@ -477,21 +531,6 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     }
 
     /**
-     * Get an action to send a heart rate command to the MiBand.
-     * @param command - Command to be send to the MiBand
-     * @return SendHRCommand Action
-     */
-    private Action sendVibrationCommand(final byte[] command) {
-        return new ActionWithResponse() {
-            @Override
-            public void run() {
-                Log.d("COMMAND_VB", convertBytesToString(command));
-                vibrationService.sendCommand(command);
-            }
-        };
-    }
-
-    /**
      * Get an action to request the battery of the MiBand.
      * @return RequestBattery Action
      */
@@ -513,7 +552,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      */
     private Action checkAuthentication() {
         return new ActionWithoutResponse() {
-            // We will try 50 times to check the Authentication (about 25 seconds)
+            // We will try 20 times to check the Authentication (about 10 seconds)
             private int timesOut = 20;
 
             @Override
@@ -606,7 +645,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
-    /* Not tested yet */
+    /* Not tested yet - TODO */
 
     /**
      * TODO - Not working!! (But not even necessary)
@@ -618,6 +657,19 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             @Override
             public void run() {
                 miliService.selfTest();
+            }
+        };
+    }
+
+    /**
+     * Get an action to perform a remote disconnection.
+     * @return RemoteDisconnect Action
+     */
+    private Action remoteDisconect() {
+        return new ActionWithoutResponse() {
+            @Override
+            public void run() {
+                miliService.remoteDisconnect();
             }
         };
     }
@@ -737,11 +789,12 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
     private void showServices(BluetoothGatt gatt) {
         for(BluetoothGattService service : gatt.getServices()) {
-            Log.d("SERVICE", "" + service.getUuid());
+            Log.d("SERVICE", "" + service.getUuid() + " - " + service.getType());
             for(BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
-                Log.d("CHARACTERISTIC", "\t" + characteristic.getUuid() + " - " + characteristic.getPermissions() + " - " +  characteristic.getProperties());
+                Log.d("CHARACTERISTIC", "\t" + characteristic.getUuid() + " - " + characteristic.getPermissions()
+                        + " - " +  characteristic.getProperties());
                 for(BluetoothGattDescriptor descriptor : characteristic.getDescriptors()) {
-                    Log.d("DESCRIPTOR", "\t\t" + descriptor.getUuid());
+                    Log.d("DESCRIPTOR", "\t\t" + descriptor.getUuid() + " - " + descriptor.getPermissions());
                 }
             }
         }
