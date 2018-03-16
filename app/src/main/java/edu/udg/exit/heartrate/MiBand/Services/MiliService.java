@@ -135,7 +135,7 @@ public class MiliService extends MiBandService {
      * TODO - Not working
      */
     public void unpair() {
-        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.PAIR, PROTOCOL.REMOTE_DISCONNECT);
+        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.PAIR,new byte[]{0x0});
     }
 
     /**

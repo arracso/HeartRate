@@ -121,11 +121,11 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             // Initialize
             initialize();
 
-            // Test
-            //test();
-
             // Vibration test
-            testVibration();
+            //testVibration();
+
+            // Test
+            test();
 
             // Start
             run();
@@ -234,11 +234,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
             Log.d("GATTc", "Battery -> " + batteryInfo);
         }else{
-            if(characteristic.getValue().length>0){
-                Log.d("GATTc", "Characteristic -> " + characteristic.getValue()[0]);
-            }else{
-                Log.d("GATTc", "Characteristic -> " + characteristic.getValue());
-            }
+            Log.d("GATTc", "Characteristic -> " + characteristic.getUuid() + " - " + convertBytesToString(characteristic.getValue()));
         }
     }
 
@@ -350,18 +346,26 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         // Set high latency to get an stable connection
         addCall(setHighLatency());
 
-        // Finish initialization - device is ready to make other calls
-        //addCall(setInitialized()); // TODO
+        // Initialization finished - device is ready to make other calls
+        addCall(setInitialized());
     }
 
     private void test() {
-        addCall(remoteDisconect());
+        addCall(sendCommand(COMMAND.START_REAL_TIME_STEPS_NOTIFICATIONS));
+        addCall(waitFor(50000)); // 50 sec
+        addCall(sendCommand(COMMAND.STOP_REAL_TIME_STEPS_NOTIFICATIONS)); // 5 sec
     }
 
+    // WORKING
+    private void testHeartRate() {
+        addCall(sendHRCommand(COMMAND.START_HEART_RATE_MEASUREMENT_CONTINUOUS));
+    }
+
+    // TODO
     private void testVibration() {
         addCall(sendCommand(COMMAND.START_VIBRATION));
-        addCall(waitFor(10000));
-        addCall(sendCommand(COMMAND.STOP_VIBRATION));
+        addCall(waitFor(5000)); // 5 sec
+        addCall(sendCommand(COMMAND.STOP_MOTOR_VIBRATION));
     }
 
     /////////////
@@ -559,7 +563,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             public void run() {
                 if(!authenticated){
                     timesOut = timesOut - 1;
-                    if(timesOut == 0) actionQueue.clear();
+                    if(timesOut == 0){
+                        actionQueue.clear();
+                        // TODO - Set authentication failed
+                    }
                     else actionQueue.addFirst(this);
                 }
             }
@@ -595,7 +602,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
     /**
      * Sets the number of steps that the user have as a Goal.
-     * @return Action to set fitness goal
+     * @return Action to set fitness goal.
      */
     private Action setFitnessGoal(final int fitnessGoal) {
         return new ActionWithoutResponse() {
@@ -608,6 +615,19 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
                     (byte) ((fitnessGoal >>> 8) & 0xff)
                 };
                 actionQueue.addFirst(sendCommand(command));
+            }
+        };
+    }
+
+    /**
+     * Sets the device as initialized.
+     * @return Action to set the device as initialized.
+     */
+    private Action setInitialized() {
+        return new ActionWithoutResponse() {
+            @Override
+            public void run() {
+                // TODO
             }
         };
     }
@@ -640,7 +660,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         return new ActionWithConditionalResponse() {
             @Override
             public void run() {
-                if(deviceInfo.isMili1S()) this.expectsResult = heartRateService.enableNotifications();
+                if(deviceInfo.supportsHeartRate()) this.expectsResult = heartRateService.enableNotifications();
             }
         };
     }

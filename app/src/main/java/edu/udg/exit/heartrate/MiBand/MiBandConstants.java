@@ -160,28 +160,19 @@ public final class MiBandConstants {
     //////////////
 
     public static final class PROTOCOL {
+        // PAIR //
         public static final byte[] PAIR = {2}; // Works
 
         public static final byte[] STOP_VIBRATION = {0};
-        public static final byte[] ENABLE_REALTIME_STEPS_NOTIFY = {3, 1};
-        public static final byte[] DISABLE_REALTIME_STEPS_NOTIFY = {3, 0};
-        public static final byte[] ENABLE_SENSOR_DATA_NOTIFY = {18, 1};
-        public static final byte[] DISABLE_SENSOR_DATA_NOTIFY = {18, 0};
-        public static final byte[] SET_COLOR_RED = {14, 6, 1, 2, 1}; // 1s has no colors
-        public static final byte[] SET_COLOR_BLUE = {14, 0, 6, 6, 1}; // 1s has no colors
-        public static final byte[] SET_COLOR_ORANGE = {14, 6, 2, 0, 1}; // 1s has no colors
-        public static final byte[] SET_COLOR_GREEN = {14, 4, 5, 0, 1}; // 1s has no colors
-        public static final byte[] START_HEART_RATE_SCAN = {21, 2, 1};
 
-
-        public static final byte[] REBOOT = {12};
-        public static final byte[] REMOTE_DISCONNECT = {1};
-        public static final byte[] FACTORY_RESET = {9};
+        // TEST //
+        public static final byte[] REMOTE_DISCONNECT = {1}; // TODO - Doesn't works
         public static final byte[] SELF_TEST = {2}; // TODO - Doesn't works
 
         // VIBRATION //
         public static final byte[] VIBRATION_WITH_LED = {1}; // Works
         public static final byte[] VIBRATION_10_TIMES_WITH_LED = {2}; // Works
+        public static final byte[] VIBRATION_WITH_LED2 = {3}; // Works (same as 1)
         public static final byte[] VIBRATION_WITHOUT_LED = {4}; // Works
     }
 
@@ -194,34 +185,68 @@ public final class MiBandConstants {
      * Some commands are send to {@link UUID_CHAR#HEARTRATE_CONTROL_POINT HEARTRATE_CONTROL_POINT} characteristic.
      */
     public static  final class COMMAND {
-        // WEAR LOCATION //
-        public static final byte[] SET_WEAR_LOCATION_LEFT = {0xf, 0};
-        public static final byte[] SET_WEAR_LOCATION_RIGHT = {0xf, 1};
-        public static final byte[] SET_WEAR_LOCATION_NECK = {0xf, 2};
+        // REAL TIME STEPS //
+        public static final byte[] START_REAL_TIME_STEPS_NOTIFICATIONS = {3, 1};
+        public static final byte[] STOP_REAL_TIME_STEPS_NOTIFICATIONS = {3, 0};
+
+        // TIMER //
+        public static final byte[] SET_TIMER = {4}; // {4, TIME (12 bytes)}
 
         // FITNESS GOAL //
-        public static final byte[] SET_FITNESS_GOAL = {0x5, 0x0, 0x0, 0x0}; // {0x5, 0x0, (GOAL & 0xff), ((GOAL >>> 8) & 0xff)}
+        public static final byte[] SET_FITNESS_GOAL = {5}; // {5, 0x0, (GOAL & 0xff), ((GOAL >>> 8) & 0xff)}
 
-        // VIBRATION //
-        public static final byte[] START_VIBRATION = {0x8, 2};
-        public static final byte[] STOP_VIBRATION = {0x8, 1};  // Don't know if this is correct.
+        // FETCH DATA //
+        public static final byte[] FETCH_DATA = {6};
 
+        // FIRMWARE //
+        public static final byte[] SEND_FIRMWARE = {7}; // {7, INFO}
+
+        // NOTIFICATION //
+        public static final byte[] SEND_NOTIFICATION = {8, 0x0, 0x0, 0x0}; // {8, xxx}
+
+        // VIBRATION // TODO - Not working
+        public static final byte[] START_VIBRATION = {8, 1};
+
+        public static final byte[] FACTORY_RESET = {9};
+        public static final byte[] CONFIRM_ACTIVITY_DATA_TRANSFER_COMPLETE = {10};
+        public static final byte[] SYNC = {11};
+        public static final byte[] REBOOT = {12}; // works
+
+        // COLORS // 1s has no colors
+        public static final byte[] SET_COLOR_RED = {14, 6, 1, 2, 1};
+        public static final byte[] SET_COLOR_BLUE = {14, 0, 6, 6, 1};
+        public static final byte[] SET_COLOR_ORANGE = {14, 6, 2, 0, 1};
+        public static final byte[] SET_COLOR_GREEN = {14, 4, 5, 0, 1};
+
+        // WEAR LOCATION //
+        public static final byte[] SET_WEAR_LOCATION_LEFT = {15, 0};
+        public static final byte[] SET_WEAR_LOCATION_RIGHT = {15, 1};
+        public static final byte[] SET_WEAR_LOCATION_NECK = {15, 2};
+
+        public static final byte[] SET_REAL_TIME_STEPS = {16, 0x0, 0x0}; // {16, (STEPS & 0xff), ((STEPS >>> 8) & 0xff)}
+
+        public static final byte[] STOP_SYNC = {17};
+
+        // SENSOR DATA //
+        private static final byte[] START_SENSOR_DATA_NOTIFICATIONS = {18, 1};
+        private static final byte[] STOP_SENSOR_DATA_NOTIFICATIONS = {18, 0};
+
+        // MOTOR VIBRATE //
+        public static final byte[] START_MOTOR_VIBRATION = {19, 1};
+        public static final byte[] STOP_MOTOR_VIBRATION = {19, 0};
+
+        /////////////////////////
         // HEART RATE COMMANDS //
-        public static final byte[] START_HEART_RATE_MEASUREMENT_SLEEP = {0xf, 0x0, 1};
-        public static final byte[] STOP_HEART_RATE_MEASUREMENT_SLEEP = {0xf, 0x0, 0};
-        public static final byte[] START_HEART_RATE_MEASUREMENT_CONTINUOUS = {0xf, 0x1, 1};
-        public static final byte[] STOP_HEART_RATE_MEASUREMENT_CONTINUOUS = {0xf, 0x1, 0};
-        public static final byte[] START_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 1};
-        public static final byte[] STOP_HEART_RATE_MEASUREMENT_MANUAL = {0xf, 0x2, 0};
+        /////////////////////////
+
+        public static final byte[] START_HEART_RATE_MEASUREMENT_SLEEP = {21, 0, 1};
+        public static final byte[] STOP_HEART_RATE_MEASUREMENT_SLEEP = {21, 0, 0};
+        public static final byte[] START_HEART_RATE_MEASUREMENT_CONTINUOUS = {21, 1, 1}; // works
+        public static final byte[] STOP_HEART_RATE_MEASUREMENT_CONTINUOUS = {21, 1, 0};
+        public static final byte[] START_HEART_RATE_MEASUREMENT_MANUAL = {21, 2, 1}; // works
+        public static final byte[] STOP_HEART_RATE_MEASUREMENT_MANUAL = {21, 2, 0};
+
     }
-
-    /*
-     static final byte[] startRealTimeStepsNotifications = new byte[]{MiBandService.COMMAND_SET_REALTIME_STEPS_NOTIFICATION, 1};
-     static final byte[] stopRealTimeStepsNotifications = new byte[]{MiBandService.COMMAND_SET_REALTIME_STEPS_NOTIFICATION, 0};
-
-     private static final byte[] startSensorRead = new byte[]{MiBandService.COMMAND_GET_SENSOR_DATA, 1};
-     private static final byte[] stopSensorRead = new byte[]{MiBandService.COMMAND_GET_SENSOR_DATA, 0};
-     */
 
     ///////////////////////////
     // NOTIFICATION PROTOCOL //

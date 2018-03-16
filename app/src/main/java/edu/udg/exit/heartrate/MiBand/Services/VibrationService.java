@@ -1,7 +1,7 @@
 package edu.udg.exit.heartrate.MiBand.Services;
 
 import android.bluetooth.BluetoothGatt;
-import edu.udg.exit.heartrate.MiBand.MiBandConstants;
+import edu.udg.exit.heartrate.MiBand.MiBandConstants.*;
 
 public class VibrationService extends MiBandService {
 
@@ -26,7 +26,7 @@ public class VibrationService extends MiBandService {
      *  REQUIREMENT: ANY.
      */
     public void vibrationWithLed() {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.VIBRATION, MiBandConstants.UUID_CHAR.VIBRATION, MiBandConstants.PROTOCOL.VIBRATION_WITH_LED);
+        writeCharacteristic(UUID_SERVICE.VIBRATION, UUID_CHAR.VIBRATION, PROTOCOL.VIBRATION_WITH_LED);
     }
 
     /**
@@ -34,7 +34,7 @@ public class VibrationService extends MiBandService {
      *  REQUIREMENT: ANY.
      */
     public void vibrationWithoutLed() {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.VIBRATION, MiBandConstants.UUID_CHAR.VIBRATION, MiBandConstants.PROTOCOL.VIBRATION_WITHOUT_LED);
+        writeCharacteristic(UUID_SERVICE.VIBRATION, UUID_CHAR.VIBRATION, PROTOCOL.VIBRATION_WITHOUT_LED);
     }
 
     /**
@@ -42,11 +42,11 @@ public class VibrationService extends MiBandService {
      * REQUIREMENT: PAIR successful.
      */
     public void vibration10TimesWithLed() {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.VIBRATION, MiBandConstants.UUID_CHAR.VIBRATION, MiBandConstants.PROTOCOL.VIBRATION_10_TIMES_WITH_LED);
+        writeCharacteristic(UUID_SERVICE.VIBRATION, UUID_CHAR.VIBRATION, PROTOCOL.VIBRATION_10_TIMES_WITH_LED);
     }
 
 
-    public void sendCommand(byte[] command) {
-        writeCharacteristic(MiBandConstants.UUID_SERVICE.VIBRATION, MiBandConstants.UUID_CHAR.CONTROL_POINT, command);
+    public void vibrationTest(byte[] data) {
+        writeCharacteristic(UUID_SERVICE.VIBRATION, UUID_CHAR.VIBRATION, data);
     }
 }
