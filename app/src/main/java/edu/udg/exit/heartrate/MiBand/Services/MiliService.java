@@ -207,4 +207,10 @@ public class MiliService extends MiBandService {
         writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.TEST, PROTOCOL.REMOTE_DISCONNECT);
     }
 
+
+    // DEBUG //
+
+    public void read(UUID serviceUUID, UUID characteristicUUID){
+        readCharacteristic(serviceUUID,characteristicUUID);
+    }
 }

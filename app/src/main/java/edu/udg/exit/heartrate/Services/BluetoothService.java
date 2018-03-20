@@ -119,7 +119,12 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void connectRemoteDevice(BluetoothDevice device) {
-        device.connectGatt(this,false,miBandConnectionManager);
+        if(miBandConnectionManager.isConnected()){
+            miBandConnectionManager.disconnect();
+            miBandConnectionManager = new MiBandConnectionManager();
+        }else{
+            device.connectGatt(this,false,miBandConnectionManager);
+        }
     }
 
     /*----------------------*/

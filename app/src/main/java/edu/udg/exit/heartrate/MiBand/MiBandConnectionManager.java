@@ -37,6 +37,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
     // Connect
     private BluetoothGatt connectGATT;
+    private boolean isConnected;
 
     // MiBandServices
     private MiliService miliService;
@@ -66,6 +67,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
         // Connect
         connectGATT = null;
+        isConnected = false;
 
         // MiBandService
         miliService = null;
@@ -90,10 +92,13 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
         if (newState == BluetoothProfile.STATE_CONNECTED) {
             Log.d("GATT", "Device connected");
+            isConnected = true;
             connectGATT = gatt;
             connectGATT.discoverServices();
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             Log.d("GATT", "Device disconnected");
+            connectGATT.close();
+            isConnected = false;
             connectGATT = null;
         }
     }
@@ -125,7 +130,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             //testVibration();
 
             // Test
-            test();
+            //test();
 
             // Start
             run();
@@ -265,6 +270,14 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     ////////////////////
     // Public Methods //
     ////////////////////
+
+    public boolean isConnected(){
+        return isConnected;
+    }
+
+    public void disconnect(){
+        connectGATT.disconnect();
+    }
 
     /**
      * Adds a call to the actionQueue.
@@ -811,12 +824,36 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         for(BluetoothGattService service : gatt.getServices()) {
             Log.d("SERVICE", "" + service.getUuid() + " - " + service.getType());
             for(BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
-                Log.d("CHARACTERISTIC", "\t" + characteristic.getUuid() + " - " + characteristic.getPermissions()
-                        + " - " +  characteristic.getProperties());
+                if(canRead(characteristic.getProperties())){
+                    Log.d("CHARACTERISTIC", "\t" + characteristic.getUuid() + " - READABLE");
+                    addCall(read(service.getUuid(),characteristic.getUuid()));
+                }else{
+                    Log.d("CHARACTERISTIC", "\t" + characteristic.getUuid() + " - " + characteristic.getPermissions()
+                            + " - " +  characteristic.getProperties());
+                }
                 for(BluetoothGattDescriptor descriptor : characteristic.getDescriptors()) {
                     Log.d("DESCRIPTOR", "\t\t" + descriptor.getUuid() + " - " + descriptor.getPermissions());
                 }
             }
         }
+    }
+
+    private boolean canRead(int properties){
+        if(properties >= 64) properties = properties - 64;
+        if(properties >= 32) properties = properties - 32;
+        if(properties >= 16) properties = properties - 16;
+        if(properties >= 8) properties = properties - 8;
+        if(properties >= 4) properties = properties - 4;
+        if(properties >= 2) return true;
+        return false;
+    }
+
+    private Action read(final UUID serviceUUID, final UUID characteristicUUID){
+        return new ActionWithResponse() {
+            @Override
+            public void run() {
+                miliService.read(serviceUUID,characteristicUUID);
+            }
+        };
     }
 }
