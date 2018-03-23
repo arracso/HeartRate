@@ -210,6 +210,10 @@ public class MiliService extends MiBandService {
 
     // DEBUG //
 
+    public void read(UUID characteristicUUID){
+        readCharacteristic(UUID_SERVICE.MILI,characteristicUUID);
+    }
+
     public void read(UUID serviceUUID, UUID characteristicUUID){
         readCharacteristic(serviceUUID,characteristicUUID);
     }

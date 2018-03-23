@@ -130,7 +130,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
             //testVibration();
 
             // Test
-            //test();
+            test();
 
             // Start
             run();
@@ -229,7 +229,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         }else if(UUID_CHAR.REALTIME_STEPS.equals(characteristic.getUuid())){
             Log.d("GATTc", "Realtime steps -> " + characteristic.getValue());
         }else if(UUID_CHAR.ACTIVITY_DATA.equals(characteristic.getUuid())){
-            Log.d("GATTc", "Activity -> " + characteristic.getValue());
+            Log.d("GATTc", "Activity -> " + convertBytesToString(characteristic.getValue()));
         }else if(UUID_CHAR.PAIR.equals(characteristic.getUuid())){
             Log.d("GATTc", "PAIR -> " + characteristic.getValue()[0]);
         }else if(UUID_CHAR.DATE_TIME.equals(characteristic.getUuid())){
@@ -339,11 +339,12 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         addCall(checkAuthentication()); // Clear the queue when not authenticated
 
         // Other Initializations
-        addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT)); // Set wear location // TODO - Check
-        addCall(setHeartRateSleepSupport()); // TODO - Check
+        addCall(setCurrentDate());
+        addCall(requestBattery());
+        addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT)); // Set wear location
         addCall(setFitnessGoal(1000)); // TODO - Check and set fitness by the app
 
-        // Enable other notifications // TODO - Check
+        // Enable other notifications // TODO - enable only when needed
         addCall(enableNotificationsFrom(UUID_CHAR.REALTIME_STEPS));
         addCall(enableNotificationsFrom(UUID_CHAR.ACTIVITY_DATA));
         addCall(enableNotificationsFrom(UUID_CHAR.BATTERY));
@@ -351,10 +352,7 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
 
         // Enable Heart Rate notifications
         addCall(enableHeartRateNotifications());
-
-        // Other Initializations
-        addCall(setCurrentDate());
-        addCall(requestBattery());
+        addCall(setHeartRateSleepSupport());
 
         // Set high latency to get an stable connection
         addCall(setHighLatency());
@@ -364,15 +362,41 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
     }
 
     private void test() {
-        addCall(sendCommand(COMMAND.START_REAL_TIME_STEPS_NOTIFICATIONS));
-        addCall(waitFor(50000)); // 50 sec
-        addCall(sendCommand(COMMAND.STOP_REAL_TIME_STEPS_NOTIFICATIONS)); // 5 sec
+        startRealtimeStepsMeasurement();
+        //startHeartRateMeasurement();
+        addCall(waitFor(9000)); // wait 9 seconds
+        addCall(sync());
     }
 
-    // WORKING
-    private void testHeartRate() {
+    private void startHeartRateMeasurement() {
+        addCall(enableHeartRateNotifications());
         addCall(sendHRCommand(COMMAND.START_HEART_RATE_MEASUREMENT_CONTINUOUS));
     }
+
+    private void startRealtimeStepsMeasurement() {
+        addCall(new ActionWithResponse() {
+            @Override
+            public void run() {
+                miliService.read(UUID_CHAR.REALTIME_STEPS);
+            }
+        });
+        addCall(enableNotificationsFrom(UUID_CHAR.REALTIME_STEPS));
+
+
+        // TODO - Check use
+        addCall(sendCommand(COMMAND.FETCH_DATA));
+        // Check data received
+        addCall(sendCommand(new byte[]{0x0a,0x12,0x02,0x17,0x0b,0x1c,0x0a,0x00,0x00})); // Confirm
+
+        addCall(new ActionWithResponse() {
+            @Override
+            public void run() {
+                miliService.read(UUID_CHAR.TEST);
+            }
+        });
+
+    }
+
 
     // TODO
     private void testVibration() {
@@ -380,6 +404,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         addCall(waitFor(5000)); // 5 sec
         addCall(sendCommand(COMMAND.STOP_MOTOR_VIBRATION));
     }
+
+
 
     /////////////
     // Actions //
@@ -560,6 +586,17 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         };
     }
 
+    private Action sync() {
+        return new ActionWithResponse() {
+            @Override
+            public void run() {
+                miliService.sendCommand(COMMAND.SYNC);
+                addCall(waitFor(9000)); // wait 9 sec
+                addCall(sync());
+            }
+        };
+    }
+
     /* Without response */
 
     /**
@@ -569,8 +606,8 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
      */
     private Action checkAuthentication() {
         return new ActionWithoutResponse() {
-            // We will try 20 times to check the Authentication (about 10 seconds)
-            private int timesOut = 20;
+            // We will try 50 times to check the Authentication (about 25 seconds)
+            private int timesOut = 50;
 
             @Override
             public void run() {
@@ -608,7 +645,10 @@ public class MiBandConnectionManager extends BluetoothGattCallback {
         return new ActionWithoutResponse() {
             @Override
             public void run() {
-                if(deviceInfo.isMili1S()) actionQueue.addFirst(sendHRCommand(COMMAND.START_HEART_RATE_MEASUREMENT_SLEEP));
+                if(deviceInfo.isMili1S()){
+                    actionQueue.addFirst(sendHRCommand(COMMAND.START_HEART_RATE_MEASUREMENT_SLEEP));
+                    actionQueue.addFirst(sendHRCommand(COMMAND.UNKNOWN_HR_COMMAND_TO_INIT));
+                }
             }
         };
     }
