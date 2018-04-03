@@ -77,6 +77,9 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void onDestroy() {
+        // Log
+        Log.d("BluetoothService", "destroy");
+
         // Scan
         devices.clear();
         scanning = null;
@@ -84,7 +87,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         scanCallback = null;
 
         // Connection
-        connectionManager = null;
+        if(connectionManager != null){
+            connectionManager.disconnect();
+            connectionManager = null;
+        }
 
         super.onDestroy();
     }
@@ -120,10 +126,18 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     @Override
     public void connectRemoteDevice(BluetoothDevice device) {
         if(connectionManager.isConnected()){
-            connectionManager.disconnect();
-            connectionManager = new MiBandConnectionManager();
+            unbindDevice(); // TODO - remove (this won't be the desired)
         }else{
             device.connectGatt(this,false,connectionManager);
+        }
+    }
+
+    @Override
+    public boolean isConnected() {
+        if(connectionManager == null){
+            return false;
+        }else{
+            return connectionManager.isConnected();
         }
     }
 
@@ -162,14 +176,14 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
         connectRemoteDevice(device);
 
-
         // TODO - Set device address to user preferences
     }
 
     @Override
     public void unbindDevice() {
         // TODO - UNPAIR
-        // TODO - Disconnect from remote device
+        // Disconnect from remote device
+        connectionManager.disconnect();
         // TODO - Unset device address from user preferences
     }
 

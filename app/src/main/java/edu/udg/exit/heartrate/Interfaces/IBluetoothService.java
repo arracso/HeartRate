@@ -34,4 +34,10 @@ public interface IBluetoothService {
      */
     void connectRemoteDevice(BluetoothDevice device);
 
+    /**
+     * Check if service is connected to remote device.
+     * @return True if service is connected to a remote device.
+     */
+    boolean isConnected();
+
 }

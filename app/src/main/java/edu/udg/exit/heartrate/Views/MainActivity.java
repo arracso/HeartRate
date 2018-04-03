@@ -1,15 +1,18 @@
 package edu.udg.exit.heartrate.Views;
 
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import edu.udg.exit.heartrate.Activities.BluetoothActivity;
 import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BluetoothActivity {
 
     ///////////////
     // Constants //
@@ -23,21 +26,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreateService(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Starts BluetoothService
-        Intent serviceIntent = new Intent(this,BluetoothService.class);
-        startService(serviceIntent);
     }
 
     @Override
     protected void onDestroy() {
-        // Stops BluetoothService
-        Intent serviceIntent = new Intent(this,BluetoothService.class);
-        stopService(serviceIntent);
-
-        super.onDestroy();
+        if(!bluetoothService.isConnected()){
+            super.onDestroyService();
+        }else{
+            super.onDestroy();
+        }
     }
 
     ////////////////////

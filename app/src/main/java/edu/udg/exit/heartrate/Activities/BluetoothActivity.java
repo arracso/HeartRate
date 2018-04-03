@@ -32,10 +32,38 @@ public abstract class BluetoothActivity extends AppCompatActivity {
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
+    /**
+     * OnCreate function creating the service.
+     * @param savedInstanceState - Context
+     */
+    protected void onCreateService(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Starts the service
+        Intent intent = new Intent(this,BluetoothService.class);
+        startService(intent);
+        // Bind to the service
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+
     @Override
     protected void onDestroy() {
         // Disconnecting from the service
         unbindService(serviceConnection);
+
+        super.onDestroy();
+    }
+
+    /**
+     * OnDestroy function destroying the service.
+     */
+    protected void onDestroyService() {
+        // Disconnecting from the service
+        unbindService(serviceConnection);
+        // Destroying the service
+        Intent intent = new Intent(this,BluetoothService.class);
+        stopService(intent);
 
         super.onDestroy();
     }
