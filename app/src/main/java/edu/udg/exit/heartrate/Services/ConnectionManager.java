@@ -10,6 +10,10 @@ import edu.udg.exit.heartrate.Utils.Queue;
 
 import java.util.UUID;
 
+/**
+ * Abstract class that performs a connection with a devices and handles it.
+ * This class must be extended in order to handle communication with an specific device.
+ */
 public abstract class ConnectionManager extends BluetoothGattCallback {
 
     ///////////////
@@ -30,6 +34,15 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     // Action Queue
     private final Queue<Action> actionQueue;
     private boolean working;
+
+    // Run
+    private final Handler handler = new Handler();
+    private final Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            ConnectionManager.this.run();
+        }
+    };
 
     ////////////////////////
     // Life Cycle Methods //
@@ -135,22 +148,61 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
         }
     }
 
+    //*****************************//
+    // Life cycle methods handlers //
+    //*****************************//
 
+    /**
+     * Handles services discoverd.
+     * @param gatt - Connected gatt.
+     */
     protected abstract void onServicesDiscovered(BluetoothGatt gatt);
+
+    /**
+     * Handles characteristic read.
+     * @param characteristic - Characteristic read.
+     */
     protected abstract void onCharacteristicRead(BluetoothGattCharacteristic characteristic);
+
+    /**
+     * Handles characteristic write.
+     * @param characteristic - Characteristic write.
+     */
     protected abstract void onCharacteristicWrite(BluetoothGattCharacteristic characteristic);
+
+    /**
+     * Handles characteristic changed.
+     * @param characteristic - Characteristic changed.
+     */
     protected abstract void onCharacteristicChanged(BluetoothGattCharacteristic characteristic);
+
+    /**
+     * Handles descriptor read.
+     * @param descriptor - Descriptor read.
+     */
     protected abstract void onDescriptorRead(BluetoothGattDescriptor descriptor);
+
+    /**
+     * Handles descriptor write.
+     * @param descriptor - Descriptor write.
+     */
     protected abstract void onDescriptorWrite(BluetoothGattDescriptor descriptor);
 
     ////////////////////
     // Public Methods //
     ////////////////////
 
+    /**
+     * Check if a device is connected or not to the GATT.
+     * @return True if a device is connected
+     */
     public boolean isConnected(){
         return isConnected;
     }
 
+    /**
+     * Disconnects the device from the connected GATT.
+     */
     public void disconnect(){
         connectGATT.disconnect();
     }
@@ -178,40 +230,10 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
         actionQueue.clear();
     }
 
-    ///////////////
-    // Protected //
-    ///////////////
-
-    /**
-     * Wait for an especific time before running the next action.
-     * @param delayMilis - Time to be waiting in miliseconds
-     * @return Wait Action
-     */
-    protected Action waitFor(final int delayMilis) {
-        return new ActionWithoutResponse() {
-            @Override
-            public void run() {
-                if(delayMilis > 0) addCallFirst(waitFor(delayMilis - DELAY_MIN));
-            }
-        };
-    }
-
-    /////////////////////
-    // Private Methods //
-    /////////////////////
-
-    private Handler handler = new Handler();
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            ConnectionManager.this.run();
-        }
-    };
-
     /**
      * Runs the first action of the queue.
      */
-    private void run() {
+    public void run() {
         handler.removeCallbacks(runnable);
         int delayMilis = DELAY_MAX;
 
@@ -227,9 +249,28 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
         handler.postDelayed(runnable, delayMilis);
     }
 
+    ///////////////
+    // Protected //
+    ///////////////
+
+    /**
+     * Wait for an especific time before running the next action.
+     * @param delayMilis - Time to be waiting in miliseconds
+     * @return Wait Action
+     */
+    protected Action waitMilis(final int delayMilis) {
+        return new ActionWithoutResponse() {
+            @Override
+            public void run() {
+                if(delayMilis > 0) addCallFirst(waitMilis(delayMilis - DELAY_MIN));
+            }
+        };
+    }
+
     ///////////
     // DEBUG //
     ///////////
+
     protected String convertBytesToString(byte[] data) {
         StringBuilder str = new StringBuilder("[");
         for(int i = 0; i < data.length; i++){

@@ -6,7 +6,7 @@ package edu.udg.exit.heartrate;
 public class Global {
 
     ///////////////
-    // MiBandConstants //
+    // Constants //
     ///////////////
 
     ///////////////

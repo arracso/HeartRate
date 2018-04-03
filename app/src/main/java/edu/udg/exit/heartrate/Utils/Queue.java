@@ -12,10 +12,10 @@ public class Queue<T> {
      * Class Node that contains an object and a reference to the next node.
      */
     private class Node {
-        public T obj;
-        public Node next;
+        T obj;
+        Node next;
 
-        public Node(T obj, Node next){
+        Node(T obj, Node next){
             this.obj = obj;
             this.next = next;
         }

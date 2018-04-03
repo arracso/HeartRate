@@ -233,17 +233,25 @@ public class MiBandConnectionManager extends ConnectionManager {
     }
 
     private void test() {
-        //startRealtimeStepsMeasurement();
+        startRealtimeStepsMeasurement();
         startHeartRateMeasurement();
-        addCall(waitFor(9000)); // wait 9 seconds
-        addCall(sync());
+        addCall(syncPeriodically());
     }
 
+    /**
+     * Start to measure heart rate.
+     * Needs to call (sync) every 9 secs in order to keep receiving notifications.
+     */
     private void startHeartRateMeasurement() {
         addCall(enableHeartRateNotifications());
         addCall(sendHRCommand(COMMAND.START_HEART_RATE_MEASUREMENT_CONTINUOUS));
     }
 
+    /**
+     * //TODO - check
+     * Start to measure steps
+     * Needs to call (sync) every 9 secs in order to keep receiving notifications.
+     */
     private void startRealtimeStepsMeasurement() {
         addCall(new ActionWithResponse() {
             @Override
@@ -271,7 +279,7 @@ public class MiBandConnectionManager extends ConnectionManager {
     // TODO
     private void testVibration() {
         addCall(sendCommand(COMMAND.START_VIBRATION));
-        addCall(waitFor(5000)); // 5 sec
+        addCall(waitMilis(5000)); // 5 sec
         addCall(sendCommand(COMMAND.STOP_MOTOR_VIBRATION));
     }
 
@@ -454,18 +462,35 @@ public class MiBandConnectionManager extends ConnectionManager {
         };
     }
 
+    /**
+     * Get an action to request synchronization with the MiBand once.
+     * @return Synchronization Action
+     */
     private Action sync() {
         return new ActionWithResponse() {
             @Override
             public void run() {
                 miliService.sendCommand(COMMAND.SYNC);
-                addCall(waitFor(9000)); // wait 9 sec
-                addCall(sync());
             }
         };
     }
 
     /* Without response */
+
+    /**
+     * Get an action to request synchronization with the MiBand periodically.
+     * @return SyncPeriodically Action
+     */
+    private Action syncPeriodically() {
+        return new ActionWithoutResponse() {
+            @Override
+            public void run() {
+                addCall(waitMilis(9000)); // wait 9 sec
+                addCall(sync());
+                addCall(syncPeriodically());
+            }
+        };
+    }
 
     /**
      * Get an action that checks if the authentication was successful.
