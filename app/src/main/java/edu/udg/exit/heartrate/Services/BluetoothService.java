@@ -45,7 +45,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     private BluetoothAdapter.LeScanCallback scanCallback;
 
     // Connection
-    private MiBandConnectionManager miBandConnectionManager;
+    private ConnectionManager connectionManager;
 
     ////////////////////////////
     // Service implementation //
@@ -62,7 +62,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         scanCallback = initScanCallback();
 
         // Connection
-        miBandConnectionManager = new MiBandConnectionManager();
+        connectionManager = new MiBandConnectionManager();
     }
 
     @Override
@@ -84,7 +84,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         scanCallback = null;
 
         // Connection
-        miBandConnectionManager = null;
+        connectionManager = null;
 
         super.onDestroy();
     }
@@ -119,11 +119,11 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void connectRemoteDevice(BluetoothDevice device) {
-        if(miBandConnectionManager.isConnected()){
-            miBandConnectionManager.disconnect();
-            miBandConnectionManager = new MiBandConnectionManager();
+        if(connectionManager.isConnected()){
+            connectionManager.disconnect();
+            connectionManager = new MiBandConnectionManager();
         }else{
-            device.connectGatt(this,false,miBandConnectionManager);
+            device.connectGatt(this,false,connectionManager);
         }
     }
 
