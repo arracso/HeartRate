@@ -134,11 +134,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public boolean isConnected() {
-        if(connectionManager == null){
-            return false;
-        }else{
-            return connectionManager.isConnected();
-        }
+        return connectionManager != null && connectionManager.isConnected();
     }
 
     /*----------------------*/

@@ -93,7 +93,7 @@ public final class MiBandConstants {
 
     public static final class UUID_DESC {
         // GATT descriptors
-        public static final UUID GATT_CLIENT_CHARACTERISTIC_CONFIGURATION = UUID.fromString(String.format(BASE_UUID, "2902"));
+        private static final UUID GATT_CLIENT_CHARACTERISTIC_CONFIGURATION = UUID.fromString(String.format(BASE_UUID, "2902"));
 
         // Mi Band
         public static final UUID UPDATE_NOTIFICATION = UUID_DESC.GATT_CLIENT_CHARACTERISTIC_CONFIGURATION; // Used to enable or disable different notifications.

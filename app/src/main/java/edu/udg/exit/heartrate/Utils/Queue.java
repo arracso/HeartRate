@@ -71,9 +71,10 @@ public class Queue<T> {
 
     /**
      * Gets the first object of the queue and remove it.
-     * @return First object of the queue
+     * @return First object of the queue, NULL if the queue is empty.
      */
     public T poll() {
+        if(isEmpty()) return null;
         T obj = start.obj;
         start = start.next;
         if(start == null) end = null;
@@ -82,9 +83,10 @@ public class Queue<T> {
 
     /**
      * Gets the first object of the queue.
-     * @return First object of the queue
+     * @return First object of the queue, NULL if the queue is empty.
      */
     public T first() {
+        if(isEmpty()) return null;
         return start.obj;
     }
 
