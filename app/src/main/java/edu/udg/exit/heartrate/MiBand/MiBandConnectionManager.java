@@ -233,7 +233,7 @@ public class MiBandConnectionManager extends ConnectionManager {
     }
 
     private void test() {
-        startRealtimeStepsMeasurement();
+        //startRealtimeStepsMeasurement();
         startHeartRateMeasurement();
         addCall(syncPeriodically());
     }
@@ -264,7 +264,7 @@ public class MiBandConnectionManager extends ConnectionManager {
 
         // TODO - Check use
         addCall(sendCommand(COMMAND.FETCH_DATA));
-        // Check data received
+        // TODO - Check data received
         addCall(sendCommand(new byte[]{0x0a,0x12,0x02,0x17,0x0b,0x1c,0x0a,0x00,0x00})); // Confirm
 
         addCall(new ActionWithResponse() {
@@ -710,7 +710,6 @@ public class MiBandConnectionManager extends ConnectionManager {
             case NOTIFICATION.STATUS_MOTOR_AUTH:
                 Log.d("Notification", "Motor AUTH");
                 authenticated = false;
-                //authenticating = true;
                 break;
             case NOTIFICATION.STATUS_MOTOR_SHUTDOWN:
                 Log.d("Notification", "Motor SHUTDOWN");
@@ -726,8 +725,7 @@ public class MiBandConnectionManager extends ConnectionManager {
                 Log.d("Notification", "Code " + value[0]);
         }
     }
-
-
+    
     // DEBUG
     @Override
     protected Action read(final UUID serviceUUID, final UUID characteristicUUID){
