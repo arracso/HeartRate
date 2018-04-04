@@ -20,8 +20,8 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     // Constants //
     ///////////////
 
-    private final static int DELAY_MAX = 10000;
-    private final static int DELAY_MIN = 500;
+    protected final static int DELAY_MAX = 10000;
+    protected final static int DELAY_MIN = 500;
 
     ////////////////
     // Attributes //

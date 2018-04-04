@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import edu.udg.exit.heartrate.Activities.BluetoothActivity;
 import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.BluetoothService;
+import edu.udg.exit.heartrate.Utils.UserPreferences;
 
 public class MainActivity extends BluetoothActivity {
 
@@ -28,6 +30,13 @@ public class MainActivity extends BluetoothActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreateService(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.d("UserPref", "" + UserPreferences.getInstance().load(this.getApplicationContext(),"test"));
+        UserPreferences.getInstance().save(this.getApplicationContext(),"test","test");
+        Log.d("UserPref", "" + UserPreferences.getInstance().load(this.getApplicationContext(),"test"));
+        UserPreferences.getInstance().remove(this.getApplicationContext(),"test");
+        Log.d("UserPref", "" + UserPreferences.getInstance().load(this.getApplicationContext(),"test"));
+        UserPreferences.getInstance().save(this.getApplicationContext(),"test","test2");
     }
 
     @Override

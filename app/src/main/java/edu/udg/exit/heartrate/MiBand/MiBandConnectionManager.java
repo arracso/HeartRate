@@ -23,6 +23,12 @@ import static edu.udg.exit.heartrate.MiBand.MiBandConstants.*;
  */
 public class MiBandConnectionManager extends ConnectionManager {
 
+    ///////////////
+    // CONSTANTS //
+    ///////////////
+
+    private static final int SYNC_PERIOD = 10000; // 10s
+
     ////////////////
     // Attributes //
     ////////////////
@@ -79,11 +85,8 @@ public class MiBandConnectionManager extends ConnectionManager {
         // Initialize
         initialize();
 
-        // Vibration test
-        //testVibration();
-
-        // Test
-        test();
+        // Start the measurement
+        startMeasurement();
     }
 
     @Override
@@ -199,7 +202,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         // Set low latency to do a faster initialization
         addCall(setLowLatency());
 
-        // Reading date for stability - TODO - Check if this is really necessary
+        // Reading date for stability // TODO - Check if this is really necessary
         addCall(requestDate());
 
         // Authentication
@@ -232,15 +235,19 @@ public class MiBandConnectionManager extends ConnectionManager {
         addCall(setInitialized());
     }
 
-    private void test() {
-        //startRealtimeStepsMeasurement();
+    /**
+     * Start the measurements.
+     * Needs to sync periodically in order to receive the notifications.
+     */
+    private void startMeasurement() {
+        //startRealtimeStepsMeasurement(); // TODO
         startHeartRateMeasurement();
         addCall(syncPeriodically());
     }
 
     /**
      * Start to measure heart rate.
-     * Needs to call (sync) every 9 secs in order to keep receiving notifications.
+     * Needs to call (sync) periodically in order to keep receiving notifications.
      */
     private void startHeartRateMeasurement() {
         addCall(enableHeartRateNotifications());
@@ -248,9 +255,8 @@ public class MiBandConnectionManager extends ConnectionManager {
     }
 
     /**
-     * //TODO - check
      * Start to measure steps
-     * Needs to call (sync) every 9 secs in order to keep receiving notifications.
+     * Needs to call (sync) periodically in order to keep receiving notifications.
      */
     private void startRealtimeStepsMeasurement() {
         addCall(new ActionWithResponse() {
@@ -260,7 +266,6 @@ public class MiBandConnectionManager extends ConnectionManager {
             }
         });
         addCall(enableNotificationsFrom(UUID_CHAR.REALTIME_STEPS));
-
 
         // TODO - Check use
         addCall(sendCommand(COMMAND.FETCH_DATA));
@@ -273,7 +278,6 @@ public class MiBandConnectionManager extends ConnectionManager {
                 miliService.read(UUID_CHAR.TEST);
             }
         });
-
     }
 
     // TODO
@@ -485,7 +489,8 @@ public class MiBandConnectionManager extends ConnectionManager {
         return new ActionWithoutResponse() {
             @Override
             public void run() {
-                addCall(waitMilis(9000)); // wait 9 sec
+                int latencySync = (2 * 480);
+                addCall(waitMilis(SYNC_PERIOD - (3 * DELAY_MIN) - latencySync)); // TODO - Adjust latency
                 addCall(sync());
                 addCall(syncPeriodically());
             }
@@ -725,7 +730,7 @@ public class MiBandConnectionManager extends ConnectionManager {
                 Log.d("Notification", "Code " + value[0]);
         }
     }
-    
+
     // DEBUG
     @Override
     protected Action read(final UUID serviceUUID, final UUID characteristicUUID){

@@ -1,11 +1,11 @@
 package edu.udg.exit.heartrate.Services;
 
 import android.app.Service;
-import android.bluetooth.*;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
-
 import android.os.IBinder;
 import android.util.Log;
 import edu.udg.exit.heartrate.Interfaces.IBluetoothService;
@@ -13,8 +13,10 @@ import edu.udg.exit.heartrate.Interfaces.IScanService;
 import edu.udg.exit.heartrate.Interfaces.IScanView;
 import edu.udg.exit.heartrate.MiBand.MiBandConnectionManager;
 import edu.udg.exit.heartrate.MiBand.MiBandConstants;
+import edu.udg.exit.heartrate.Utils.UserPreferences;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Bluetooth Low Energy Service
@@ -63,6 +65,11 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
         // Connection
         connectionManager = new MiBandConnectionManager();
+
+        // Check user preferences for device address
+        String boundAddress = UserPreferences.getInstance().load(this, UserPreferences.BONDED_DEVICE_ADDRESS);
+        Log.d("BluetoothService", "Address " + boundAddress);
+        if(boundAddress != null) connectRemoteDevice(getRemoteDevice(boundAddress));
     }
 
     @Override
@@ -125,11 +132,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void connectRemoteDevice(BluetoothDevice device) {
-        if(connectionManager.isConnected()){
-            unbindDevice(); // TODO - remove (this won't be the desired)
-        }else{
-            device.connectGatt(this,false,connectionManager);
-        }
+        device.connectGatt(this,false,connectionManager);
     }
 
     @Override
@@ -170,9 +173,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         if(name == null) name = "NO NAME";
         Log.d("BIND",name);
 
-        connectRemoteDevice(device);
-
-        // TODO - Set device address to user preferences
+        UserPreferences.getInstance().save(this, UserPreferences.BONDED_DEVICE_ADDRESS, address);
+        Log.d("BluetoothService", "Address " + address);
+        if(!connectionManager.isConnected()) connectRemoteDevice(device);
+        else unbindDevice();
     }
 
     @Override
@@ -180,7 +184,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         // TODO - UNPAIR
         // Disconnect from remote device
         connectionManager.disconnect();
-        // TODO - Unset device address from user preferences
+        // Unset device address from user preferences
+        UserPreferences.getInstance().remove(this, UserPreferences.BONDED_DEVICE_ADDRESS);
     }
 
     /////////////////////
