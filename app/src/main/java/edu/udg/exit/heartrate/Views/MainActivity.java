@@ -1,15 +1,12 @@
 package edu.udg.exit.heartrate.Views;
 
-import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.annotation.NonNull;
 import android.view.View;
 import edu.udg.exit.heartrate.Activities.BluetoothActivity;
-import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
@@ -35,6 +32,20 @@ public class MainActivity extends BluetoothActivity {
     }
 
     @Override
+    protected void onServiceConnected(ComponentName name, BluetoothService.BluetoothBinder binder) {
+        super.onServiceConnected(name, binder);
+
+        // TODO
+    }
+
+    @Override
+    protected void onServiceDisconnected(ComponentName name) {
+        // TODO
+
+        super.onServiceDisconnected(name);
+    }
+
+    @Override
     protected void onDestroy() {
         if(!bluetoothService.isConnected()){
             super.onDestroyService();
@@ -49,7 +60,7 @@ public class MainActivity extends BluetoothActivity {
 
     /**
      * Starts the ScanActivity.
-     * @param view
+     * @param view - MainActivity view
      */
     public void goToScan(View view) {
         Intent scan = new Intent(this,ScanActivity.class);
@@ -72,7 +83,7 @@ public class MainActivity extends BluetoothActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_ENABLE_BT_TO_START_SERVICE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){ // Locaion permissions given

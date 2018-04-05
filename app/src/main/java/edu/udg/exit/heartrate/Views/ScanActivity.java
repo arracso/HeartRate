@@ -5,18 +5,15 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.*;
 import edu.udg.exit.heartrate.Activities.BluetoothActivity;
-import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.Interfaces.IScanView;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ScanActivity extends BluetoothActivity implements IScanView {
 
@@ -97,7 +94,7 @@ public class ScanActivity extends BluetoothActivity implements IScanView {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_ENABLE_BT_TO_SCAN:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){ // Location permissions granted
@@ -128,8 +125,8 @@ public class ScanActivity extends BluetoothActivity implements IScanView {
         lv_devices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Map<String, String> item = (Map<String, String>) parent.getAdapter().getItem(position);
-                bluetoothService.bindDevice(item.get(ATTRIBUTE_DEVICE_ADDRESS));
+                Map<?, ?> item = (Map<?, ?>) parent.getAdapter().getItem(position); // Cannot cast to (Map<String,String>) without a warning
+                bluetoothService.bindDevice((String) item.get(ATTRIBUTE_DEVICE_ADDRESS));
             }
         });
     }

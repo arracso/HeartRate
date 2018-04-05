@@ -125,16 +125,16 @@ public abstract class BluetoothActivity extends AppCompatActivity {
 
     /**
      * Function called when service is connected.
-     * @param name
-     * @param binder
+     * @param name - Identifier of the component
+     * @param binder - Binder to the service
      */
     protected void onServiceConnected(ComponentName name, BluetoothService.BluetoothBinder binder){
         bluetoothService = binder.getService();
     }
 
     /**
-     * Function called when service is disconnected
-     * @param name
+     * Function called when service is disconnected.
+     * @param name - Identifier of the component
      */
     protected void onServiceDisconnected(ComponentName name){
         bluetoothService = null;
