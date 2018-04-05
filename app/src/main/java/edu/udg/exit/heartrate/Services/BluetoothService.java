@@ -173,10 +173,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         if(name == null) name = "NO NAME";
         Log.d("BIND",name);
 
+        // Save device address to user preferences
         UserPreferences.getInstance().save(this, UserPreferences.BONDED_DEVICE_ADDRESS, address);
-        Log.d("BluetoothService", "Address " + address);
+        // Connect to connect to remote device
         if(!connectionManager.isConnected()) connectRemoteDevice(device);
-        else unbindDevice();
     }
 
     @Override

@@ -204,6 +204,7 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
      * Disconnects the device from the connected GATT.
      */
     public void disconnect(){
+        clearCalls();
         if(connectGATT != null) connectGATT.disconnect();
     }
 
