@@ -31,12 +31,7 @@ public class MainActivity extends BluetoothActivity {
         super.onCreateService(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d("UserPref", "" + UserPreferences.getInstance().load(this.getApplicationContext(),"test"));
-        UserPreferences.getInstance().save(this.getApplicationContext(),"test","test");
-        Log.d("UserPref", "" + UserPreferences.getInstance().load(this.getApplicationContext(),"test"));
         UserPreferences.getInstance().remove(this.getApplicationContext(),"test");
-        Log.d("UserPref", "" + UserPreferences.getInstance().load(this.getApplicationContext(),"test"));
-        UserPreferences.getInstance().save(this.getApplicationContext(),"test","test2");
     }
 
     @Override

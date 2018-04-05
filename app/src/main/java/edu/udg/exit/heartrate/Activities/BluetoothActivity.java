@@ -39,8 +39,9 @@ public abstract class BluetoothActivity extends AppCompatActivity {
     protected void onCreateService(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Starts the service
+        // Intent of the service
         Intent intent = new Intent(this,BluetoothService.class);
+        // Starts the service
         startService(intent);
         // Bind to the service
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
