@@ -67,6 +67,14 @@ public class MainActivity extends BluetoothActivity {
         startActivity(scan);
     }
 
+    /**
+     * Unbind the current binded device.
+     * @param view - MainActivity view
+     */
+    public void unbindDevice(View view) {
+        bluetoothService.unbindDevice();
+    }
+
     /////////////////////
     // Activity Result //
     /////////////////////

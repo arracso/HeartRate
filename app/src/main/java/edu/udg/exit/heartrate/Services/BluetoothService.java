@@ -183,7 +183,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     public void unbindDevice() {
         // TODO - UNPAIR
         // Disconnect from remote device
-        connectionManager.disconnect();
+        if(connectionManager != null) connectionManager.disconnect();
         // Unset device address from user preferences
         UserPreferences.getInstance().remove(this, UserPreferences.BONDED_DEVICE_ADDRESS);
     }
