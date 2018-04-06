@@ -3,6 +3,7 @@ package edu.udg.exit.heartrate.Services;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
@@ -167,12 +168,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void bindDevice(String address) {
+        // Get the device
         BluetoothDevice device = devices.get(address);
-
-        String name = device.getName();
-        if(name == null) name = "NO NAME";
-        Log.d("BIND",name);
-
         // Save device address to user preferences
         UserPreferences.getInstance().save(this, UserPreferences.BONDED_DEVICE_ADDRESS, address);
         // Connect to connect to remote device
