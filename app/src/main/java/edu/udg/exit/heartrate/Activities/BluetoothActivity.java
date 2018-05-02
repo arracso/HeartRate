@@ -111,6 +111,9 @@ public abstract class BluetoothActivity extends AppCompatActivity {
 
     protected BluetoothService bluetoothService = null;
 
+    /**
+     * Service Connection handler.
+     */
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
