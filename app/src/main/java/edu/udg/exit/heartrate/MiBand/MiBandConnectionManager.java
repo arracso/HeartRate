@@ -82,6 +82,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         vibrationService = new VibrationService(gatt);
         heartRateService = new HeartRateService(gatt);
 
+        Log.d("GATT", "Initialize.");
         // Initialize
         initialize();
 
@@ -187,7 +188,6 @@ public class MiBandConnectionManager extends ConnectionManager {
     // Public Methods //
     ////////////////////
 
-
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -202,13 +202,47 @@ public class MiBandConnectionManager extends ConnectionManager {
         // Set low latency to do a faster initialization
         addCall(setLowLatency());
 
-        // Reading date for stability // TODO - Check if this is really necessary
+        // Reading date for stability
+        addCall(requestDate()); // TODO - Check if this is really necessary
+
+        // Authentication
+        addCall(requestDeviceInformation()); // Needed to send user info to the device
+        addCall(requestDeviceName()); // Not needed to pair
+        addCall(sendUserInfo()); // Needed to authenticate
+        addCall(checkAuthentication()); // Clear the queue when not authenticated
+
+        // Other Initializations
+        addCall(setCurrentDate());
+        addCall(requestBattery());
+        addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT)); // Set wear location // TODO - Set by the app
+
+        // Enable battery notifications
+        addCall(enableNotificationsFrom(UUID_CHAR.BATTERY));
+
+        // Set high latency to get an stable connection
+        addCall(setHighLatency());
+
+        // Initialization finished - device is ready to make other calls
+        addCall(setInitialized());
+    }
+
+    /**
+     * Adds further initialization calls to the actionQueue.
+     */
+    private void initializeAll() {
+        // Enable notifications
+        addCall(enableNotifications());
+
+        // Set low latency to do a faster initialization
+        addCall(setLowLatency());
+
+        // Reading date for stability
         addCall(requestDate());
 
         // Authentication
-        addCall(pair());
+        addCall(pair()); // TODO - Check if this is necessary
         addCall(requestDeviceInformation()); // Needed to send user info to the device
-        addCall(requestDeviceName());
+        addCall(requestDeviceName()); // Not needed to pair
         addCall(sendUserInfo()); // Needed to authenticate
         addCall(checkAuthentication()); // Clear the queue when not authenticated
 
@@ -218,7 +252,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT)); // Set wear location
         addCall(setFitnessGoal(1000)); // TODO - Check and set fitness by the app
 
-        // Enable other notifications // TODO - enable only when needed
+        // Enable other notifications // Enable only when needed
         addCall(enableNotificationsFrom(UUID_CHAR.REALTIME_STEPS));
         addCall(enableNotificationsFrom(UUID_CHAR.ACTIVITY_DATA));
         addCall(enableNotificationsFrom(UUID_CHAR.BATTERY));
@@ -278,13 +312,6 @@ public class MiBandConnectionManager extends ConnectionManager {
                 miliService.read(UUID_CHAR.TEST);
             }
         });
-    }
-
-    // TODO
-    private void testVibration() {
-        addCall(sendCommand(COMMAND.START_VIBRATION));
-        addCall(waitMilis(5000)); // 5 sec
-        addCall(sendCommand(COMMAND.STOP_MOTOR_VIBRATION));
     }
 
     /////////////
@@ -605,7 +632,6 @@ public class MiBandConnectionManager extends ConnectionManager {
     /* Not tested yet - TODO */
 
     /**
-     * TODO - Not working!! (But not even necessary)
      * Get an action to make the MiBand do "crazy" things.
      * @return SelfTest Action
      */
@@ -741,4 +767,5 @@ public class MiBandConnectionManager extends ConnectionManager {
             }
         };
     }
+
 }
