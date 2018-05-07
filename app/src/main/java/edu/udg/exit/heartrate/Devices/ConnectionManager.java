@@ -4,8 +4,8 @@ import android.bluetooth.*;
 import android.os.Handler;
 import android.util.Log;
 
-import edu.udg.exit.heartrate.Devices.Actions.Action;
-import edu.udg.exit.heartrate.Devices.Actions.ActionWithoutResponse;
+import edu.udg.exit.heartrate.Utils.Actions.Action;
+import edu.udg.exit.heartrate.Utils.Actions.ActionWithoutResponse;
 import edu.udg.exit.heartrate.Utils.Queue;
 
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package edu.udg.exit.heartrate.Devices.Actions;
+package edu.udg.exit.heartrate.Utils.Actions;
 
 /**
  * Class to perform an action controlled by a Manager.

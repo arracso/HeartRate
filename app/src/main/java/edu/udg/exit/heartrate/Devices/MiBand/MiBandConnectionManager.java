@@ -6,10 +6,10 @@ import android.util.Log;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import edu.udg.exit.heartrate.Devices.Actions.Action;
-import edu.udg.exit.heartrate.Devices.Actions.ActionWithConditionalResponse;
-import edu.udg.exit.heartrate.Devices.Actions.ActionWithResponse;
-import edu.udg.exit.heartrate.Devices.Actions.ActionWithoutResponse;
+import edu.udg.exit.heartrate.Utils.Actions.Action;
+import edu.udg.exit.heartrate.Utils.Actions.ActionWithConditionalResponse;
+import edu.udg.exit.heartrate.Utils.Actions.ActionWithResponse;
+import edu.udg.exit.heartrate.Utils.Actions.ActionWithoutResponse;
 import edu.udg.exit.heartrate.Devices.MiBand.Services.HeartRateService;
 import edu.udg.exit.heartrate.Devices.MiBand.Services.MiliService;
 import edu.udg.exit.heartrate.Devices.MiBand.Services.VibrationService;

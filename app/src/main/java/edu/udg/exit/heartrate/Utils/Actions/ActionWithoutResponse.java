@@ -1,4 +1,4 @@
-package edu.udg.exit.heartrate.Devices.Actions;
+package edu.udg.exit.heartrate.Utils.Actions;
 
 /**
  * Action that doesn't expects a result.
