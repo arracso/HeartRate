@@ -56,6 +56,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void onCreate() {
+        super.onCreate();
+
         // Log
         Log.d("BluetoothService", "create");
 
