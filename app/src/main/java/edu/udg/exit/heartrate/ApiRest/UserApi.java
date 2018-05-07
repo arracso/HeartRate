@@ -1,5 +1,6 @@
 package edu.udg.exit.heartrate.ApiRest;
 
+import edu.udg.exit.heartrate.Model.User;
 import retrofit2.Call;
 import retrofit2.http.*;
 
