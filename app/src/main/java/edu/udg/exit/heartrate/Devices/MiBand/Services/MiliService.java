@@ -1,10 +1,10 @@
-package edu.udg.exit.heartrate.MiBand.Services;
+package edu.udg.exit.heartrate.Devices.MiBand.Services;
 
 import android.bluetooth.BluetoothGatt;
 
-import edu.udg.exit.heartrate.MiBand.MiBandConstants.*;
-import edu.udg.exit.heartrate.MiBand.Utils.Latency;
-import edu.udg.exit.heartrate.MiBand.Utils.MiDate;
+import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants.*;
+import edu.udg.exit.heartrate.Devices.MiBand.Utils.Latency;
+import edu.udg.exit.heartrate.Devices.MiBand.Utils.MiDate;
 
 import java.util.UUID;
 

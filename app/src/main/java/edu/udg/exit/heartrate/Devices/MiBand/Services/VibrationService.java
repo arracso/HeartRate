@@ -1,7 +1,7 @@
-package edu.udg.exit.heartrate.MiBand.Services;
+package edu.udg.exit.heartrate.Devices.MiBand.Services;
 
 import android.bluetooth.BluetoothGatt;
-import edu.udg.exit.heartrate.MiBand.MiBandConstants.*;
+import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants.*;
 
 public class VibrationService extends MiBandService {
 

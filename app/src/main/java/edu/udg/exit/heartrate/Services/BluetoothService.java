@@ -8,11 +8,12 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import edu.udg.exit.heartrate.Devices.ConnectionManager;
 import edu.udg.exit.heartrate.Interfaces.IBluetoothService;
 import edu.udg.exit.heartrate.Interfaces.IScanService;
 import edu.udg.exit.heartrate.Interfaces.IScanView;
-import edu.udg.exit.heartrate.MiBand.MiBandConnectionManager;
-import edu.udg.exit.heartrate.MiBand.MiBandConstants;
+import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
+import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
 
 import java.util.HashMap;

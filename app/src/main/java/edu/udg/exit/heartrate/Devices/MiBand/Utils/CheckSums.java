@@ -1,4 +1,4 @@
-package edu.udg.exit.heartrate.MiBand.Utils;
+package edu.udg.exit.heartrate.Devices.MiBand.Utils;
 
 /**
  * Class to obtain different check sums.

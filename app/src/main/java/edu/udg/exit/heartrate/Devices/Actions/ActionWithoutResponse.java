@@ -1,4 +1,4 @@
-package edu.udg.exit.heartrate.MiBand.Actions;
+package edu.udg.exit.heartrate.Devices.Actions;
 
 /**
  * Action that doesn't expects a result.

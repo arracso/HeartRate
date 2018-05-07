@@ -1,4 +1,4 @@
-package edu.udg.exit.heartrate.MiBand;
+package edu.udg.exit.heartrate.Devices.MiBand;
 
 import android.bluetooth.*;
 import android.util.Log;
@@ -6,17 +6,17 @@ import android.util.Log;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import edu.udg.exit.heartrate.MiBand.Actions.Action;
-import edu.udg.exit.heartrate.MiBand.Actions.ActionWithConditionalResponse;
-import edu.udg.exit.heartrate.MiBand.Actions.ActionWithResponse;
-import edu.udg.exit.heartrate.MiBand.Actions.ActionWithoutResponse;
-import edu.udg.exit.heartrate.MiBand.Services.HeartRateService;
-import edu.udg.exit.heartrate.MiBand.Services.MiliService;
-import edu.udg.exit.heartrate.MiBand.Services.VibrationService;
-import edu.udg.exit.heartrate.MiBand.Utils.*;
-import edu.udg.exit.heartrate.Services.ConnectionManager;
+import edu.udg.exit.heartrate.Devices.Actions.Action;
+import edu.udg.exit.heartrate.Devices.Actions.ActionWithConditionalResponse;
+import edu.udg.exit.heartrate.Devices.Actions.ActionWithResponse;
+import edu.udg.exit.heartrate.Devices.Actions.ActionWithoutResponse;
+import edu.udg.exit.heartrate.Devices.MiBand.Services.HeartRateService;
+import edu.udg.exit.heartrate.Devices.MiBand.Services.MiliService;
+import edu.udg.exit.heartrate.Devices.MiBand.Services.VibrationService;
+import edu.udg.exit.heartrate.Devices.MiBand.Utils.*;
+import edu.udg.exit.heartrate.Devices.ConnectionManager;
 
-import static edu.udg.exit.heartrate.MiBand.MiBandConstants.*;
+import static edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants.*;
 
 /**
  * Class that performs a connection with a Mi Band and handles it.

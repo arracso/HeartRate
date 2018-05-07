@@ -1,4 +1,4 @@
-package edu.udg.exit.heartrate.MiBand;
+package edu.udg.exit.heartrate.Devices.MiBand;
 
 import java.util.UUID;
 

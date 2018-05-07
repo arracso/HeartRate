@@ -1,11 +1,11 @@
-package edu.udg.exit.heartrate.Services;
+package edu.udg.exit.heartrate.Devices;
 
 import android.bluetooth.*;
 import android.os.Handler;
 import android.util.Log;
 
-import edu.udg.exit.heartrate.MiBand.Actions.Action;
-import edu.udg.exit.heartrate.MiBand.Actions.ActionWithoutResponse;
+import edu.udg.exit.heartrate.Devices.Actions.Action;
+import edu.udg.exit.heartrate.Devices.Actions.ActionWithoutResponse;
 import edu.udg.exit.heartrate.Utils.Queue;
 
 import java.util.UUID;
