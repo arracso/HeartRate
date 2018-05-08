@@ -1,19 +1,10 @@
 package edu.udg.exit.heartrate.Services;
 
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import edu.udg.exit.heartrate.Devices.ConnectionManager;
-import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
-import edu.udg.exit.heartrate.Interfaces.IScanView;
-import edu.udg.exit.heartrate.Utils.UserPreferences;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ApiService extends Service {
 
@@ -40,6 +31,8 @@ public class ApiService extends Service {
 
         // Log
         Log.d("ApiService", "create");
+
+
     }
 
     @Override
