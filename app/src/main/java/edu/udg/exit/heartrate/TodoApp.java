@@ -34,8 +34,6 @@ public class TodoApp extends Application{
         bindService(apiServiceIntent, apiServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
-
-
     ////////////////////////
     // Service Connection //
     ////////////////////////

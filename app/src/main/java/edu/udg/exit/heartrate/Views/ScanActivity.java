@@ -126,7 +126,11 @@ public class ScanActivity extends BluetoothActivity implements IScanView {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Map<?, ?> item = (Map<?, ?>) parent.getAdapter().getItem(position); // Cannot cast to (Map<String,String>) without a warning
-                bluetoothService.bindDevice((String) item.get(ATTRIBUTE_DEVICE_ADDRESS));
+                //bluetoothService.bindDevice((String) item.get(ATTRIBUTE_DEVICE_ADDRESS));
+                Intent pair = new Intent(ScanActivity.this, PairActivity.class);
+                pair.putExtra(PairActivity.DEVICE_ADDRESS, (String) item.get(ATTRIBUTE_DEVICE_ADDRESS));
+                startActivity(pair);
+                ScanActivity.this.finish();
             }
         });
     }
@@ -156,7 +160,7 @@ public class ScanActivity extends BluetoothActivity implements IScanView {
      * Set the animation for progress bar.
      */
     private void setProgressAnimation() {
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar = (ProgressBar) findViewById(R.id.scan_progress_bar);
         progressBar.setVisibility(View.INVISIBLE);
     }
 

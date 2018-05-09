@@ -3,7 +3,7 @@ package edu.udg.exit.heartrate.Interfaces;
 public interface IScanService {
 
     ///////////////
-    // MiBandConstants //
+    // Constants //
     ///////////////
 
     int SCAN_PERIOD = 3000; // delayMillis
@@ -14,7 +14,7 @@ public interface IScanService {
 
     /**
      * Sets the view that will be used to place the found devices.
-     * @param view
+     * @param view Scan View to be set.
      */
     void setScanView(IScanView view);
 
@@ -35,15 +35,4 @@ public interface IScanService {
      */
     boolean isScanning();
 
-    /**
-     * Bind the device using its address and add to user preferences.
-     * @param address - MAC address of the device.
-     */
-    void bindDevice(String address);
-
-
-    /**
-     * Unbind the binded device and remove from user preferences.
-     */
-    void unbindDevice();
 }

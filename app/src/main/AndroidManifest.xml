@@ -3,7 +3,7 @@
           package="edu.udg.exit.heartrate">
 
     <!-- Internet Permissions -->
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <!-- Bluetooth Permissions -->
     <uses-permission android:name="android.permission.BLUETOOTH"/>
@@ -15,6 +15,7 @@
     <!-- Required Bluetooth LE -->
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
+    <!-- Application -->
     <application
             android:name=".TodoApp"
             android:allowBackup="true"
@@ -22,7 +23,9 @@
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+    >
+
         <!-- Launch Activity -->
         <activity android:name=".Views.MainActivity">
             <intent-filter>
@@ -32,11 +35,13 @@
         </activity>
 
         <!-- Activities -->
-        <activity android:name=".Views.ScanActivity"></activity>
+        <activity android:name=".Views.ScanActivity"/>
+        <activity android:name=".Views.PairActivity" />
 
         <!-- Services -->
-        <service android:name=".Services.BluetoothService"></service>
-        <service android:name=".Services.ApiService"></service>
+        <service android:name=".Services.BluetoothService"/>
+        <service android:name=".Services.ApiService"/>
+
     </application>
 
 </manifest>

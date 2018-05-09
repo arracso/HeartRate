@@ -9,9 +9,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import edu.udg.exit.heartrate.Devices.ConnectionManager;
-import edu.udg.exit.heartrate.Interfaces.IBluetoothService;
-import edu.udg.exit.heartrate.Interfaces.IScanService;
-import edu.udg.exit.heartrate.Interfaces.IScanView;
+import edu.udg.exit.heartrate.Interfaces.*;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
@@ -22,14 +20,14 @@ import java.util.Map;
 /**
  * Bluetooth Low Energy Service
  */
-public class BluetoothService extends Service implements IBluetoothService, IScanService {
+public class BluetoothService extends Service implements IBluetoothService, IScanService, IPairService {
 
     ///////////////
     // Constants //
     ///////////////
 
-    public static final int REQUEST_ENABLE_BT_TO_START_SERVICE = 1;
-    public static final int REQUEST_ENABLE_BT_TO_SCAN = 2;
+    public static final int REQUEST_ENABLE_BT_TO_SCAN = 1;
+    public static final int REQUEST_ENABLE_BT_TO_PAIR = 2;
 
     ////////////////
     // Attributes //
@@ -46,6 +44,9 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     private Boolean scanning;
     private IScanView scanView;
     private BluetoothAdapter.LeScanCallback scanCallback;
+
+    // Pair
+    private IPairView pairView;
 
     // Connection
     private ConnectionManager connectionManager;
@@ -166,6 +167,20 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     @Override
     public boolean isScanning(){
         return scanning;
+    }
+
+    /*----------------------*/
+    /* IPairService methods */
+    /*----------------------*/
+
+    @Override
+    public void setPairView(IPairView view) {
+        pairView = view;
+    }
+
+    @Override
+    public void unSetPairView() {
+        pairView = null;
     }
 
     @Override
