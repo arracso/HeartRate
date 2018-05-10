@@ -189,8 +189,15 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         BluetoothDevice device = devices.get(address);
         // Save device address to user preferences
         UserPreferences.getInstance().save(this, UserPreferences.BONDED_DEVICE_ADDRESS, address);
-        // Connect to connect to remote device
-        if(!connectionManager.isConnected()) connectRemoteDevice(device);
+        // Connect to remote device
+        if(!connectionManager.isConnected()){
+            connectRemoteDevice(device);
+            pairView.startLoadingAnimation();
+            pairView.setMessage("pairing (" + address + ")");
+        }else{
+            pairView.startLoadingAnimation();
+            pairView.setMessage("Failed");
+        }
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import edu.udg.exit.heartrate.Activities.BluetoothActivity;
 import edu.udg.exit.heartrate.Interfaces.IPairView;
 import edu.udg.exit.heartrate.R;
@@ -28,6 +29,7 @@ public class PairActivity extends BluetoothActivity implements IPairView {
     ////////////////
 
     private ProgressBar progressBar;
+    private TextView textView;
 
     ///////////////////////
     // LifeCicle methods //
@@ -41,7 +43,8 @@ public class PairActivity extends BluetoothActivity implements IPairView {
         // Set Progress animation
         setProgressAnimation();
 
-        // Start Pairing
+        // Set Text view
+        setTextView();
     }
 
     @Override
@@ -51,13 +54,13 @@ public class PairActivity extends BluetoothActivity implements IPairView {
         // Set this activity as the pair view on bluetoothService
         bluetoothService.setPairView(PairActivity.this);
         // Start pairing to the device
-
+        bluetoothService.bindDevice(getIntent().getStringExtra(DEVICE_ADDRESS));
     }
 
     @Override
     protected void onServiceDisconnected(ComponentName name) {
         // Unset scanView from bluetoothService
-        if(bluetoothService != null) bluetoothService.unSetScanView();
+        if(bluetoothService != null) bluetoothService.unSetPairView();
 
         super.onServiceDisconnected(name);
     }
@@ -65,7 +68,7 @@ public class PairActivity extends BluetoothActivity implements IPairView {
     @Override
     protected void onDestroy() {
         // Unset scanView from bluetoothService
-        if(bluetoothService != null) bluetoothService.unSetScanView();
+        if(bluetoothService != null) bluetoothService.unSetPairView();
 
         super.onDestroy();
     }
@@ -106,6 +109,14 @@ public class PairActivity extends BluetoothActivity implements IPairView {
         progressBar.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Set text view
+     */
+    private void setTextView() {
+        textView = (TextView) findViewById(R.id.pair_text);
+        textView.setVisibility(View.INVISIBLE);
+    }
+
     ////////////////////
     // Public methods //
     ////////////////////
@@ -122,7 +133,12 @@ public class PairActivity extends BluetoothActivity implements IPairView {
 
     @Override
     public void setMessage(String message) {
-
+        if(message == null){
+            textView.setText("");
+            textView.setVisibility(View.INVISIBLE);
+        }
+        textView.setText(message);
+        textView.setVisibility(View.VISIBLE);
     }
 
     @Override

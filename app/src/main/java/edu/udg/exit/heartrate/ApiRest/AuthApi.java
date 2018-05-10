@@ -16,4 +16,7 @@ public interface AuthApi {
     @POST("auth/register")
     Call<String> register(@Body User registerRequest);
 
+    @GET("auth/guest")
+    Call<String> loginAsGuest();
+
 }

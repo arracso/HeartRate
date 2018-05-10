@@ -23,7 +23,7 @@ public class ApiService extends Service {
     // Constants //
     ///////////////
 
-    public static final String BASE_URL = "localhost";
+    public static final String BASE_URL = "http://private-7b351-fit5.apiary-mock.com";
 
     ////////////////
     // Attributes //
