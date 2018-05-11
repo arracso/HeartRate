@@ -7,8 +7,8 @@ import retrofit2.http.*;
 public interface UserApi {
 
     @GET("user/get")
-    Call<User> getUser(@Header("Authorization") String authorization);
-
+    Call<User> getUser();
+    //Call<User> getUser(@Header("Authorization") String authorization);
     @PUT("user/update")
     Call<String> updateUser(
             @Header("Authorization") String authorization,

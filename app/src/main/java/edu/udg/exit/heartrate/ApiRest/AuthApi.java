@@ -1,5 +1,6 @@
 package edu.udg.exit.heartrate.ApiRest;
 
+import edu.udg.exit.heartrate.Model.Tokens;
 import edu.udg.exit.heartrate.Model.User;
 import retrofit2.Call;
 import retrofit2.http.*;
@@ -17,6 +18,6 @@ public interface AuthApi {
     Call<String> register(@Body User registerRequest);
 
     @GET("auth/guest")
-    Call<String> loginAsGuest();
+    Call<Tokens> loginAsGuest();
 
 }
