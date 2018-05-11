@@ -4,6 +4,7 @@ import android.bluetooth.*;
 import android.os.Handler;
 import android.util.Log;
 
+import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.Utils.Actions.Action;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithoutResponse;
 import edu.udg.exit.heartrate.Utils.Queue;
@@ -26,6 +27,8 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     ////////////////
     // Attributes //
     ////////////////
+
+    protected BluetoothService bluetoothService;
 
     // Connect
     private BluetoothGatt connectGATT;
@@ -51,8 +54,11 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     /**
      * Default constructor.
      */
-    public ConnectionManager() {
+    public ConnectionManager(BluetoothService bluetoothService) {
         super();
+
+        // Bluetooth Service
+        this.bluetoothService = bluetoothService;
 
         // Connect
         connectGATT = null;

@@ -6,6 +6,8 @@ import android.util.Log;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import edu.udg.exit.heartrate.Interfaces.IPairView;
+import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.Utils.Actions.Action;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithConditionalResponse;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithResponse;
@@ -52,8 +54,8 @@ public class MiBandConnectionManager extends ConnectionManager {
     /**
      * Default constructor.
      */
-    public MiBandConnectionManager() {
-        super();
+    public MiBandConnectionManager(BluetoothService bluetoothService) {
+        super(bluetoothService);
 
         // MiBandService
         miliService = null;
@@ -74,7 +76,7 @@ public class MiBandConnectionManager extends ConnectionManager {
 
         // TODO - Move setup to the app
         userInfo = new UserInfo();
-        userInfo.setUsername("Oscar");
+        userInfo.setUsername("Guest");
         userInfo.setBlueToothAddress(gatt.getDevice().getAddress());
 
         // Init Services
@@ -82,12 +84,11 @@ public class MiBandConnectionManager extends ConnectionManager {
         vibrationService = new VibrationService(gatt);
         heartRateService = new HeartRateService(gatt);
 
-        Log.d("GATT", "Initialize.");
         // Initialize
         initialize();
 
         // Start the measurement
-        startMeasurement();
+        //startMeasurement();
     }
 
     @Override
@@ -540,9 +541,24 @@ public class MiBandConnectionManager extends ConnectionManager {
                     timesOut = timesOut - 1;
                     if(timesOut == 0){
                         clearCalls();
-                        // TODO - Set authentication failed
+                       /* addCall(new ActionWithoutResponse() {
+                            @Override
+                            public void run() {
+                                bluetoothService.getPairView().setPairStatus(IPairView.STATUS_FAILED);
+                            }
+                        });*/
+
                     }
                     else addCallFirst(this);
+                }else{
+                    /*
+                    addCallFirst(new ActionWithoutResponse() {
+                        @Override
+                        public void run() {
+                            bluetoothService.getPairView().setMessage("setting up configurations");
+                        }
+                    });*/
+
                 }
             }
         };
@@ -591,7 +607,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         return new ActionWithoutResponse() {
             @Override
             public void run() {
-                // TODO
+                bluetoothService.getPairView().setMessage("Paired!");
             }
         };
     }

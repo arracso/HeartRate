@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import edu.udg.exit.heartrate.Activities.BluetoothActivity;
 import edu.udg.exit.heartrate.Interfaces.IPairView;
 import edu.udg.exit.heartrate.R;
@@ -117,6 +118,20 @@ public class PairActivity extends BluetoothActivity implements IPairView {
         textView.setVisibility(View.INVISIBLE);
     }
 
+    private void handleSuccessToPair() {
+        stopLoadingAnimation();
+        setMessage("paired!");
+        Toast.makeText(getApplicationContext(),"Paired!",Toast.LENGTH_LONG);
+        PairActivity.this.finish();
+    }
+
+    private void handleFailedToPair(){
+        stopLoadingAnimation();
+        setMessage("failed to pair");
+        Toast.makeText(getApplicationContext(),"Failed to pair!",Toast.LENGTH_LONG);
+        PairActivity.this.finish();
+    }
+
     ////////////////////
     // Public methods //
     ////////////////////
@@ -143,7 +158,19 @@ public class PairActivity extends BluetoothActivity implements IPairView {
 
     @Override
     public void setPairStatus(Integer status) {
-
+        Toast.makeText(this,"Status " + status,Toast.LENGTH_LONG);
+        switch (status) {
+            case STATUS_WORKING:
+                startLoadingAnimation();
+                setMessage("pairing...");
+                break;
+            case STATUS_SUCCESS:
+                this.handleSuccessToPair();
+                break;
+            case STATUS_FAILED:
+                this.handleFailedToPair();
+                break;
+        }
     }
 
 }

@@ -12,6 +12,8 @@ public interface IScanService {
     // Methods //
     /////////////
 
+    IScanView getScanView();
+
     /**
      * Sets the view that will be used to place the found devices.
      * @param view Scan View to be set.

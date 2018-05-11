@@ -68,7 +68,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         scanCallback = initScanCallback();
 
         // Connection
-        connectionManager = new MiBandConnectionManager();
+        connectionManager = new MiBandConnectionManager(this);
 
         // Check user preferences for device address
         String boundAddress = UserPreferences.getInstance().load(this, UserPreferences.BONDED_DEVICE_ADDRESS);
@@ -149,6 +149,11 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     /*----------------------*/
 
     @Override
+    public IScanView getScanView() {
+        return scanView;
+    }
+
+    @Override
     public void setScanView(IScanView view){
         scanView = view;
     }
@@ -174,6 +179,11 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     /*----------------------*/
 
     @Override
+    public IPairView getPairView() {
+        return pairView;
+    }
+
+    @Override
     public void setPairView(IPairView view) {
         pairView = view;
     }
@@ -195,7 +205,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
             pairView.startLoadingAnimation();
             pairView.setMessage("pairing (" + address + ")");
         }else{
-            pairView.startLoadingAnimation();
+            pairView.stopLoadingAnimation();
             pairView.setMessage("Failed");
         }
     }

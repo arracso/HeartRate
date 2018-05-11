@@ -6,6 +6,8 @@ public interface IPairService {
     // Methods //
     /////////////
 
+    IPairView getPairView();
+
     /**
      * Sets the view that will be used to show the user pairing status.
      * @param view Pair view to be set.
