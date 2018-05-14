@@ -23,7 +23,8 @@ public class ApiService extends Service {
     // Constants //
     ///////////////
 
-    public static final String BASE_URL = "http://private-7b351-fit5.apiary-mock.com";
+    //public static final String BASE_URL = "http://private-7b351-fit5.apiary-mock.com";
+    public static final String BASE_URL = "http://84.88.154.119:12380";
 
     ////////////////
     // Attributes //

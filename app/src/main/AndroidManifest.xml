@@ -13,7 +13,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <!-- Required Bluetooth LE -->
-    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
+    <uses-feature
+            android:name="android.hardware.bluetooth_le"
+            android:required="true"/>
 
     <!-- Application -->
     <application
@@ -23,25 +25,25 @@
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme"
-    >
+            android:theme="@style/AppTheme">
 
         <!-- Launch Activity -->
         <activity android:name=".Views.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <!-- Activities -->
         <activity android:name=".Views.ScanActivity"/>
-        <activity android:name=".Views.PairActivity" />
+        <activity android:name=".Views.PairActivity"/>
+        <activity android:name=".Views.MeasureActivity" />
 
         <!-- Services -->
         <service android:name=".Services.BluetoothService"/>
         <service android:name=".Services.ApiService"/>
-
     </application>
 
 </manifest>
