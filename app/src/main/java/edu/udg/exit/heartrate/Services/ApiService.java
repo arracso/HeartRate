@@ -47,9 +47,6 @@ public class ApiService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        // Log
-        Log.d("ApiService", "create");
-
         // Create JSON converter
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
 
@@ -58,7 +55,7 @@ public class ApiService extends Service {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
                 String accessToken = UserPreferences.getInstance().load(ApiService.this, UserPreferences.ACCESS_TOKEN);
-                Request newRequest = chain.request().newBuilder().header("Authorization", accessToken).build();
+                Request newRequest = chain.request().newBuilder().header("Authorization", "Bearer " + accessToken).build();
 
                 return chain.proceed(newRequest);
             }
@@ -95,9 +92,6 @@ public class ApiService extends Service {
 
     @Override
     public void onDestroy() {
-        // Log
-        Log.d("ApiService", "destroy");
-
         super.onDestroy();
     }
 

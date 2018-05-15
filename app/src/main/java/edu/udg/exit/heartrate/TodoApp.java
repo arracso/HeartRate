@@ -32,6 +32,7 @@ public class TodoApp extends Application{
 
     @Override
     public void onCreate() {
+        super.onCreate();
         // Start & bind bluetooth service
         Intent bluetoothServiceIntent = new Intent(this,BluetoothService.class);
         startService(bluetoothServiceIntent);
@@ -68,7 +69,7 @@ public class TodoApp extends Application{
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
             apiService = ((ApiService.ApiBinder) binder).getService();
-            loginAsGuest();
+            login();
         }
 
         @Override
@@ -101,13 +102,19 @@ public class TodoApp extends Application{
     // Private Methods //
     /////////////////////
 
-    public void loginAsGuest() {
+    private void login(){
+        String accessToken = UserPreferences.getInstance().load(getApplicationContext(),UserPreferences.ACCESS_TOKEN);
+        if(accessToken == null) loginAsGuest();
+        else getUser();
+    }
+
+    private void loginAsGuest() {
         if(apiService == null) return;
         apiService.getAuthService().loginAsGuest().enqueue(new Callback<Tokens>() {
             @Override
             public void onResponse(Call<Tokens> call, Response<Tokens> response) {
-                Toast.makeText(getApplicationContext(), "Connection successful.", Toast.LENGTH_LONG).show();
                 UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.ACCESS_TOKEN, ((Tokens)response.body()).getAccessToken());
+                getUser();
             }
 
             @Override
@@ -117,12 +124,18 @@ public class TodoApp extends Application{
         });
     }
 
-    public void test2() {
+    private void getUser() {
         if(apiService == null) return;
         apiService.getUserService().getUser().enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                Toast.makeText(getApplicationContext(), "Correct", Toast.LENGTH_LONG).show();
+                if(response.isSuccessful()){
+                    User user = response.body();
+                    Global.user = user;
+                    Toast.makeText(getApplicationContext(), "User id: " + user.getId(), Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Login failed!", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override

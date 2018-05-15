@@ -245,14 +245,11 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
      * Runs the first action of the queue.
      */
     public void run() {
-        Log.d("Manager", "Run");
         handler.removeCallbacks(runnable);
         int delayMilis = DELAY_MAX;
 
-        if(actionQueue.isEmpty()){
-            Log.d("Manager", "Empty queue.");
-            return;
-        }else if(!working){
+        if(actionQueue.isEmpty()) return;
+        else if(!working){
             Action action = actionQueue.poll();
             action.run();
             if(!action.expectsResult()) delayMilis = DELAY_MIN;

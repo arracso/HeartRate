@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.Interfaces.IMeasureView;
 import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.R;
@@ -28,14 +30,14 @@ import java.util.Date;
 
 public class MeasureActivity extends Activity implements IMeasureView {
 
-    BluetoothService bluetoothService;
-    ApiService apiService;
+    private BluetoothService bluetoothService;
+    private ApiService apiService;
 
-    FileWriter fileWriter;
+    private FileWriter fileWriter;
 
-    Boolean recording;
+    private Boolean recording;
 
-    Integer id = null;
+    private Integer id = Global.user.getId();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,32 +58,18 @@ public class MeasureActivity extends Activity implements IMeasureView {
         // Set button actions
         setButtonActions();
 
+        if(id!=null) setTextId();
+
     }
 
     /////////////////////
     // Private Methods //
     /////////////////////
 
-    private void setId(){
-        if(id == null){
-            apiService.getUserService().getUser().enqueue(new Callback<User>() {
-                @Override
-                public void onResponse(Call<User> call, Response<User> response) {
-                    id = response.body().getId();
-                    setTextId(id);
-                }
-
-                @Override
-                public void onFailure(Call<User> call, Throwable t) {
-                    Log.d("Api", "Error retrieving user!");
-                }
-            });
-        }
-    }
-
-    private void setTextId(Integer id) {
+    private void setTextId() {
         TextView textId = (TextView) findViewById(R.id.measure_text_id);
-        textId.setText("Your id: " + id);
+        String text = "Your id: " + id;
+        textId.setText(text);
     }
 
     private void setButtonActions() {
@@ -119,13 +107,11 @@ public class MeasureActivity extends Activity implements IMeasureView {
         }
     }
 
-
-
     ////////////////////
     // Public Methods //
     ////////////////////
 
-    Handler handler = new Handler();
+    private Handler handler = new Handler();
 
     @Override
     public void showText(final String text) {
@@ -159,7 +145,7 @@ public class MeasureActivity extends Activity implements IMeasureView {
         }
 
 
-        public void createFile(){
+        private void createFile(){
             // Create file
             try {
                 name = "HR_" + new Date().getTime() + ".csv";
@@ -173,60 +159,78 @@ public class MeasureActivity extends Activity implements IMeasureView {
             }
         }
 
-        public void closeFile(){
+        private void closeFile(){
             // Close file and send
             if(file != null){
                 try {
                     bw.close();
+                    bw = null;
                     file.close();
+                    file = null;
                 } catch (IOException e) {
                     Log.d("File", e.getMessage());
                 }
             }
         }
 
-        public void writeToFile(String text){
-            try {
-                for(int i=0; i<text.length(); i++){
-                    bw.append(text.charAt(i));
+        private void writeToFile(String text){
+            if(bw != null){
+                try {
+                    for(int i=0; i<text.length(); i++){
+                        bw.append(text.charAt(i));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 
-        public void sendFile() {
+        private String getMimeType(String url) {
+            String type = null;
+            String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+            if (extension != null) {
+                type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+            }
+            return type;
+        }
+
+        private void uploadFile(File file){
+            Log.d("File", "start upload");
+            if (file != null){
+                String type = getMimeType(file.getPath());
+                Log.d("File", "type: " + type);
+                MediaType mediaType = MediaType.parse(type);
+                RequestBody reqFile = RequestBody.create(mediaType, file);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), reqFile);
+
+                Call<ResponseBody> call = apiService.getFileService().uploadFile(body);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if(response.isSuccessful())
+                            Toast.makeText(MeasureActivity.this, "File uploaded!", Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(MeasureActivity.this, "Failed to upload the file!", Toast.LENGTH_LONG).show();
+                    }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        System.out.println(call.toString());
+                        System.out.println(t.getMessage());
+                        System.out.println(t.getLocalizedMessage());
+                        t.printStackTrace();
+                        Toast.makeText(MeasureActivity.this, "BAD CONNECTION", Toast.LENGTH_LONG).show();
+                    }
+                });
+            } else {
+                Toast.makeText(MeasureActivity.this, "FAILED TO UPLOAD THE FILE", Toast.LENGTH_LONG).show();
+            }
+        }
 
 
-            File file = new File(name);
-
-            Uri fileUri = Uri.fromFile(file);
-
-            // create RequestBody instance from file
-            RequestBody requestFile = RequestBody.create(
-                    MediaType.parse(getContentResolver().getType(fileUri)), file
-            );
-
-            RequestBody name = RequestBody.create(MediaType.parse("text/plain"), this.name);
-
-            // MultipartBody.Part is used to send also the actual file name
-            MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-
-            // finally, execute the request
-            Call<ResponseBody> call = apiService.getFileService().uploadFile(name, body);
-
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call,
-                                       Response<ResponseBody> response) {
-                    Log.v("Upload", "success");
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Log.e("Upload error:", t.getMessage());
-                }
-            });
+        private void sendFile() {
+            String path = getApplicationContext().getFilesDir() + "/" + name;
+            File file = new File(path);
+            if(file.exists()) uploadFile(file);
         }
     }
 

@@ -1,14 +1,18 @@
 package edu.udg.exit.heartrate.ApiRest;
 
 import edu.udg.exit.heartrate.Model.User;
+import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.http.*;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.PUT;
+import retrofit2.http.Query;
 
 public interface UserApi {
 
     @GET("user/get")
     Call<User> getUser();
-    //Call<User> getUser(@Header("Authorization") String authorization);
+
     @PUT("user/update")
     Call<String> updateUser(
             @Header("Authorization") String authorization,
