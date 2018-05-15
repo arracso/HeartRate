@@ -119,16 +119,12 @@ public class PairActivity extends BluetoothActivity implements IPairView {
     }
 
     private void handleSuccessToPair() {
-        stopLoadingAnimation();
-        setMessage("paired!");
-        Toast.makeText(getApplicationContext(),"Paired!",Toast.LENGTH_LONG);
+        Intent measure = new Intent(PairActivity.this, MeasureActivity.class);
+        startActivity(measure);
         PairActivity.this.finish();
     }
 
     private void handleFailedToPair(){
-        stopLoadingAnimation();
-        setMessage("failed to pair");
-        Toast.makeText(getApplicationContext(),"Failed to pair!",Toast.LENGTH_LONG);
         PairActivity.this.finish();
     }
 
@@ -158,7 +154,6 @@ public class PairActivity extends BluetoothActivity implements IPairView {
 
     @Override
     public void setPairStatus(Integer status) {
-        Toast.makeText(this,"Status " + status,Toast.LENGTH_LONG);
         switch (status) {
             case STATUS_WORKING:
                 startLoadingAnimation();

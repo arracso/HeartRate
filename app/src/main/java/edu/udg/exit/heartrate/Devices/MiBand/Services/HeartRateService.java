@@ -37,4 +37,8 @@ public class HeartRateService extends MiBandService {
     public boolean enableNotifications() {
         return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.HEARTRATE, MiBandConstants.UUID_CHAR.HEARTRATE_NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,true);
     }
+
+    public boolean dissableNotifications() {
+        return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.HEARTRATE, MiBandConstants.UUID_CHAR.HEARTRATE_NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,false);
+    }
 }

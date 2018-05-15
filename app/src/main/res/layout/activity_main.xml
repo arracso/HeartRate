@@ -28,8 +28,6 @@
                 android:onClick="unbindDevice"
         />
 
-
-
     </LinearLayout>
 
 </RelativeLayout>

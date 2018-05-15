@@ -198,6 +198,9 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     // Public Methods //
     ////////////////////
 
+    public abstract void startMeasure();
+    public abstract void stopMeasure();
+
     /**
      * Check if a device is connected or not to the GATT.
      * @return True if a device is connected
@@ -235,6 +238,7 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
      */
     public void clearCalls() {
         actionQueue.clear();
+        handler.removeCallbacks(runnable);
     }
 
     /**

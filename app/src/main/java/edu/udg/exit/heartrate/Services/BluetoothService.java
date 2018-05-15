@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Bluetooth Low Energy Service
  */
-public class BluetoothService extends Service implements IBluetoothService, IScanService, IPairService {
+public class BluetoothService extends Service implements IBluetoothService, IScanService, IPairService, IMeasureService {
 
     ///////////////
     // Constants //
@@ -48,6 +48,9 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     // Pair
     private IPairView pairView;
 
+    // Measure
+    private IMeasureView measureView;
+
     // Connection
     private ConnectionManager connectionManager;
 
@@ -66,6 +69,12 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         scanning = false;
         scanView = null;
         scanCallback = initScanCallback();
+
+        // Pair
+        pairView = null;
+
+        // Measure
+        measureView = null;
 
         // Connection
         connectionManager = new MiBandConnectionManager(this);
@@ -217,6 +226,35 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         if(connectionManager != null) connectionManager.disconnect();
         // Unset device address from user preferences
         UserPreferences.getInstance().remove(this, UserPreferences.BONDED_DEVICE_ADDRESS);
+    }
+
+    /*-------------------------*/
+    /* IMeasureService methods */
+    /*-------------------------*/
+
+    @Override
+    public IMeasureView getMeasureView() {
+        return measureView;
+    }
+
+    @Override
+    public void setMeasureView(IMeasureView view) {
+        this.measureView = view;
+    }
+
+    @Override
+    public void unsetMeasureView() {
+        this.measureView = null;
+    }
+
+    @Override
+    public void startMeasure() {
+        connectionManager.startMeasure();
+    }
+
+    @Override
+    public void stopMeasure() {
+        connectionManager.stopMeasure();
     }
 
     /////////////////////

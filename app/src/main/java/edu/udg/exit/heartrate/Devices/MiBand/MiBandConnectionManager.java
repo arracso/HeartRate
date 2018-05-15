@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import edu.udg.exit.heartrate.Interfaces.IPairView;
+import edu.udg.exit.heartrate.Interfaces.IScanView;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.Utils.Actions.Action;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithConditionalResponse;
@@ -86,9 +87,6 @@ public class MiBandConnectionManager extends ConnectionManager {
 
         // Initialize
         initialize();
-
-        // Start the measurement
-        //startMeasurement();
     }
 
     @Override
@@ -170,6 +168,8 @@ public class MiBandConnectionManager extends ConnectionManager {
         }else if(MiBandConstants.UUID_CHAR.BATTERY.equals(characteristic.getUuid())){
             BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
             Log.d("GATTc", "Battery -> " + batteryInfo);
+        }else if(UUID_CHAR.HEARTRATE_NOTIFICATION.equals(characteristic.getUuid())){
+            handleHeartrateNotification(characteristic.getValue());
         }else{
             Log.d("GATTc", "Characteristic -> " + characteristic.getUuid() + " - " + convertBytesToString(characteristic.getValue()));
         }
@@ -188,6 +188,19 @@ public class MiBandConnectionManager extends ConnectionManager {
     ////////////////////
     // Public Methods //
     ////////////////////
+
+    @Override
+    public void startMeasure() {
+        startMeasurement();
+        run();
+    }
+
+    @Override
+    public void stopMeasure() {
+        clearCalls();
+        stopHeartRateMeasurement();
+        run();
+    }
 
     /////////////////////
     // Private Methods //
@@ -287,6 +300,11 @@ public class MiBandConnectionManager extends ConnectionManager {
     private void startHeartRateMeasurement() {
         addCall(enableHeartRateNotifications());
         addCall(sendHRCommand(COMMAND.START_HEART_RATE_MEASUREMENT_CONTINUOUS));
+    }
+
+    private void stopHeartRateMeasurement() {
+        addCall(sendHRCommand(COMMAND.STOP_HEART_RATE_MEASUREMENT_CONTINUOUS));
+        addCall(dissableHeartRateNotifications());
     }
 
     /**
@@ -607,7 +625,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         return new ActionWithoutResponse() {
             @Override
             public void run() {
-                bluetoothService.getPairView().setMessage("Paired!");
+                bluetoothService.getPairView().setPairStatus(IPairView.STATUS_SUCCESS);
             }
         };
     }
@@ -644,6 +662,16 @@ public class MiBandConnectionManager extends ConnectionManager {
             }
         };
     }
+
+    private Action dissableHeartRateNotifications() {
+        return new ActionWithConditionalResponse() {
+            @Override
+            public void run() {
+                if(deviceInfo.supportsHeartRate()) this.expectsResult = heartRateService.dissableNotifications();
+            }
+        };
+    }
+
 
     /* Not tested yet - TODO */
 
@@ -770,6 +798,24 @@ public class MiBandConnectionManager extends ConnectionManager {
                 break;
             default:
                 Log.d("Notification", "Code " + value[0]);
+        }
+    }
+
+    private void handleHeartrateNotification(byte[] value) {
+        // Check if value is 2 byte long.
+        if(value.length != 2){
+            Log.e("Notification", "Received " + value.length + " bytes");
+            return ;
+        }
+
+        // Handle value
+        switch (value[0]) {
+            case 6:
+                Log.d("Notification", "Heartrate: " + Parse.BytesToInt(value,1,1));
+                bluetoothService.getMeasureView().sendHeartrate(new Date(),Parse.BytesToInt(value,1,1));
+                break;
+            default:
+                Log.d("Notification", "Code " + value[0] + " value: " + value[1]);
         }
     }
 
