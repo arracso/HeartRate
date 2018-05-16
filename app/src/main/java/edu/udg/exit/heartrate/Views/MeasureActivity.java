@@ -127,7 +127,7 @@ public class MeasureActivity extends Activity implements IMeasureView {
     public void sendHeartrate(Date date, Integer heartrate) {
         showText("" + heartrate);
         // Save to file
-        fileWriter.writeToFile("" + date.getTime() + " " + heartrate + "/n");
+        fileWriter.writeToFile("\r\n" + date.getTime() + ", " + heartrate);
     }
 
 
@@ -148,10 +148,10 @@ public class MeasureActivity extends Activity implements IMeasureView {
         private void createFile(){
             // Create file
             try {
-                name = "HR_" + new Date().getTime() + ".csv";
+                name = "HR_" + Global.user.getId() + "_" + new Date().getTime() + ".csv";
                 file = openFileOutput(name, MODE_PRIVATE);
                 bw = new BufferedWriter(new OutputStreamWriter(file));
-                writeToFile("Time HeartRate/n");
+                writeToFile("Time, HeartRate");
                 Log.d("File", "file created");
             } catch(FileNotFoundException e) {
                 file = null;
