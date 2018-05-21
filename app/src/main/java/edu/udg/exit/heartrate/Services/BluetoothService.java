@@ -267,7 +267,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     @Override
     public void setMeasure(Date date, Integer measure) {
         storage.writeToFile("\r\n" + date.getTime() + ", " + measure);
-        if(measureView != null) measureView.sendHeartrate(date, measure);
+        if(measureView != null) measureView.setHeartRate(measure);
     }
 
     /////////////////////
