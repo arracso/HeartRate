@@ -1,23 +1,24 @@
 package edu.udg.exit.heartrate.Devices.MiBand;
 
-import android.bluetooth.*;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.util.Log;
-
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
+import edu.udg.exit.heartrate.Devices.ConnectionManager;
+import edu.udg.exit.heartrate.Devices.MiBand.Services.HeartRateService;
+import edu.udg.exit.heartrate.Devices.MiBand.Services.MiliService;
+import edu.udg.exit.heartrate.Devices.MiBand.Services.VibrationService;
+import edu.udg.exit.heartrate.Devices.MiBand.Utils.*;
 import edu.udg.exit.heartrate.Interfaces.IPairView;
-import edu.udg.exit.heartrate.Interfaces.IScanView;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.Utils.Actions.Action;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithConditionalResponse;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithResponse;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithoutResponse;
-import edu.udg.exit.heartrate.Devices.MiBand.Services.HeartRateService;
-import edu.udg.exit.heartrate.Devices.MiBand.Services.MiliService;
-import edu.udg.exit.heartrate.Devices.MiBand.Services.VibrationService;
-import edu.udg.exit.heartrate.Devices.MiBand.Utils.*;
-import edu.udg.exit.heartrate.Devices.ConnectionManager;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.UUID;
 
 import static edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants.*;
 
@@ -812,7 +813,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         switch (value[0]) {
             case 6:
                 Log.d("Notification", "Heartrate: " + Parse.BytesToInt(value,1,1));
-                bluetoothService.getMeasureView().sendHeartrate(new Date(),Parse.BytesToInt(value,1,1));
+                bluetoothService.setMeasure(new Date(),Parse.BytesToInt(value,1,1));
                 break;
             default:
                 Log.d("Notification", "Code " + value[0] + " value: " + value[1]);

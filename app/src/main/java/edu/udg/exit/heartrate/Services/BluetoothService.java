@@ -12,8 +12,10 @@ import edu.udg.exit.heartrate.Devices.ConnectionManager;
 import edu.udg.exit.heartrate.Interfaces.*;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants;
+import edu.udg.exit.heartrate.Utils.Storage;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +52,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     // Measure
     private IMeasureView measureView;
+    private Storage storage;
 
     // Connection
     private ConnectionManager connectionManager;
@@ -75,6 +78,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
         // Measure
         measureView = null;
+        storage = new Storage();
 
         // Connection
         connectionManager = new MiBandConnectionManager(this);
@@ -249,12 +253,21 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void startMeasure() {
+        storage.createFile(getApplicationContext());
         connectionManager.startMeasure();
     }
 
     @Override
     public void stopMeasure() {
         connectionManager.stopMeasure();
+        storage.closeFile();
+        storage.uploadFile(getApplicationContext());
+    }
+
+    @Override
+    public void setMeasure(Date date, Integer measure) {
+        storage.writeToFile("\r\n" + date.getTime() + ", " + measure);
+        if(measureView != null) measureView.sendHeartrate(date, measure);
     }
 
     /////////////////////
