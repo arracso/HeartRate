@@ -9,7 +9,6 @@
 - MiBand A1 - Not supported
 
 ## Local Properties
-
 On eXiT lab:
 ```
 sdk.dir=C\:\\Users\\eXIt\\AppData\\Local\\Android\\android-sdk
