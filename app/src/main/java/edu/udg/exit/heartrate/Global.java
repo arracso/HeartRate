@@ -15,6 +15,6 @@ public class Global {
     // Variables //
     ///////////////
 
-    public static User user = null;
+    public static User user = new User();
 
 }

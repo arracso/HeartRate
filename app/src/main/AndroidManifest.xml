@@ -3,11 +3,10 @@
           package="edu.udg.exit.heartrate">
 
     <!-- Storage Permissions -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE"/>
 
     <!-- Internet Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -34,23 +33,26 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
 
+        <!-- Services -->
+        <service android:name=".Services.BluetoothService"/>
+        <service android:name=".Services.ApiService"/>
+
         <!-- Launch Activity -->
-        <activity android:name=".Views.MainActivity">
+        <activity android:name=".Views.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <!-- Activities -->
+        <activity android:name=".Views.MainActivity" />
+        <activity android:name=".Views.LoginActivity"/>
         <activity android:name=".Views.ScanActivity"/>
         <activity android:name=".Views.PairActivity"/>
-        <activity android:name=".Views.MeasureActivity" />
+        <activity android:name=".Views.MeasureActivity"/>
+        <activity android:name=".Views.RegisterActivity"/>
 
-        <!-- Services -->
-        <service android:name=".Services.BluetoothService"/>
-        <service android:name=".Services.ApiService"/>
     </application>
 
 </manifest>
