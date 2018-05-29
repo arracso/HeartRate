@@ -51,4 +51,25 @@ public class MainActivity extends Activity {
         (((TodoApp) this.getApplication())).getBluetoothService().unbindDevice();
     }
 
+    /**
+     * Delete user information and redirect to Login Activity
+     * @param view - MainActivity view
+     */
+    public void logout(View view) {
+        UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.ACCESS_TOKEN);
+        UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.REFRESH_TOKEN);
+        // TODO - unbind mi band, delete other user preference. delete measurements, etc
+        startLoginActivity();
+    }
+
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+
+    private void startLoginActivity() {
+        Intent login = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(login);
+        this.finish();
+    }
+
 }

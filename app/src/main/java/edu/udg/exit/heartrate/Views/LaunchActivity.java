@@ -1,24 +1,17 @@
 package edu.udg.exit.heartrate.Views;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.media.Image;
 import android.os.Bundle;
-import android.os.LocaleList;
-import android.util.Log;
+import android.os.Handler;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
-import edu.udg.exit.heartrate.Activities.BluetoothActivity;
 import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
-import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
 import retrofit2.Call;
@@ -27,10 +20,32 @@ import retrofit2.Response;
 
 public class LaunchActivity extends Activity {
 
+    ///////////////
+    // Constants //
+    ///////////////
+
+    private static final int MAX_ATTEMPTS = 10;
+    private static final int DELAY = 10; // Delay between login attempts
+
+    ////////////////
+    // Attributes //
+    ////////////////
+
+    private Handler handler; // Handler to try login again
+    private int count; // Counter to try login
+
+    ///////////////////////
+    // Lifecycle Methods //
+    ///////////////////////
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launch);
+
+        // Handler & counter
+        handler = new Handler();
+        count = 0;
 
         // Launch animation
         loadLaunchAnimation();
@@ -51,23 +66,46 @@ public class LaunchActivity extends Activity {
         Glide.with(this).load(R.drawable.loading_heart_rate).into(new GlideDrawableImageViewTarget(launchAnimation));
     }
 
+    /**
+     * Check if the user is logged in and tries to retrieve its information.
+     * If no user session found (tokens) redirect to login activity.
+     */
     private void checkLogin() {
         String accessToken = UserPreferences.getInstance().load(getApplicationContext(),UserPreferences.ACCESS_TOKEN);
         if(accessToken != null) getUser();
+        else startLoginActivity();
     }
 
+    /**
+     * Gets the user from access token and redirect to main activity.
+     * On access token expired request new access token.
+     * On access token invalid redirect to login activity.
+     */
     private void getUser() {
         ApiService apiService = ((TodoApp) getApplication()).getApiService();
 
-        if(apiService == null) return;
+        if(apiService == null){
+            if(count == MAX_ATTEMPTS) startMainActivity();
+            else{
+                count = count + 1;
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getUser();
+                    }
+                },DELAY);
+            }
+            return;
+        }
 
         apiService.getUserService().getUser().enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if(response.isSuccessful()){
-                    User user = response.body();
+                    User user = (User) response.body();
                     Global.user = user;
                     Toast.makeText(getApplicationContext(), "User id: " + user.getId(), Toast.LENGTH_LONG).show();
+                    startMainActivity();
                 }else if(response.code() == 401){ // Unauthorized
                     Toast.makeText(getApplicationContext(), "Unauthorized!", Toast.LENGTH_LONG).show();
                 }else{
@@ -77,9 +115,28 @@ public class LaunchActivity extends Activity {
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Failed to connect.", Toast.LENGTH_LONG).show();
+                startMainActivity();
             }
         });
+    }
+
+    /**
+     * Starts main activity and finish this activity.
+     */
+    private void startMainActivity() {
+        Intent main = new Intent(LaunchActivity.this,MainActivity.class);
+        startActivity(main);
+        this.finish();
+    }
+
+    /**
+     * Starts login activity and finish this activity.
+     */
+    private void startLoginActivity() {
+        Intent login = new Intent(LaunchActivity.this,LoginActivity.class);
+        startActivity(login);
+        this.finish();
     }
 
 
