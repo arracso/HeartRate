@@ -3,7 +3,6 @@ package edu.udg.exit.heartrate.Views;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,18 +10,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.Model.Login;
-import edu.udg.exit.heartrate.Model.Register;
 import edu.udg.exit.heartrate.Model.Tokens;
-import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
-import junit.framework.Test;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Activity to perform a login into the application.
+ */
 public class LoginActivity extends Activity {
 
     ///////////////////////
@@ -42,6 +41,9 @@ public class LoginActivity extends Activity {
     // Private Methods //
     /////////////////////
 
+    /**
+     * Sets the actions of all buttons and links of the view.
+     */
     private void setButtonActions() {
         // Login Button
         Button loginBtn = (Button) findViewById(R.id.login_button);
@@ -64,7 +66,7 @@ public class LoginActivity extends Activity {
         resetLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                resetPassword();
+                startResetPasswordActivity();
             }
         });
         // Register button
@@ -77,6 +79,9 @@ public class LoginActivity extends Activity {
         });
     }
 
+    /**
+     * Checks if credentials are valid and attempts to make a login with them.
+     */
     private void login() {
         ApiService apiService = ((TodoApp) getApplication()).getApiService();
 
@@ -107,20 +112,47 @@ public class LoginActivity extends Activity {
         });
     }
 
+    /**
+     * Attempts to make a login as a guest.
+     */
     private void loginAsGuest() {
+        ((TodoApp) getApplication()).getApiService().getAuthService().loginAsGuest().enqueue(new Callback<Tokens>() {
+            @Override
+            public void onResponse(Call<Tokens> call, Response<Tokens> response) {
+                if(response.isSuccessful()){
+                    UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.ACCESS_TOKEN,response.body().getAccessToken());
+                    UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.REFRESH_TOKEN,response.body().getRefreshToken());
+                    startLaunchActivity();
+                }
+            }
 
+            @Override
+            public void onFailure(Call<Tokens> call, Throwable t) {
+                Toast.makeText(LoginActivity.this,"Failed to Login!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
-    private void resetPassword() {
-
+    /**
+     * Starts the reset password activity. (no need to close this activity)
+     */
+    private void startResetPasswordActivity() {
+        //Intent resetPassword = new Intent(LoginActivity.this, ResetPasswordActivity.class);
+        //startActivity(resetPassword);
     }
 
+    /**
+     * Starts the register activity and closes this activity.
+     */
     private void startRegisterActivity() {
         Intent register = new Intent(LoginActivity.this, RegisterActivity.class);
         startActivity(register);
         this.finish();
     }
 
+    /**
+     * Starts the launch activity and closes this activity.
+     */
     private void startLaunchActivity() {
         Intent launch = new Intent(LoginActivity.this, LaunchActivity.class);
         startActivity(launch);
@@ -130,7 +162,7 @@ public class LoginActivity extends Activity {
     /**
      * Checks if username is valid (it can be an email)
      * @param username - Username to be check
-     * @return
+     * @return True when username is valid, false otherwise.
      */
     private boolean checkUsername(String username) {
         String error = null;
@@ -151,9 +183,9 @@ public class LoginActivity extends Activity {
     }
 
     /**
-     * Checks if password is valid
+     * Checks if password is valid.
      * @param password - Password to be check
-     * @return
+     * @return True when password is valid, false otherwise.
      */
     private boolean checkPassword(String password) {
         String error = null;
