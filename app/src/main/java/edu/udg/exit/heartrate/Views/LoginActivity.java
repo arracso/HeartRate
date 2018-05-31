@@ -8,9 +8,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.gson.Gson;
+import edu.udg.exit.heartrate.Model.*;
 import edu.udg.exit.heartrate.Global;
-import edu.udg.exit.heartrate.Model.Login;
-import edu.udg.exit.heartrate.Model.Tokens;
+import edu.udg.exit.heartrate.Model.ErrorBody;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.TodoApp;
@@ -18,6 +19,8 @@ import edu.udg.exit.heartrate.Utils.UserPreferences;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import java.io.IOException;
 
 /**
  * Activity to perform a login into the application.
@@ -102,6 +105,16 @@ public class LoginActivity extends Activity {
                     UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.ACCESS_TOKEN,response.body().getAccessToken());
                     UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.REFRESH_TOKEN,response.body().getRefreshToken());
                     startLaunchActivity();
+                }else{
+                    try {
+                        Gson gson = new Gson();
+                        ErrorBody errorBody = gson.fromJson(response.errorBody().string(), ErrorBody.class);
+
+                    } catch (IOException e) {
+                        Toast.makeText(LoginActivity.this,"Unknown login error.",Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(LoginActivity.this,"Fatal login error.",Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
@@ -142,12 +155,11 @@ public class LoginActivity extends Activity {
     }
 
     /**
-     * Starts the register activity and closes this activity.
+     * Starts the register activity and closes this activity. (no need to close this activity)
      */
     private void startRegisterActivity() {
         Intent register = new Intent(LoginActivity.this, RegisterActivity.class);
         startActivity(register);
-        this.finish();
     }
 
     /**
