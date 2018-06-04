@@ -109,7 +109,7 @@ public class LoginActivity extends Activity {
                     try {
                         Gson gson = new Gson();
                         ErrorBody errorBody = gson.fromJson(response.errorBody().string(), ErrorBody.class);
-
+                        Toast.makeText(LoginActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
                     } catch (IOException e) {
                         Toast.makeText(LoginActivity.this,"Unknown login error.",Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
@@ -120,7 +120,7 @@ public class LoginActivity extends Activity {
 
             @Override
             public void onFailure(Call<Tokens> call, Throwable t) {
-                Toast.makeText(LoginActivity.this,"Failed to Login!", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this,"Failed to connect to the server!", Toast.LENGTH_LONG).show();
             }
         });
     }

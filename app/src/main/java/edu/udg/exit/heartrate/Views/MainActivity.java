@@ -66,6 +66,9 @@ public class MainActivity extends Activity {
     // Private Methods //
     /////////////////////
 
+    /**
+     * Starts the login activity and finish this activity.
+     */
     private void startLoginActivity() {
         Intent login = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(login);
