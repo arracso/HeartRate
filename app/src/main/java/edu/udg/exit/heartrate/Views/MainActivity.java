@@ -1,13 +1,21 @@
 package edu.udg.exit.heartrate.Views;
 
 import android.app.Activity;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.transition.Transition;
+import android.util.Log;
 import android.view.View;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.TodoApp;
+import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Date;
 
 public class MainActivity extends Activity {
 
@@ -19,6 +27,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        test();
     }
 
     ////////////////////
@@ -64,6 +74,14 @@ public class MainActivity extends Activity {
         Intent login = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(login);
         this.finish();
+    }
+
+
+    private void test(){
+        DataBase db = new DataBase(this.getApplicationContext());
+
+        File file = db.exportAsCSV(DataBase.RATE_TABLE_NAME, "HR.csv");
+
     }
 
 }

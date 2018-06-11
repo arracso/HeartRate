@@ -41,22 +41,26 @@ public class Storage {
     // Public Methods //
     ////////////////////
 
-    public void createFile(Context ctx){
-        // Create file
+    /**
+     * Create & open a file with the given fileName.
+     * @param ctx - Application context
+     * @param fileName - Name of the file
+     */
+    public void createFile(Context ctx, String fileName){
         try {
-            fileName = "HR_" + Global.user.getId() + "_" + new Date().getTime() + ".csv";
+            this.fileName = fileName;
             fos = ctx.openFileOutput(fileName, ctx.MODE_PRIVATE);
             bw = new BufferedWriter(new OutputStreamWriter(fos));
-            writeToFile("Time, HeartRate");
-            Log.d("File", "file created");
         } catch(FileNotFoundException e) {
             fos = null;
-            Log.d("File", e.getMessage());
+            Log.d("Storage", e.getMessage());
         }
     }
 
+    /**
+     * Close the current file.
+     */
     public void closeFile(){
-        // Close file and send
         if(fos != null){
             try {
                 bw.close();
@@ -64,7 +68,7 @@ public class Storage {
                 fos.close();
                 fos = null;
             } catch (IOException e) {
-                Log.d("File", e.getMessage());
+                Log.d("Storage", e.getMessage());
             }
         }
     }
@@ -79,6 +83,19 @@ public class Storage {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Gets the file with the given file name.
+     * @param ctx - Context
+     * @param fileName - Name of the file
+     * @return File
+     */
+    public File getFile(Context ctx, String fileName) {
+        String path = ctx.getFilesDir() + "/" + fileName;
+        File file = new File(path);
+        if(file.exists()) return file;
+        else return null;
     }
 
     public void uploadFile(Context ctx){

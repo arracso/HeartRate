@@ -74,7 +74,6 @@ public class MeasureActivity extends Activity implements IMeasureView {
     private void startMeasure() {
         if(!recording){
             recording = true;
-            //fileWriter.createFile();
             bluetoothService.startMeasure();
         }
     }
@@ -82,8 +81,6 @@ public class MeasureActivity extends Activity implements IMeasureView {
     private void stopMeasure() {
         if(recording){
             bluetoothService.stopMeasure();
-            //fileWriter.closeFile();
-            //fileWriter.sendFile();
             recording = false;
         }
     }
