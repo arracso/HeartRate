@@ -16,7 +16,7 @@
     >
 
         <EditText
-                android:id="@+id/login_username"
+                android:id="@+id/login_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
@@ -27,7 +27,7 @@
                 android:background="@color/white"
                 android:inputType="textEmailAddress"
                 android:textAlignment="center"
-                android:hint="email or username"
+                android:hint="email"
         />
 
         <EditText
@@ -67,27 +67,6 @@
             android:layout_centerHorizontal="true"
             android:layout_margin="20dp"
     >
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:textAlignment="center"
-                android:textSize="12dp"
-                android:text="Forgot your password?"
-        />
-
-        <TextView
-                android:id="@+id/login_reset_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:textAlignment="center"
-                android:textSize="12dp"
-                android:text="RESET PASSWORD"
-                android:textStyle="bold"
-                android:clickable="true"
-        />
-
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

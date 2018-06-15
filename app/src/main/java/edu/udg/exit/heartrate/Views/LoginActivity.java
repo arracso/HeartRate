@@ -64,14 +64,6 @@ public class LoginActivity extends Activity {
                 loginAsGuest();
             }
         });
-        // Reset password button
-        TextView resetLink = (TextView) findViewById(R.id.login_reset_password);
-        resetLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startResetPasswordActivity();
-            }
-        });
         // Register button
         TextView registerLink = (TextView) findViewById(R.id.login_register);
         registerLink.setOnClickListener(new View.OnClickListener() {
@@ -89,16 +81,16 @@ public class LoginActivity extends Activity {
         ApiService apiService = ((TodoApp) getApplication()).getApiService();
 
         // Get & check username and password
-        String username = ((EditText) findViewById(R.id.login_username)).getText().toString();
+        String email = ((EditText) findViewById(R.id.login_email)).getText().toString();
         String password = ((EditText) findViewById(R.id.login_password)).getText().toString();
 
         Boolean error = false;
-        if(!checkUsername(username)) error = true;
+        if(!checkEmail(email)) error = true;
         if(!checkPassword(password)) error = true;
         if(error) return;
 
         // Make the call to the server
-        apiService.getAuthService().login(new Login(username,password)).enqueue(new Callback<Tokens>() {
+        apiService.getAuthService().login(new Login(email,password)).enqueue(new Callback<Tokens>() {
             @Override
             public void onResponse(Call<Tokens> call, Response<Tokens> response) {
                 if(response.isSuccessful()){
@@ -147,14 +139,6 @@ public class LoginActivity extends Activity {
     }
 
     /**
-     * Starts the reset password activity. (no need to close this activity)
-     */
-    private void startResetPasswordActivity() {
-        //Intent resetPassword = new Intent(LoginActivity.this, ResetPasswordActivity.class);
-        //startActivity(resetPassword);
-    }
-
-    /**
      * Starts the register activity and closes this activity. (no need to close this activity)
      */
     private void startRegisterActivity() {
@@ -172,24 +156,23 @@ public class LoginActivity extends Activity {
     }
 
     /**
-     * Checks if username is valid (it can be an email)
-     * @param username - Username to be check
-     * @return True when username is valid, false otherwise.
+     * Checks if email is valid.
+     * @param email - Email to be check
+     * @return True when email is valid, false otherwise.
      */
-    private boolean checkUsername(String username) {
+    private boolean checkEmail(String email) {
         String error = null;
 
         // Check username (can be email to)
-        if(username == null || username.equals("")) error = "Username cannot be empty.";
-        else if(username.length() < 4 || username.length() > 16) error = "Username must be 4 to 16 characters long.";
-        else if(!username.matches(Global.REGEX_USERNAME) && !username.matches(Global.REGEX_EMAIL)) error = "Invalid username or email.";
+        if(email == null || email.equals("")) error = "Email cannot be empty.";
+        else if(!email.matches(Global.REGEX_EMAIL)) error = "Invalid email.";
 
         // All checks passed
         if(error == null) return true;
 
         // Show the error
-        EditText usernameText = (EditText) findViewById(R.id.login_username);
-        usernameText.setError(error);
+        EditText emailText = (EditText) findViewById(R.id.login_email);
+        emailText.setError(error);
 
         return false;
     }
