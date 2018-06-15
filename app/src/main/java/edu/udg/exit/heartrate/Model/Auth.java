@@ -1,6 +1,6 @@
 package edu.udg.exit.heartrate.Model;
 
-public class Login {
+public class Auth {
 
     ////////////////
     // Attributes //
@@ -16,7 +16,7 @@ public class Login {
     /**
      * Constructor by params.
      */
-    public Login(String email, String password) {
+    public Auth(String email, String password) {
         this.email = email;
         this.password = password;
     }

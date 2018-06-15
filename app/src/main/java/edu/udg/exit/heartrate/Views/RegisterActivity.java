@@ -11,7 +11,6 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.Model.ErrorBody;
-import edu.udg.exit.heartrate.Model.Login;
 import edu.udg.exit.heartrate.Model.Register;
 import edu.udg.exit.heartrate.Model.Tokens;
 import edu.udg.exit.heartrate.R;

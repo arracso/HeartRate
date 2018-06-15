@@ -9,8 +9,6 @@ public class User {
     ////////////////
 
     private Integer id;
-    private String username;
-    private String email;
     private Integer sex; // (0|1|2) => (other|male|female)
     private Date birthday;
     private Integer weight;
@@ -25,8 +23,6 @@ public class User {
      */
     public User() {
         this.id = null;
-        this.username = "";
-        this.email = "";
         this.sex = null;
         this.birthday = null;
         this.weight = null;
@@ -39,8 +35,6 @@ public class User {
      */
     public User(User user) {
         this.id = user.id;
-        this.username = user.username;
-        this.email = user.email;
         this.sex = user.sex;
         this.birthday = user.birthday;
         this.weight = user.weight;
@@ -56,20 +50,6 @@ public class User {
     }
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public Integer getSex() {

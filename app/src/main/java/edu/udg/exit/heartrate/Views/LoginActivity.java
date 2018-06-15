@@ -90,7 +90,7 @@ public class LoginActivity extends Activity {
         if(error) return;
 
         // Make the call to the server
-        apiService.getAuthService().login(new Login(email,password)).enqueue(new Callback<Tokens>() {
+        apiService.getAuthService().login(new Auth(email,password)).enqueue(new Callback<Tokens>() {
             @Override
             public void onResponse(Call<Tokens> call, Response<Tokens> response) {
                 if(response.isSuccessful()){
@@ -128,6 +128,16 @@ public class LoginActivity extends Activity {
                     UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.ACCESS_TOKEN,response.body().getAccessToken());
                     UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.REFRESH_TOKEN,response.body().getRefreshToken());
                     startLaunchActivity();
+                }else{
+                    try {
+                        Gson gson = new Gson();
+                        ErrorBody errorBody = gson.fromJson(response.errorBody().string(), ErrorBody.class);
+                        Toast.makeText(LoginActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        Toast.makeText(LoginActivity.this,"Unknown login error.",Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(LoginActivity.this,"Fatal login error.",Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
