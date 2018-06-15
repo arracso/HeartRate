@@ -6,7 +6,7 @@ public class Login {
     // Attributes //
     ////////////////
 
-    private String username;
+    private String email;
     private String password;
 
     ///////////////////////
@@ -16,8 +16,8 @@ public class Login {
     /**
      * Constructor by params.
      */
-    public Login(String username, String password) {
-        this.username = username;
+    public Login(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
@@ -25,11 +25,11 @@ public class Login {
     // Public Methods //
     ////////////////////
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
