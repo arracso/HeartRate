@@ -9,6 +9,10 @@ import android.util.Log;
 
 import java.io.File;
 
+/**
+ * Data base maintaining the measures of the user.
+ * NOTE: All tables must be indexed by a timestamp
+ */
 public class DataBase extends SQLiteOpenHelper {
 
     ///////////////
@@ -75,25 +79,53 @@ public class DataBase extends SQLiteOpenHelper {
         this.getWritableDatabase().insert(RATE_TABLE_NAME, null, values);
     }
 
-    public Cursor selectRate() {
-        return this.getReadableDatabase().rawQuery("SELECT * FROM " + RATE_TABLE_NAME, null);
+    /**
+     * Select rows from a table and return its cursor.
+     * @param tableName - name of the table to be selected
+     * @param from - timestamp to start the selection
+     * @param to - timestamp to stop the selection
+     * @return Cursor with selected rows.
+     */
+    public Cursor select(String tableName, Long from, Long to) {
+        if(from == null && to == null)
+            return this.getReadableDatabase().rawQuery("SELECT * FROM " + tableName, null);
+        else if(from == null)
+            return this.getReadableDatabase().rawQuery("SELECT * FROM " + tableName + " WHERE time <= ?", new String[]{""+to});
+        else if(to == null)
+            return this.getReadableDatabase().rawQuery("SELECT * FROM " + tableName + " WHERE time >= ?", new String[]{""+from});
+        else
+            return this.getReadableDatabase().rawQuery("SELECT * FROM " + tableName + " WHERE time >= ? AND time <= ?", new String[]{""+from,""+to});
     }
 
-    public Cursor selectRate(long to) {
-        return this.getReadableDatabase().rawQuery("SELECT * FROM " + RATE_TABLE_NAME + " WHERE time <= ?", new String[]{""+to});
+    /**
+     * Delete rows from a table.
+     * @param tableName - name of the table
+     * @param from - timestamp to start the deletion
+     * @param to - timestamp to stop the deletion
+     * @return Integer
+     */
+    public Integer delete(String tableName, Long from, Long to) {
+        if(from == null && to == null)
+            return this.getWritableDatabase().delete(tableName,null,null);
+        else if(from == null)
+            return this.getWritableDatabase().delete(tableName,"time <= ?", new String[]{""+to});
+        else if(to == null)
+            return this.getWritableDatabase().delete(tableName,"time >= ?", new String[]{""+from});
+        else
+            return this.getWritableDatabase().delete(tableName,"time >= ? AND time <=?", new String[]{""+from,""+to});
     }
 
-    public Cursor selectRate(long from, long to) {
-        return this.getReadableDatabase().rawQuery("SELECT * FROM " + RATE_TABLE_NAME + " WHERE time >= ? AND time <= ?", new String[]{""+from,""+to});
-    }
-
-    public Cursor select(String tableName) {
-        return this.getReadableDatabase().rawQuery("SELECT * FROM " + tableName, null);
-    }
-
-    public File exportAsCSV(String tableName, String fileName) {
+    /**
+     * Exports a table as a CSV.
+     * @param tableName - name of the table to be exported.
+     * @param from - timestamp to start the selection
+     * @param to - timestamp to begin the selection
+     * @param fileName - name of the exported csv file
+     * @return File
+     */
+    public File exportAsCSV(String tableName, Long from, Long to, String fileName) {
         // Retrieve data from data base
-        Cursor cursor = select(tableName);
+        Cursor cursor = select(tableName, from, to);
 
         // Create File
         Storage storage = new Storage();
@@ -120,6 +152,11 @@ public class DataBase extends SQLiteOpenHelper {
     // Private Methods //
     /////////////////////
 
+    /**
+     * Split the array of objects into coma separated values string format.
+     * @param values - Array with diferent object values.
+     * @return String
+     */
     private String toComaSeparatedValues(Object[] values) {
         StringBuilder builder = new StringBuilder("");
         for(int i = 0; i < values.length; i++){
@@ -130,13 +167,17 @@ public class DataBase extends SQLiteOpenHelper {
         return builder.toString();
     }
 
+    /**
+     * Split the values of the cursor into coma separated values string format.
+     * @param cursor - cursor pointing to a row
+     * @return String
+     */
     private String toComaSeparatedValues(Cursor cursor) {
         StringBuilder builder = new StringBuilder("\r\n");
         for(int i = 0; i < cursor.getColumnCount(); i++){
             if(i!=0) builder.append(", ");
             builder.append(cursor.getString(i));
         }
-        Log.d("CSV", builder.toString());
         return builder.toString();
     }
 

@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
     private void test(){
         DataBase db = new DataBase(this.getApplicationContext());
 
-        File file = db.exportAsCSV(DataBase.RATE_TABLE_NAME, "HR.csv");
+        File file = db.exportAsCSV(DataBase.RATE_TABLE_NAME, null, null, "HR.csv");
 
     }
 
