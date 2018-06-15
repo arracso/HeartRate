@@ -74,16 +74,14 @@ public class RegisterActivity extends Activity {
     private void register() {
         ApiService apiService = ((TodoApp) getApplication()).getApiService();
 
-        // Get email, username and password
+        // Get email and password
         String email = ((EditText) findViewById(R.id.register_email)).getText().toString();;
-        String username = ((EditText) findViewById(R.id.register_username)).getText().toString();
         String password = ((EditText) findViewById(R.id.register_password)).getText().toString();
         String repassword = ((EditText) findViewById(R.id.register_repassword)).getText().toString();
 
         // Check email, username and password
         Boolean error = false;
         if(!checkEmail(email)) error = true;
-        if(!checkUsername(username)) error = true;
         if(!checkPassword(password,repassword)) error = true;
         if(error) return;
 
@@ -149,29 +147,6 @@ public class RegisterActivity extends Activity {
         // Show the error
         EditText emailText = (EditText) findViewById(R.id.register_email);
         emailText.setError(error);
-
-        return false;
-    }
-
-    /**
-     * Checks if username is valid.
-     * @param username - Username to be check
-     * @return True when username is valid, false otherwise.
-     */
-    private boolean checkUsername(String username) {
-        String error = null;
-
-        // Check username
-        if(username == null || username.equals("")) error = "Username cannot be empty.";
-        else if(username.length() < 4 || username.length() > 16) error = "Username must be 4 to 16 characters long.";
-        else if(!username.matches(Global.REGEX_USERNAME)) error = "Invalid username.";
-
-        // All checks passed
-        if(error == null) return true;
-
-        // Show the error
-        EditText usernameText = (EditText) findViewById(R.id.register_username);
-        usernameText.setError(error);
 
         return false;
     }
