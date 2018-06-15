@@ -10,7 +10,7 @@ public class User {
 
     private Integer id;
     private Integer sex; // (0|1|2) => (other|male|female)
-    private Date birthday;
+    private Integer birthYear;
     private Integer weight;
     private Integer height;
 
@@ -24,7 +24,7 @@ public class User {
     public User() {
         this.id = null;
         this.sex = null;
-        this.birthday = null;
+        this.birthYear = null;
         this.weight = null;
         this.height = null;
     }
@@ -36,7 +36,7 @@ public class User {
     public User(User user) {
         this.id = user.id;
         this.sex = user.sex;
-        this.birthday = user.birthday;
+        this.birthYear = user.birthYear;
         this.weight = user.weight;
         this.height = user.height;
     }
@@ -59,14 +59,11 @@ public class User {
         this.sex = sex;
     }
 
-    public Date getBirthday() {
-        return birthday;
+    public Integer getBirthYear() {
+        return birthYear;
     }
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-    public void setBirthday(String birthday) {
-        this.birthday = new Date(birthday);
+    public void setBirthYear(Integer birthYear) {
+        this.birthYear = birthYear;
     }
 
     public Integer getWeight() {
