@@ -10,8 +10,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.google.gson.Gson;
 import edu.udg.exit.heartrate.Global;
+import edu.udg.exit.heartrate.Model.Auth;
 import edu.udg.exit.heartrate.Model.ErrorBody;
-import edu.udg.exit.heartrate.Model.Register;
 import edu.udg.exit.heartrate.Model.Tokens;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
@@ -88,7 +88,7 @@ public class RegisterActivity extends Activity {
         if(error) return;
 
         // Make the call to the server
-        apiService.getAuthService().register(new Register(email,username,password)).enqueue(new Callback<Tokens>() {
+        apiService.getAuthService().register(new Auth(email,password)).enqueue(new Callback<Tokens>() {
             @Override
             public void onResponse(Call<Tokens> call, Response<Tokens> response) {
                 if(response.isSuccessful()){
