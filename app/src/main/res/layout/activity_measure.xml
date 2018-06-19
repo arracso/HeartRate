@@ -7,6 +7,13 @@
         tools:context="edu.udg.exit.heartrate.Views.MeasureActivity">
 
     <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Unbind"
+            android:onClick="unbindDevice"
+    />
+
+    <Button
             android:id="@+id/measure_btn_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

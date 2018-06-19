@@ -102,17 +102,24 @@ public class DataBase extends SQLiteOpenHelper {
      * @param tableName - name of the table
      * @param from - timestamp to start the deletion
      * @param to - timestamp to stop the deletion
-     * @return Integer
+     * @return Integer - Number of rows affected.
      */
     public Integer delete(String tableName, Long from, Long to) {
         if(from == null && to == null)
-            return this.getWritableDatabase().delete(tableName,null,null);
+            return this.getWritableDatabase().delete(tableName,"1",null);
         else if(from == null)
             return this.getWritableDatabase().delete(tableName,"time <= ?", new String[]{""+to});
         else if(to == null)
             return this.getWritableDatabase().delete(tableName,"time >= ?", new String[]{""+from});
         else
             return this.getWritableDatabase().delete(tableName,"time >= ? AND time <=?", new String[]{""+from,""+to});
+    }
+
+    /**
+     * Deletes all records from all tables of the data base.
+     */
+    public void deleteAllRecords() {
+        delete(RATE_TABLE_NAME,null,null);
     }
 
     /**

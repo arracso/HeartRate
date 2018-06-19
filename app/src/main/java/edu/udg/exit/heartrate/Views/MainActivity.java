@@ -27,8 +27,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        test();
     }
 
     ////////////////////
@@ -45,21 +43,20 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Unbind the current binded device.
-     * @param view - MainActivity view
-     */
-    public void unbindDevice(View view) {
-        (((TodoApp) this.getApplication())).getBluetoothService().unbindDevice();
-    }
-
-    /**
      * Delete user information and redirect to Login Activity
      * @param view - MainActivity view
      */
     public void logout(View view) {
+        // UNBIND MI BAND
+        (((TodoApp) this.getApplication())).getBluetoothService().unbindDevice();
+        // DELETE USER PREFERENCES
         UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.ACCESS_TOKEN);
         UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.REFRESH_TOKEN);
-        // TODO - unbind mi band, delete other user preference. delete measurements, etc
+        UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.USER_PROFILE);
+        // DELETE DATA BASE MEASUREMENTS
+        DataBase dataBase = new DataBase(getApplicationContext());
+        dataBase.deleteAllRecords();
+        // Start login activity
         startLoginActivity();
     }
 
@@ -78,10 +75,9 @@ public class MainActivity extends Activity {
 
 
     private void test(){
-        /*DataBase db = new DataBase(this.getApplicationContext());
+        DataBase db = new DataBase(this.getApplicationContext());
 
-        File file = db.exportAsCSV(DataBase.RATE_TABLE_NAME, null, null, "HR.csv");*/
-
+        File file = db.exportAsCSV(DataBase.RATE_TABLE_NAME, null, null, "HR.csv");
     }
 
 }

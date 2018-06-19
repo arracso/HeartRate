@@ -107,4 +107,13 @@ public class MeasureActivity extends Activity implements IMeasureView {
         showText("" + heartrate);
     }
 
+    /**
+     * Unbind the current binded device.
+     * @param view - MainActivity view
+     */
+    public void unbindDevice(View view) {
+        (((TodoApp) this.getApplication())).getBluetoothService().unbindDevice();
+        this.finish();
+    }
+
 }

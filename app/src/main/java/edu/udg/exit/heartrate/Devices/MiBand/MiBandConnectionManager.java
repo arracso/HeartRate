@@ -9,12 +9,15 @@ import edu.udg.exit.heartrate.Devices.MiBand.Services.HeartRateService;
 import edu.udg.exit.heartrate.Devices.MiBand.Services.MiliService;
 import edu.udg.exit.heartrate.Devices.MiBand.Services.VibrationService;
 import edu.udg.exit.heartrate.Devices.MiBand.Utils.*;
+import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.Interfaces.IPairView;
+import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.Utils.Actions.Action;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithConditionalResponse;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithResponse;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithoutResponse;
+import edu.udg.exit.heartrate.Utils.UserPreferences;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -76,9 +79,8 @@ public class MiBandConnectionManager extends ConnectionManager {
     protected void onServicesDiscovered(BluetoothGatt gatt) {
         Log.d("GATT", "Services discovered");
 
-        // TODO - Move setup to the app
-        userInfo = new UserInfo();
-        userInfo.setUsername("Guest");
+        // Add address to user information
+        userInfo = retrieveUserInfo();
         userInfo.setBlueToothAddress(gatt.getDevice().getAddress());
 
         // Init Services
@@ -208,6 +210,23 @@ public class MiBandConnectionManager extends ConnectionManager {
     /////////////////////
 
     /**
+     * Retrieve user information from user preferences.
+     */
+    private UserInfo retrieveUserInfo(){
+        String userOnj = UserPreferences.getInstance().load(bluetoothService.getApplicationContext(),UserPreferences.USER_PROFILE);
+        User user = Global.gson.fromJson(userOnj, User.class);
+        UserInfo userInfo = new UserInfo();
+        if(user != null){
+            if(user.getId() != null) userInfo.setUsername(""+user.getId());
+            if(user.getHeight() != null) userInfo.setHeight(user.getHeight());
+            if(user.getWeight() != null) userInfo.setWeight(user.getWeight());
+            if(user.getSex() != null) userInfo.setGender(user.getSex());
+            if(user.getBirthYear() != null) userInfo.setAge((new Date()).getYear() - user.getBirthYear());
+        }
+        return userInfo;
+    }
+
+    /**
      * Adds initialization calls to the actionQueue.
      */
     private void initialize() {
@@ -289,7 +308,6 @@ public class MiBandConnectionManager extends ConnectionManager {
      * Needs to sync periodically in order to receive the notifications.
      */
     private void startMeasurement() {
-        //startRealtimeStepsMeasurement(); // TODO
         startHeartRateMeasurement();
         addCall(syncPeriodically());
     }
@@ -537,7 +555,7 @@ public class MiBandConnectionManager extends ConnectionManager {
             @Override
             public void run() {
                 int latencySync = (2 * 480);
-                addCall(waitMilis(SYNC_PERIOD - (3 * DELAY_MIN) - latencySync)); // TODO - Adjust latency
+                addCall(waitMilis(SYNC_PERIOD - (3 * DELAY_MIN) - latencySync));
                 addCall(sync());
                 addCall(syncPeriodically());
             }
@@ -560,24 +578,8 @@ public class MiBandConnectionManager extends ConnectionManager {
                     timesOut = timesOut - 1;
                     if(timesOut == 0){
                         clearCalls();
-                       /* addCall(new ActionWithoutResponse() {
-                            @Override
-                            public void run() {
-                                bluetoothService.getPairView().setPairStatus(IPairView.STATUS_FAILED);
-                            }
-                        });*/
-
                     }
                     else addCallFirst(this);
-                }else{
-                    /*
-                    addCallFirst(new ActionWithoutResponse() {
-                        @Override
-                        public void run() {
-                            bluetoothService.getPairView().setMessage("setting up configurations");
-                        }
-                    });*/
-
                 }
             }
         };
@@ -669,35 +671,6 @@ public class MiBandConnectionManager extends ConnectionManager {
             @Override
             public void run() {
                 if(deviceInfo.supportsHeartRate()) this.expectsResult = heartRateService.dissableNotifications();
-            }
-        };
-    }
-
-
-    /* Not tested yet - TODO */
-
-    /**
-     * Get an action to make the MiBand do "crazy" things.
-     * @return SelfTest Action
-     */
-    private Action selfTest() {
-        return new ActionWithResponse() {
-            @Override
-            public void run() {
-                miliService.selfTest();
-            }
-        };
-    }
-
-    /**
-     * Get an action to perform a remote disconnection.
-     * @return RemoteDisconnect Action
-     */
-    private Action remoteDisconect() {
-        return new ActionWithoutResponse() {
-            @Override
-            public void run() {
-                miliService.remoteDisconnect();
             }
         };
     }
