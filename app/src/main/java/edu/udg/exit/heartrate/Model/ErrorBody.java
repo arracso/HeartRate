@@ -16,6 +16,7 @@ public class ErrorBody {
     public static final int EXPIRED_TOKEN = 4;
     public static final int INVALID_TOKEN = 5;
     public static final int NULL_TOKEN = 6;
+    public static final int UNKNOWN_USER = 7;
 
     ////////////////
     // Attributes //

@@ -8,7 +8,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.google.gson.Gson;
 import edu.udg.exit.heartrate.Global;
+import edu.udg.exit.heartrate.Model.ErrorBody;
 import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
@@ -17,6 +19,8 @@ import edu.udg.exit.heartrate.Utils.UserPreferences;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import java.io.IOException;
 
 public class LaunchActivity extends Activity {
 
@@ -103,11 +107,17 @@ public class LaunchActivity extends Activity {
             public void onResponse(Call<User> call, Response<User> response) {
                 if(response.isSuccessful()){
                     User user = (User) response.body();
-                    Global.user = user;
-                    Toast.makeText(getApplicationContext(), "User id: " + user.getId(), Toast.LENGTH_LONG).show();
+                    ((TodoApp)getApplication()).setUser(user);
                     startMainActivity();
                 }else if(response.code() == 401){ // Unauthorized
-                    Toast.makeText(getApplicationContext(), "Unauthorized!", Toast.LENGTH_LONG).show();
+                    try {
+                        ErrorBody errorBody = Global.gson.fromJson(response.errorBody().string(), ErrorBody.class);
+                        Toast.makeText(LaunchActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        Toast.makeText(LaunchActivity.this,"Unknown login error.",Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(LaunchActivity.this,"Fatal login error.",Toast.LENGTH_LONG).show();
+                    }
                 }else{
                     Toast.makeText(getApplicationContext(), "Login failed!", Toast.LENGTH_LONG).show();
                 }

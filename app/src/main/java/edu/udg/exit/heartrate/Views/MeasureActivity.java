@@ -21,7 +21,7 @@ public class MeasureActivity extends Activity implements IMeasureView {
 
     private Boolean recording;
 
-    private Integer id = Global.user.getId();
+    private Integer id = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +39,7 @@ public class MeasureActivity extends Activity implements IMeasureView {
         // Set button actions
         setButtonActions();
 
+        id = ((TodoApp) getApplication()).getUser().getId();
         if(id!=null) setTextId();
 
     }

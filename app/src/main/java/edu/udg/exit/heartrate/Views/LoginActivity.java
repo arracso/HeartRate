@@ -99,8 +99,7 @@ public class LoginActivity extends Activity {
                     startLaunchActivity();
                 }else{
                     try {
-                        Gson gson = new Gson();
-                        ErrorBody errorBody = gson.fromJson(response.errorBody().string(), ErrorBody.class);
+                        ErrorBody errorBody = Global.gson.fromJson(response.errorBody().string(), ErrorBody.class);
                         Toast.makeText(LoginActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
                     } catch (IOException e) {
                         Toast.makeText(LoginActivity.this,"Unknown login error.",Toast.LENGTH_LONG).show();

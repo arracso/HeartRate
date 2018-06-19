@@ -15,6 +15,7 @@ public class UserPreferences {
     private static final String FILENAME = "HearthRate";
 
     // Fields //
+    public static final String USER_PROFILE = "user_profile";
     public static final String BONDED_DEVICE_ADDRESS = "bounded_device_address";
     public static final String ACCESS_TOKEN = "access_token";
     public static final String REFRESH_TOKEN = "refresh_token";

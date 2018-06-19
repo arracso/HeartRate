@@ -6,8 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.util.Log;
+import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.Services.BluetoothService;
+import edu.udg.exit.heartrate.Utils.UserPreferences;
 
 public class TodoApp extends Application{
 
@@ -15,8 +18,11 @@ public class TodoApp extends Application{
     // Attributes //
     ////////////////
 
+    // Services //
     private BluetoothService bluetoothService = null;
     private ApiService apiService = null;
+    // Profile //
+    private User user = new User();
 
     ///////////////////////
     // LifeCicle methods //
@@ -25,6 +31,8 @@ public class TodoApp extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
+        // Retrieve user profile from user preferences
+        retrieveUser();
         // Connecting & start api service
         Intent apiServiceIntent = new Intent(this,ApiService.class);
         startService(apiServiceIntent);
@@ -87,6 +95,27 @@ public class TodoApp extends Application{
      */
     public ApiService getApiService() {
         return apiService;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+        String userObj = Global.gson.toJson(user);
+        Log.d("USER","set: " + userObj); // TODO - remove Log
+        UserPreferences.getInstance().save(this, UserPreferences.USER_PROFILE, userObj);
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    /////////////////////
+    // Private Methods //
+    /////////////////////
+
+    private void retrieveUser() {
+        String userObj = UserPreferences.getInstance().load(this, UserPreferences.USER_PROFILE);
+        Log.d("USER","get: " + userObj); // TODO - remove Log
+        this.user = Global.gson.fromJson(userObj, User.class);
     }
 
 }
