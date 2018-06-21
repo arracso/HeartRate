@@ -54,7 +54,6 @@
         <activity android:name=".Views.MeasureActivity"/>
         <activity android:name=".Views.RegisterActivity"/>
         <activity android:name=".Views.DeviceActivity"/>
-        <activity android:name=".Views.RecoverPasswordActivity"/>
     </application>
 
 </manifest>
