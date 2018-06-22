@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.transition.Transition;
 import android.util.Log;
 import android.view.View;
+import android.widget.NumberPicker;
+import android.widget.TextView;
+import android.widget.Toast;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.DataBase;
@@ -19,8 +22,7 @@ import java.util.Date;
 
 public class MainActivity extends Activity {
 
-    
-
+    private Integer id = null;
 
     ///////////////////////
     // Lifecycle methods //
@@ -30,6 +32,12 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Set text ID
+        setTextId();
+
+        // Set birth year picker
+        setBirthYearPicker();
     }
 
     ////////////////////
@@ -76,6 +84,41 @@ public class MainActivity extends Activity {
         this.finish();
     }
 
+    /**
+     *
+     */
+    private void setTextId() {
+        Integer id = ((TodoApp) getApplication()).getUser().getId();
+        TextView textId = (TextView) findViewById(R.id.main_text_id);
+        String text = "Your id:";
+        if(id!=null) text += id;
+        textId.setText(text);
+    }
+
+    /**
+     *
+     */
+    private void setBirthYearPicker() {
+        NumberPicker birthYearPicker = (NumberPicker) findViewById(R.id.user_birth_year);
+        // Set range values & current value
+        birthYearPicker.setMinValue(1900);
+        birthYearPicker.setValue(2000);
+        birthYearPicker.setMaxValue((new Date()).getYear());
+        // Set listener
+        birthYearPicker.setOnValueChangedListener(onValueChangeListener);
+    }
+
+    /**
+     * Birth Year picker listener.
+     */
+    NumberPicker.OnValueChangeListener onValueChangeListener = new	NumberPicker.OnValueChangeListener(){
+        @Override
+        public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+            Toast.makeText(MainActivity.this, "selected number "+numberPicker.getValue(), Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    // DEBUG //
 
     private void test(){
         DataBase db = new DataBase(this.getApplicationContext());

@@ -7,29 +7,71 @@
         android:layout_height="match_parent"
 >
 
-    <LinearLayout
+    <Button
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Scan"
+            android:onClick="goToScan"
+            android:layout_alignParentTop="true" android:layout_toStartOf="@+id/button" android:id="@+id/button2"/>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Logout"
+            android:onClick="logout"
+            android:layout_alignParentTop="true" android:layout_alignParentEnd="true" android:id="@+id/button"/>
+    <TextView
+            android:id="@+id/main_text_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Your ID:"
+    />
+    <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
+            android:id="@+id/linearLayout"
     >
-        <Button
-                android:layout_width="wrap_content"
+
+        <RadioGroup
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Scan"
-                android:onClick="goToScan"
-        />
+                android:gravity="center_horizontal"
+                tools:orientation="horizontal"
+        >
+            <RadioButton
+                    android:id="@+id/user_radio_male"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Male"
+                    android:layout_weight="1"
+            />
+            <RadioButton
+                    android:id="@+id/user_radio_female"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Female"
+                    android:layout_weight="1"
+            />
+            <RadioButton
+                    android:id="@+id/user_radio_other"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Other"
+                    android:layout_weight="1"
+            />
+        </RadioGroup>
 
-
-
-        <Button
-                android:layout_width="wrap_content"
+        <NumberPicker
+                android:id="@+id/user_birth_year"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Logout"
-                android:onClick="logout"
         />
-
     </LinearLayout>
+
+
+
 
 </RelativeLayout>
