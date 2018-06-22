@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.Interfaces.IMeasureView;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.BluetoothService;

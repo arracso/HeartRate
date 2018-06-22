@@ -1,10 +1,10 @@
 package edu.udg.exit.heartrate.Views;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import edu.udg.exit.heartrate.R;
 
-public class DeviceActivity extends AppCompatActivity {
+public class DeviceActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
