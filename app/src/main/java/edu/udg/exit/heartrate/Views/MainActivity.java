@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.DataBase;
@@ -18,7 +19,9 @@ import edu.udg.exit.heartrate.Utils.UserPreferences;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class MainActivity extends Activity {
 
@@ -100,21 +103,26 @@ public class MainActivity extends Activity {
      */
     private void setBirthYearPicker() {
         NumberPicker birthYearPicker = (NumberPicker) findViewById(R.id.user_birth_year);
-        // Set range values & current value
+        // Set range values
         birthYearPicker.setMinValue(1900);
-        birthYearPicker.setValue(2000);
-        birthYearPicker.setMaxValue((new Date()).getYear());
+        birthYearPicker.setMaxValue((new GregorianCalendar()).get(Calendar.YEAR));
+        // Set user value
+        Integer birthYear = ((TodoApp) getApplication()).getUser().getBirthYear();
+        if(birthYear != null) birthYearPicker.setValue(birthYear);
+        else birthYearPicker.setValue(2000);
         // Set listener
-        birthYearPicker.setOnValueChangedListener(onValueChangeListener);
+        birthYearPicker.setOnValueChangedListener(onBirthYearPickerListener);
+        // Clear the focus
+        birthYearPicker.clearFocus();
     }
 
     /**
      * Birth Year picker listener.
      */
-    NumberPicker.OnValueChangeListener onValueChangeListener = new	NumberPicker.OnValueChangeListener(){
+    NumberPicker.OnValueChangeListener onBirthYearPickerListener = new NumberPicker.OnValueChangeListener(){
         @Override
         public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-            Toast.makeText(MainActivity.this, "selected number "+numberPicker.getValue(), Toast.LENGTH_SHORT).show();
+            numberPicker.getValue();
         }
     };
 

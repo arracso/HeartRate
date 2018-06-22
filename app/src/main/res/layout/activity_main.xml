@@ -26,6 +26,35 @@
             android:layout_margin="10dp"
             android:text="Your ID:"
     />
+    <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:orientation="vertical"
+            android:layout_marginTop="100dp"
+    >
+        <RadioButton
+                android:id="@+id/user_radio_male"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Male"
+        />
+        <RadioButton
+                android:id="@+id/user_radio_female"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Female"
+        />
+        <RadioButton
+                android:id="@+id/user_radio_other"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Other"
+        />
+    </RadioGroup>
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,35 +63,6 @@
             android:layout_centerHorizontal="true"
             android:id="@+id/linearLayout"
     >
-
-        <RadioGroup
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                tools:orientation="horizontal"
-        >
-            <RadioButton
-                    android:id="@+id/user_radio_male"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Male"
-                    android:layout_weight="1"
-            />
-            <RadioButton
-                    android:id="@+id/user_radio_female"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Female"
-                    android:layout_weight="1"
-            />
-            <RadioButton
-                    android:id="@+id/user_radio_other"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Other"
-                    android:layout_weight="1"
-            />
-        </RadioGroup>
 
         <NumberPicker
                 android:id="@+id/user_birth_year"
