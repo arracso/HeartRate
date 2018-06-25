@@ -1,46 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+
+<ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         tools:context="edu.udg.exit.heartrate.Views.MainActivity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 >
-
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Scan"
-            android:onClick="goToScan"
-            android:layout_alignParentTop="true" android:layout_toStartOf="@+id/button" android:id="@+id/button2"/>
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Logout"
-            android:onClick="logout"
-            android:layout_alignParentTop="true" android:layout_alignParentEnd="true" android:id="@+id/button"/>
-    <TextView
-            android:id="@+id/main_text_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Your ID:"
-    />
-
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/linearLayout"
+            android:gravity="center"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
     >
-
-        <NumberPicker
-                android:id="@+id/user_birth_year"
+        <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-        />
+                android:layout_height="match_parent"
+        >
+            <TextView
+                    android:id="@+id/main_text_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Your ID:"
+                    android:layout_weight="1"
+            />
+
+            <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Scan"
+                    android:onClick="goToScan"
+                    android:layout_alignParentTop="true" android:layout_toStartOf="@+id/button"
+                    android:id="@+id/button2"
+                    android:layout_weight="1"
+            />
+            <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Logout"
+                    android:onClick="logout"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:id="@+id/button"
+                    android:layout_weight="1"
+            />
+        </RelativeLayout>
         <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -68,9 +76,20 @@
                     android:text="Other"
             />
         </RadioGroup>
+        <NumberPicker
+                android:id="@+id/user_birth_year"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+        />
+        <NumberPicker
+                android:id="@+id/user_weight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+        />
+        <NumberPicker
+                android:id="@+id/user_height"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+        />
     </LinearLayout>
-
-
-
-
-</RelativeLayout>
+</ScrollView>

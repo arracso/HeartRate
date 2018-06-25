@@ -106,10 +106,18 @@ public class MainActivity extends Activity {
         // Set range values
         birthYearPicker.setMinValue(1900);
         birthYearPicker.setMaxValue((new GregorianCalendar()).get(Calendar.YEAR));
+        // Set displayed values
+        int nValues = birthYearPicker.getMaxValue()-birthYearPicker.getMinValue()+1;
+        String[] displayedValues = new String[nValues];
+        displayedValues[0] = " ";
+        for (int i=1; i<nValues; i++) {
+            displayedValues[i] = String.format("%d",(birthYearPicker.getMinValue()+i));
+        }
+        birthYearPicker.setDisplayedValues(displayedValues);
         // Set user value
         Integer birthYear = ((TodoApp) getApplication()).getUser().getBirthYear();
         if(birthYear != null) birthYearPicker.setValue(birthYear);
-        else birthYearPicker.setValue(2000);
+        else birthYearPicker.setValue(birthYearPicker.getMinValue());
         // Set listener
         birthYearPicker.setOnValueChangedListener(onBirthYearPickerListener);
         // Clear the focus
@@ -121,8 +129,8 @@ public class MainActivity extends Activity {
      */
     NumberPicker.OnValueChangeListener onBirthYearPickerListener = new NumberPicker.OnValueChangeListener(){
         @Override
-        public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-            numberPicker.getValue();
+        public void onValueChange(NumberPicker numberPicker, int oldValue, int newValue) {
+            Log.d("PICKER", "" + numberPicker.getValue());
         }
     };
 
