@@ -39,8 +39,12 @@ public class MainActivity extends Activity {
         // Set text ID
         setTextId();
 
-        // Set birth year picker
+        // Set number pickers
         setBirthYearPicker();
+        setWeightPicker();
+        setHeightPicker();
+
+        // Set radio buttons
     }
 
     ////////////////////
@@ -99,40 +103,85 @@ public class MainActivity extends Activity {
     }
 
     /**
-     *
+     * Sets birth year picker
      */
     private void setBirthYearPicker() {
+        // Listener
+        NumberPicker.OnValueChangeListener onBirthYearPickerListener = new NumberPicker.OnValueChangeListener(){
+            @Override
+            public void onValueChange(NumberPicker numberPicker, int oldValue, int newValue) {
+                Log.d("PICKER", "" + numberPicker.getValue());
+            }
+        };
+
         NumberPicker birthYearPicker = (NumberPicker) findViewById(R.id.user_birth_year);
-        // Set range values
-        birthYearPicker.setMinValue(1900);
-        birthYearPicker.setMaxValue((new GregorianCalendar()).get(Calendar.YEAR));
-        // Set displayed values
-        int nValues = birthYearPicker.getMaxValue()-birthYearPicker.getMinValue()+1;
-        String[] displayedValues = new String[nValues];
-        displayedValues[0] = " ";
-        for (int i=1; i<nValues; i++) {
-            displayedValues[i] = String.format("%d",(birthYearPicker.getMinValue()+i));
-        }
-        birthYearPicker.setDisplayedValues(displayedValues);
-        // Set user value
-        Integer birthYear = ((TodoApp) getApplication()).getUser().getBirthYear();
-        if(birthYear != null) birthYearPicker.setValue(birthYear);
-        else birthYearPicker.setValue(birthYearPicker.getMinValue());
-        // Set listener
-        birthYearPicker.setOnValueChangedListener(onBirthYearPickerListener);
-        // Clear the focus
-        birthYearPicker.clearFocus();
+        int actualYear = (new GregorianCalendar()).get(Calendar.YEAR);
+        setNumberPicker(birthYearPicker,1900, actualYear,1900,true, onBirthYearPickerListener);
     }
 
     /**
-     * Birth Year picker listener.
+     * Sets birth year picker
      */
-    NumberPicker.OnValueChangeListener onBirthYearPickerListener = new NumberPicker.OnValueChangeListener(){
-        @Override
-        public void onValueChange(NumberPicker numberPicker, int oldValue, int newValue) {
-            Log.d("PICKER", "" + numberPicker.getValue());
+    private void setWeightPicker() {
+        // Listener
+        NumberPicker.OnValueChangeListener onWeightPickerListener = new NumberPicker.OnValueChangeListener(){
+            @Override
+            public void onValueChange(NumberPicker numberPicker, int oldValue, int newValue) {
+                Log.d("PICKER", "" + numberPicker.getValue());
+            }
+        };
+
+        NumberPicker birthYearPicker = (NumberPicker) findViewById(R.id.user_weight);
+        setNumberPicker(birthYearPicker,30, 250,30,true, onWeightPickerListener);
+    }
+
+    /**
+     * Sets birth year picker
+     */
+    private void setHeightPicker() {
+        // Listener
+        NumberPicker.OnValueChangeListener onHeightPickerListener = new NumberPicker.OnValueChangeListener(){
+            @Override
+            public void onValueChange(NumberPicker numberPicker, int oldValue, int newValue) {
+                Log.d("PICKER", "" + numberPicker.getValue());
+            }
+        };
+
+        NumberPicker birthYearPicker = (NumberPicker) findViewById(R.id.user_height);
+        setNumberPicker(birthYearPicker,50, 250,50,true, onHeightPickerListener);
+    }
+
+    /**
+     * Sets number picker configurations
+     * @param numberPicker - Number picker to be configured
+     * @param minValue - Min value of the number picker
+     * @param maxValue - Max value of the number picker
+     * @param defaultValue - Default value of the number picker
+     * @param firstAsNull - When this is true first value is used to define null value
+     * @param onValueChangeListener - Listener of the number picker
+     */
+    private void setNumberPicker(NumberPicker numberPicker, int minValue, int maxValue, int defaultValue, boolean firstAsNull, NumberPicker.OnValueChangeListener onValueChangeListener) {
+        // Set range values
+        numberPicker.setMinValue(minValue);
+        numberPicker.setMaxValue(maxValue);
+        // Set displayed values
+        if(firstAsNull){
+            int nValues = maxValue - minValue + 1;
+            String[] displayedValues = new String[nValues];
+            displayedValues[0] = " ";
+            for (int i=1; i<nValues; i++) {
+                displayedValues[i] = String.format("%d",(minValue+i));
+            }
+            numberPicker.setDisplayedValues(displayedValues);
         }
-    };
+        // Set user value
+        numberPicker.setValue(defaultValue);
+        // Set listener
+        numberPicker.setOnValueChangedListener(onValueChangeListener);
+        // Clear the focus
+        numberPicker.clearFocus();
+    }
+
 
     // DEBUG //
 

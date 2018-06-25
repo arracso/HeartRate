@@ -1,4 +1,4 @@
-# Working
+﻿# Working
 
 ID       | MAC               | CHARGED  | CHARGES | COMMENT
 :-------:|:-----------------:|:--------:|:-------:|:---------------
