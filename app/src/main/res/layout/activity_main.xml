@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 >
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,10 +50,29 @@
                     android:layout_weight="1"
             />
         </RelativeLayout>
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@android:color/black" />
+
+        <TextView
+                android:id="@+id/user_sex_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="Sex"
+        />
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black" />
         <RadioGroup
+                android:id="@+id/user_sex"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:orientation="vertical"
+                android:visibility="gone"
         >
             <RadioButton
                     android:id="@+id/user_radio_male"
@@ -76,20 +96,85 @@
                     android:text="Other"
             />
         </RadioGroup>
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/black" />
+
+        <TextView
+                android:id="@+id/user_birth_year_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="Birth Year"
+        />
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black" />
         <NumberPicker
                 android:id="@+id/user_birth_year"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
         />
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/black" />
+
+        <TextView
+                android:id="@+id/user_weight_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="Weight"
+        />
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black" />
         <NumberPicker
                 android:id="@+id/user_weight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
         />
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/black" />
+
+        <TextView
+                android:id="@+id/user_height_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="Height"
+        />
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/black" />
         <NumberPicker
                 android:id="@+id/user_height"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
         />
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/black" />
+
+        <edu.udg.exit.heartrate.Components.ExpandItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        />
+
     </LinearLayout>
 </ScrollView>

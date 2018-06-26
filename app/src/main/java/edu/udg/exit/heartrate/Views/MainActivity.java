@@ -12,6 +12,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.udg.exit.heartrate.Global;
+import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.DataBase;
@@ -25,7 +26,21 @@ import java.util.GregorianCalendar;
 
 public class MainActivity extends Activity {
 
+    ///////////////
+    // Constants //
+    ///////////////
+
+    private static final int SEX = 0;
+    private static final int BIRTH_YEAR = 1;
+    private static final int HEIGHT = 2;
+    private static final int WEIGHT = 3;
+
+    ///////////////
+    // Variables //
+    ///////////////
+
     private Integer id = null;
+    private int oldContent = -1;
 
     ///////////////////////
     // Lifecycle methods //
@@ -35,6 +50,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Set content
+        setContents();
 
         // Set text ID
         setTextId();
@@ -78,6 +96,8 @@ public class MainActivity extends Activity {
         startLoginActivity();
     }
 
+
+
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -106,17 +126,9 @@ public class MainActivity extends Activity {
      * Sets birth year picker
      */
     private void setBirthYearPicker() {
-        // Listener
-        NumberPicker.OnValueChangeListener onBirthYearPickerListener = new NumberPicker.OnValueChangeListener(){
-            @Override
-            public void onValueChange(NumberPicker numberPicker, int oldValue, int newValue) {
-                Log.d("PICKER", "" + numberPicker.getValue());
-            }
-        };
-
         NumberPicker birthYearPicker = (NumberPicker) findViewById(R.id.user_birth_year);
         int actualYear = (new GregorianCalendar()).get(Calendar.YEAR);
-        setNumberPicker(birthYearPicker,1900, actualYear,1900,true, onBirthYearPickerListener);
+        setNumberPicker(birthYearPicker,1900, actualYear,1900,true, null);
     }
 
     /**
@@ -182,6 +194,86 @@ public class MainActivity extends Activity {
         numberPicker.clearFocus();
     }
 
+
+    private void setContents() {
+        oldContent = -1;
+
+        findViewById(R.id.user_sex_label).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(SEX);
+            }
+        });
+        findViewById(R.id.user_birth_year_label).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(BIRTH_YEAR);
+            }
+        });
+        findViewById(R.id.user_height_label).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(HEIGHT);
+            }
+        });
+        findViewById(R.id.user_weight_label).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(WEIGHT);
+            }
+        });
+    }
+
+    private void toggleContents(int newContent) {
+        if(oldContent != -1) collapseContent(oldContent);
+        if(oldContent == newContent) oldContent = -1;
+        else {
+            oldContent = newContent;
+            expandContent(newContent);
+        }
+    }
+
+    private void expandContent(int content) {
+        switch (content){
+            case SEX:
+                findViewById(R.id.user_sex).setVisibility(View.VISIBLE);
+                break;
+            case BIRTH_YEAR:
+                findViewById(R.id.user_birth_year).setVisibility(View.VISIBLE);
+                break;
+            case HEIGHT:
+                findViewById(R.id.user_height).setVisibility(View.VISIBLE);
+                break;
+            case WEIGHT:
+                findViewById(R.id.user_weight).setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    private void collapseContent(int content) {
+        switch (content){
+            case SEX:
+                findViewById(R.id.user_sex).setVisibility(View.GONE);
+                break;
+            case BIRTH_YEAR:
+                findViewById(R.id.user_birth_year).setVisibility(View.GONE);
+                setBirthYearFromPicker();
+                break;
+            case HEIGHT:
+                findViewById(R.id.user_height).setVisibility(View.GONE);
+                break;
+            case WEIGHT:
+                findViewById(R.id.user_weight).setVisibility(View.GONE);
+                break;
+        }
+    }
+
+    private void setBirthYearFromPicker() {
+        Integer birthYear = ((NumberPicker) findViewById(R.id.user_birth_year)).getValue();
+        if(birthYear == 1900) birthYear = null;
+
+
+    }
 
     // DEBUG //
 
