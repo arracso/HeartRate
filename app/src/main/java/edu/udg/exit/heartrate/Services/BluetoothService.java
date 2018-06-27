@@ -12,8 +12,10 @@ import edu.udg.exit.heartrate.Devices.ConnectionManager;
 import edu.udg.exit.heartrate.Interfaces.*;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants;
+import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +53,9 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     // Measure
     private IMeasureView measureView;
 
+    // Data base
+    private DataBase dataBase;
+
     // Connection
     private ConnectionManager connectionManager;
 
@@ -62,9 +67,6 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     public void onCreate() {
         super.onCreate();
 
-        // Log
-        Log.d("BluetoothService", "create");
-
         // Scan
         scanning = false;
         scanView = null;
@@ -75,6 +77,9 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
         // Measure
         measureView = null;
+
+        // Data Base
+        dataBase = new DataBase(getApplicationContext());
 
         // Connection
         connectionManager = new MiBandConnectionManager(this);
@@ -97,9 +102,6 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void onDestroy() {
-        // Log
-        Log.d("BluetoothService", "destroy");
-
         // Scan
         devices.clear();
         scanning = null;
@@ -255,6 +257,12 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     @Override
     public void stopMeasure() {
         connectionManager.stopMeasure();
+    }
+
+    @Override
+    public void setMeasure(Date date, Integer measure) {
+        dataBase.insertRate(date.getTime(),measure);
+        if(measureView != null) measureView.setHeartRate(measure);
     }
 
     /////////////////////

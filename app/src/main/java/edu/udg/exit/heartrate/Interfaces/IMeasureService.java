@@ -1,5 +1,7 @@
 package edu.udg.exit.heartrate.Interfaces;
 
+import java.util.Date;
+
 public interface IMeasureService {
 
     /////////////
@@ -22,5 +24,7 @@ public interface IMeasureService {
     void startMeasure();
 
     void stopMeasure();
+
+    void setMeasure(Date date, Integer measure);
 
 }

@@ -9,10 +9,8 @@ public class User {
     ////////////////
 
     private Integer id;
-    private String username;
-    private String email;
     private Integer sex; // (0|1|2) => (other|male|female)
-    private Date birthday;
+    private Integer birthYear;
     private Integer weight;
     private Integer height;
 
@@ -25,10 +23,8 @@ public class User {
      */
     public User() {
         this.id = null;
-        this.username = "";
-        this.email = "";
         this.sex = null;
-        this.birthday = null;
+        this.birthYear = null;
         this.weight = null;
         this.height = null;
     }
@@ -39,10 +35,8 @@ public class User {
      */
     public User(User user) {
         this.id = user.id;
-        this.username = user.username;
-        this.email = user.email;
         this.sex = user.sex;
-        this.birthday = user.birthday;
+        this.birthYear = user.birthYear;
         this.weight = user.weight;
         this.height = user.height;
     }
@@ -58,20 +52,6 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String name) {
-        this.username = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public Integer getSex() {
         return sex;
     }
@@ -79,14 +59,11 @@ public class User {
         this.sex = sex;
     }
 
-    public Date getBirthday() {
-        return birthday;
+    public Integer getBirthYear() {
+        return birthYear;
     }
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-    public void setBirthday(String birthday) {
-        this.birthday = new Date(birthday);
+    public void setBirthYear(Integer birthYear) {
+        this.birthYear = birthYear;
     }
 
     public Integer getWeight() {

@@ -4,7 +4,7 @@ import java.util.Date;
 
 public interface IMeasureView {
 
-    void sendHeartrate(Date date, Integer heartrate);
+    void setHeartRate(int heartRate);
 
     void showText(String text);
 

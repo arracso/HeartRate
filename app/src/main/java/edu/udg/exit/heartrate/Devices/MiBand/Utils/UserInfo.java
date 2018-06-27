@@ -1,6 +1,7 @@
 package edu.udg.exit.heartrate.Devices.MiBand.Utils;
 
 import android.util.Log;
+import edu.udg.exit.heartrate.Model.User;
 
 import java.util.Arrays;
 

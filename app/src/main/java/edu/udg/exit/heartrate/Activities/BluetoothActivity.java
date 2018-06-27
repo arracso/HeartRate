@@ -1,6 +1,7 @@
 package edu.udg.exit.heartrate.Activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,14 +11,12 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v7.app.AppCompatActivity;
-
 import edu.udg.exit.heartrate.Services.BluetoothService;
 
 /**
  * Activity class that handles the connection with bluetooth service.
  */
-public abstract class BluetoothActivity extends AppCompatActivity {
+public abstract class BluetoothActivity extends Activity {
 
     ///////////////////////
     // LifeCicle methods //
