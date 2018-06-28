@@ -174,7 +174,21 @@
         <edu.udg.exit.heartrate.Components.ExpandItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-        />
+            android:orientation="vertical"
+        >
+            <TextView
+                    android:tag="Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Textssss"
+            />
+            <TextView
+                    android:tag="Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Textssss2"
+            />
+        </edu.udg.exit.heartrate.Components.ExpandItem>
 
     </LinearLayout>
 </ScrollView>
