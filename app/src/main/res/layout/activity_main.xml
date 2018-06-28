@@ -3,6 +3,7 @@
 <ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:expanditem="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         tools:context="edu.udg.exit.heartrate.Views.MainActivity"
         android:layout_width="match_parent"
@@ -175,18 +176,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            expanditem:labelText="Height"
+            expanditem:labelValue="45"
         >
             <TextView
-                    android:tag="Text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Textssss"
-            />
-            <TextView
-                    android:tag="Text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Textssss2"
             />
         </edu.udg.exit.heartrate.Components.ExpandItem>
 
