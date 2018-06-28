@@ -25,9 +25,12 @@ public class ExpandItem extends LinearLayout {
     // State
     private Boolean isCollapsed = true;
 
+    // Callback
+    private Runnable onCollapseCallback = null;
+
     // Label Attributes
-    String labelText = null;
-    String labelValue = null;
+    private String labelText = null;
+    private String labelValue = null;
 
     ///////////////////////
     // Lifecycle Methods //
@@ -73,10 +76,8 @@ public class ExpandItem extends LinearLayout {
         label = (RelativeLayout) findViewById(R.id.label);
 
         // Set label attributes
-        TextView labelText = (TextView) findViewById(R.id.label_text);
-        labelText.setText(this.labelText);
-        TextView labelValue = (TextView) findViewById(R.id.label_value);
-        labelValue.setText(this.labelValue);
+        setLabelText(this.labelText);
+        setLabelValue(this.labelValue);
 
         // Get child that acts as collapsible component and its index
         collapsibleComponent = (LinearLayout) findViewById(R.id.collapsible_component);
@@ -100,6 +101,14 @@ public class ExpandItem extends LinearLayout {
     }
 
     /**
+     * Sets a callback to be triggered when the item is collapsed.
+     * @param callback - Callback that will be triggered
+     */
+    public void setOnCollapseCallback(Runnable callback) {
+        this.onCollapseCallback = callback;
+    }
+
+    /**
      * Gets current state (collapsed/expanded) of the item.
      * @return True when the item is collapsed, false otherwise.
      */
@@ -111,6 +120,7 @@ public class ExpandItem extends LinearLayout {
      * Collapses the item.
      */
     public void collapse() {
+        if(onCollapseCallback != null) onCollapseCallback.run();
         collapsibleComponent.setVisibility(View.GONE);
         isCollapsed = true;
     }
@@ -122,6 +132,26 @@ public class ExpandItem extends LinearLayout {
         collapsibleComponent.setVisibility(View.VISIBLE);
         isCollapsed = false;
     }
+
+    /**
+     * Sets the text of the label.
+     * @param text - Text of the label.
+     */
+    public void setLabelText(String text) {
+        TextView labelText = (TextView) findViewById(R.id.label_text);
+        labelText.setText(text);
+    }
+
+    /**
+     * Sets the value of the label.
+     * @param value - Value of the label.
+     */
+    public void setLabelValue(String value) {
+        TextView labelValue = (TextView) findViewById(R.id.label_value);
+        labelValue.setText(value);
+    }
+
+
 
     /////////////////////
     // Private Methods //
