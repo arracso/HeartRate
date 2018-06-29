@@ -6,16 +6,16 @@
     <color name="red">#ff0000</color>
     <color name="green">#00ff00</color>
     <color name="blue">#0000ff</color>
-    <color name="yellow">#ffff00</color>
+    <color name="amber">#ffcc00</color>
+    <color name="yellow">#ffff66</color>
+    <color name="yellow_accent">#ffff00</color>
     <color name="purple">#ff00ff</color>
     <color name="cyan">#00ffff</color>
-    <color name="orange">#ff6d00</color>
+    <color name="orange">#ff8000</color>
+    <color name="orange_accent">#ff6d00</color>
 
     <!-- Theme colors -->
-    <color name="colorPrimary">#0021f5</color>
-    <color name="colorPrimaryDark">@color/orange</color>
-    <color name="colorAccent">#ff0004</color>
-
-    <!-- Specific colors -->
-    <color name="activityBackground">@color/orange</color>
+    <color name="colorPrimary">@color/orange</color>
+    <color name="colorPrimaryDark">@color/orange_accent</color>
+    <color name="colorAccent">@color/red</color>
 </resources>

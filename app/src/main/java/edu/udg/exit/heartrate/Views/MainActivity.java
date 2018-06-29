@@ -1,48 +1,33 @@
 package edu.udg.exit.heartrate.Views;
 
 import android.app.Activity;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.transition.Transition;
-import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.NumberPicker;
-import android.widget.TextView;
 import android.widget.Toast;
 import edu.udg.exit.heartrate.Components.ExpandItem;
-import edu.udg.exit.heartrate.Global;
-import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
+/**
+ * Main activity with user profile.
+ */
 public class MainActivity extends Activity {
-
-    ///////////////
-    // Constants //
-    ///////////////
-
-    private static final int ID = 0;
-    private static final int SEX = 1;
-    private static final int BIRTH_YEAR = 2;
-    private static final int HEIGHT = 3;
-    private static final int WEIGHT = 4;
 
     ///////////////
     // Variables //
     ///////////////
 
-    private Integer id = null;
     private int oldContent = -1;
+    private ViewGroup container = null;
 
     ///////////////////////
     // Lifecycle methods //
@@ -53,18 +38,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Set content
-        setContents();
+        // Get the container
+        container = (ViewGroup) findViewById(R.id.main_container);
 
-        // Set ID
-        setId();
-
-        // Set number pickers
-        setBirthYearPicker();
-        setWeightPicker();
-        setHeightPicker();
-
-        // Set radio buttons
+        // Setup contents
+        setupContents();
     }
 
     ////////////////////
@@ -98,8 +76,6 @@ public class MainActivity extends Activity {
         startLoginActivity();
     }
 
-
-
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -114,36 +90,173 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Sets the value of the user id on the ui.
+     * Expands the new content and collapses the old one.
+     * @param newContent - New content to be expanded
      */
-    private void setId() {
+    private void toggleContents(int newContent) {
+        if(oldContent != -1) collapseContent(oldContent);
+        if(oldContent == newContent) oldContent = -1;
+        else {
+            oldContent = newContent;
+            expandContent(newContent);
+        }
+    }
+
+    /**
+     * Expands a content from the container.
+     * @param content - Content to be expanded
+     */
+    private void expandContent(int content) {
+        ExpandItem item = (ExpandItem) container.getChildAt(content);
+        item.expand();
+    }
+
+    /**
+     * Collapses a content from the container.
+     * @param content - Content to be collapsed
+     */
+    private void collapseContent(int content) {
+        ExpandItem item = (ExpandItem) container.getChildAt(content);
+        item.collapse();
+    }
+
+    /**
+     * Contents setup.
+     */
+    private void setupContents() {
+        // Set old content as no one
+        oldContent = -1;
+
+        // Setup content of the container
+        setupId();
+        setupSex();
+        setupBirthYear();
+        setupWeight();
+        setupHeight();
+    }
+
+    /**
+     * Sets the value of the user id and its listeners and callbacks.
+     */
+    private void setupId() {
+        // Get user ID item
+        final ExpandItem idItem = (ExpandItem) findViewById(R.id.user_id);
+        // Set listeners and callbacks
+        idItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(container.indexOfChild(idItem));
+            }
+        });
+        // Set user ID
         Integer id = ((TodoApp) getApplication()).getUser().getId();
-        ExpandItem idItem = (ExpandItem) findViewById(R.id.user_id);
         idItem.setLabelValue(""+id);
     }
 
     /**
-     * Sets birth year picker
+     * Sets the value of the user sex and its listeners and callbacks.
      */
-    private void setBirthYearPicker() {
-        NumberPicker birthYearPicker = (NumberPicker) findViewById(R.id.user_birth_year_picker);
+    private void setupSex() {
+        // Get user sex item
+        final ExpandItem sexItem = (ExpandItem) findViewById(R.id.user_sex);
+        // Set listeners and callbacks
+        sexItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(container.indexOfChild(sexItem));
+            }
+        });
+        sexItem.setOnCollapseCallback(new Runnable() {
+            @Override
+            public void run() {
+                // TODO - Change sex on user
+            }
+        });
+        // Set sex
+        Integer sex = ((TodoApp) getApplication()).getUser().getSex();
+        sexItem.setLabelValue(sex == null ? "" : (sex == 1 ? "Male" : (sex == 2 ? "Female" : "Other")));
+        // TODO - Control radio buttons
+    }
+
+    /**
+     * Sets the value of the user birth year and its listeners and callbacks.
+     */
+    private void setupBirthYear() {
+        // Get user birth year item & picker
+        final ExpandItem birthYearItem = (ExpandItem) findViewById(R.id.user_birth_year);
+        final NumberPicker birthYearPicker = (NumberPicker) findViewById(R.id.user_birth_year_picker);
+        // Set listeners and callbacks
+        birthYearItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(container.indexOfChild(birthYearItem));
+            }
+        });
+        birthYearItem.setOnCollapseCallback(new Runnable() {
+            @Override
+            public void run() {
+                // TODO - change birth year on user
+            }
+        });
+        // Setup birth year
+        Integer birthYear = ((TodoApp) getApplication()).getUser().getBirthYear();
+        birthYearItem.setLabelValue(birthYear == null ? "" : ""+birthYear);
+        // Setup birth year picker
         int actualYear = (new GregorianCalendar()).get(Calendar.YEAR);
         setNumberPicker(birthYearPicker,1900, actualYear,1900,true, null, null, null);
     }
 
     /**
-     * Sets birth year picker
+     * Sets the value of the user weight and its listeners and callbacks.
      */
-    private void setWeightPicker() {
-        NumberPicker weightPicker = (NumberPicker) findViewById(R.id.user_weight_picker);
+    private void setupWeight() {
+        // Get user weight item & picker
+        final ExpandItem weightItem = (ExpandItem) findViewById(R.id.user_weight);
+        final NumberPicker weightPicker = (NumberPicker) findViewById(R.id.user_weight_picker);
+        // Set listeners and callbacks
+        weightItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(container.indexOfChild(weightItem));
+            }
+        });
+        weightItem.setOnCollapseCallback(new Runnable() {
+            @Override
+            public void run() {
+                // TODO - change weight on user
+            }
+        });
+        // Setup weight
+        Integer weight = ((TodoApp) getApplication()).getUser().getWeight();
+        weightItem.setLabelValue(weight == null ? "" : "" + weight + " Kg");
+        // Setup weight picker
         setNumberPicker(weightPicker,30, 250,30,true, null, " Kg", null);
     }
 
     /**
-     * Sets birth year picker
+     * Sets the value of the user height and its listeners and callbacks.
      */
-    private void setHeightPicker() {
-        NumberPicker heightPicker = (NumberPicker) findViewById(R.id.user_height_picker);
+    private void setupHeight() {
+        // Get user height item & picker
+        final ExpandItem heightItem = (ExpandItem) findViewById(R.id.user_height);
+        final NumberPicker heightPicker = (NumberPicker) findViewById(R.id.user_height_picker);
+        // Set listeners and callbacks
+        heightItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(container.indexOfChild(heightItem));
+            }
+        });
+        heightItem.setOnCollapseCallback(new Runnable() {
+            @Override
+            public void run() {
+                // TODO - change height on user
+            }
+        });
+        // Setup weight
+        Integer height = ((TodoApp) getApplication()).getUser().getHeight();
+        heightItem.setLabelValue(height == null ? "" : "" + height + " cm");
+        // Setup weight picker
         setNumberPicker(heightPicker,50, 250,50,true, null, " cm", null);
     }
 
@@ -156,6 +269,7 @@ public class MainActivity extends Activity {
      * @param firstAsNull - When this is true first value is used to define null value
      * @param onValueChangeListener - Listener of the number picker
      */
+    @SuppressWarnings("SameParameterValue")
     private void setNumberPicker(NumberPicker numberPicker, int minValue, int maxValue, int defaultValue, boolean firstAsNull, String prefix, String suffix, NumberPicker.OnValueChangeListener onValueChangeListener) {
         // Set range values
         numberPicker.setMinValue(minValue);
@@ -182,104 +296,6 @@ public class MainActivity extends Activity {
         numberPicker.clearFocus();
     }
 
-    private void setContents() {
-        oldContent = -1;
-
-        ExpandItem userID = (ExpandItem) findViewById(R.id.user_id);
-        userID.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleContents(ID);
-            }
-        });
-        userID.setOnCollapseCallback(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(MainActivity.this,"ID collapsed", Toast.LENGTH_LONG).show();
-            }
-        });
-        findViewById(R.id.user_sex).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleContents(SEX);
-            }
-        });
-        findViewById(R.id.user_birth_year).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleContents(BIRTH_YEAR);
-            }
-        });
-        findViewById(R.id.user_height).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleContents(HEIGHT);
-            }
-        });
-        findViewById(R.id.user_weight).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleContents(WEIGHT);
-            }
-        });
-    }
-
-    private void toggleContents(int newContent) {
-        if(oldContent != -1) collapseContent(oldContent);
-        if(oldContent == newContent) oldContent = -1;
-        else {
-            oldContent = newContent;
-            expandContent(newContent);
-        }
-    }
-
-    private void expandContent(int content) {
-        switch (content){
-            case ID:
-                ((ExpandItem)findViewById(R.id.user_id)).expand();
-                break;
-            case SEX:
-                ((ExpandItem)findViewById(R.id.user_sex)).expand();
-                break;
-            case BIRTH_YEAR:
-                ((ExpandItem)findViewById(R.id.user_birth_year)).expand();
-                setBirthYearFromPicker();
-                break;
-            case HEIGHT:
-                ((ExpandItem)findViewById(R.id.user_height)).expand();
-                break;
-            case WEIGHT:
-                ((ExpandItem)findViewById(R.id.user_weight)).expand();
-                break;
-        }
-    }
-
-    private void collapseContent(int content) {
-        switch (content){
-            case ID:
-                ((ExpandItem)findViewById(R.id.user_id)).collapse();
-                break;
-            case SEX:
-                ((ExpandItem)findViewById(R.id.user_sex)).collapse();
-                break;
-            case BIRTH_YEAR:
-                ((ExpandItem)findViewById(R.id.user_birth_year)).collapse();
-                setBirthYearFromPicker();
-                break;
-            case HEIGHT:
-                ((ExpandItem)findViewById(R.id.user_height)).collapse();
-                break;
-            case WEIGHT:
-                ((ExpandItem)findViewById(R.id.user_weight)).collapse();
-                break;
-        }
-    }
-
-    private void setBirthYearFromPicker() {
-        Integer birthYear = ((NumberPicker) findViewById(R.id.user_birth_year_picker)).getValue();
-        if(birthYear == 1900) birthYear = null;
-
-    }
 
     // DEBUG //
 
