@@ -3,8 +3,10 @@ package edu.udg.exit.heartrate.Views;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 import edu.udg.exit.heartrate.Components.ExpandItem;
@@ -50,15 +52,6 @@ public class MainActivity extends Activity {
     ////////////////////
 
     /**
-     * Starts the ScanActivity.
-     * @param view - MainActivity view
-     */
-    public void goToScan(View view) {
-        Intent scan = new Intent(this,ScanActivity.class);
-        startActivity(scan);
-    }
-
-    /**
      * Delete user information and redirect to Login Activity
      * @param view - MainActivity view
      */
@@ -80,6 +73,26 @@ public class MainActivity extends Activity {
     // Private Methods //
     /////////////////////
 
+    //*************************//
+    // Activity Change Methods //
+    //*************************//
+
+    /**
+     * Starts the ScanActivity.
+     */
+    private void startScanActivity() {
+        Intent scan = new Intent(this,ScanActivity.class);
+        startActivity(scan);
+    }
+
+    /**
+     * Starts the ScanActivity.
+     */
+    private void startBandActivity() {
+        Intent device = new Intent(this,MeasureActivity.class);
+        startActivity(device);
+    }
+
     /**
      * Starts the login activity and finish this activity.
      */
@@ -88,6 +101,10 @@ public class MainActivity extends Activity {
         startActivity(login);
         this.finish();
     }
+
+    //*********************************//
+    // Content Expand/Collapse Methods //
+    //*********************************//
 
     /**
      * Expands the new content and collapses the old one.
@@ -120,6 +137,10 @@ public class MainActivity extends Activity {
         item.collapse();
     }
 
+    //***********************//
+    // Content Setup Methods //
+    //***********************//
+
     /**
      * Contents setup.
      */
@@ -133,6 +154,7 @@ public class MainActivity extends Activity {
         setupBirthYear();
         setupWeight();
         setupHeight();
+        setupBand();
     }
 
     /**
@@ -258,6 +280,75 @@ public class MainActivity extends Activity {
         heightItem.setLabelValue(height == null ? "" : "" + height + " cm");
         // Setup weight picker
         setNumberPicker(heightPicker,50, 250,50,true, null, " cm", null);
+    }
+
+    /**
+     * Sets the value of the band and its listeners.
+     */
+    private void setupBand() {
+        // Get band item & buttons
+        final ExpandItem bandItem = (ExpandItem) findViewById(R.id.main_band);
+        final Button scanButton = (Button) findViewById(R.id.main_band_scan);
+        final Button bandButton = (Button) findViewById(R.id.main_band_settings);
+        final Button unbindButton = (Button) findViewById(R.id.main_band_unbind);
+        // Set listeners
+        bandItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(container.indexOfChild(bandItem));
+            }
+        });
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bandItem.collapse();
+                startScanActivity();
+            }
+        });
+        bandButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bandItem.collapse();
+                startBandActivity();
+            }
+        });
+        unbindButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (((TodoApp) getApplication())).getBluetoothService().unbindDevice();
+                bandItem.setLabelValue("Not paired!");
+                bandItem.collapse();
+                scanButton.setVisibility(View.VISIBLE);
+                bandButton.setVisibility(View.GONE);
+                unbindButton.setVisibility(View.GONE);
+            }
+        });
+        // Set visibility & state (not paired | not connected | connected)
+        final Handler handler = new Handler();
+        Runnable setupState = new Runnable() {
+            @Override
+            public void run() {
+                String bondedDeviceAddress = UserPreferences.getInstance().load(getApplicationContext(),UserPreferences.BONDED_DEVICE_ADDRESS);
+                if(((TodoApp) getApplication()).getBluetoothService().isConnected()){
+                    bandItem.setLabelValue(bondedDeviceAddress);
+                    scanButton.setVisibility(View.GONE);
+                    bandButton.setVisibility(View.VISIBLE);
+                    unbindButton.setVisibility(View.VISIBLE);
+                }else if(bondedDeviceAddress != null){
+                    bandItem.setLabelValue("Not connected!");
+                    scanButton.setVisibility(View.GONE);
+                    bandButton.setVisibility(View.GONE);
+                    unbindButton.setVisibility(View.VISIBLE);
+                }else{
+                    bandItem.setLabelValue("Not paired!");
+                    scanButton.setVisibility(View.VISIBLE);
+                    bandButton.setVisibility(View.GONE);
+                    unbindButton.setVisibility(View.GONE);
+                }
+                handler.postDelayed(this,3000);
+            }
+        };
+        setupState.run();
     }
 
     /**

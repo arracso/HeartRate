@@ -26,13 +26,6 @@
             <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:onClick="goToScan"
-                    android:text="Scan"
-            />
-            <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:onClick="logout"
                     android:text="Logout"
@@ -168,6 +161,41 @@
                     android:id="@+id/user_height_picker"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+            />
+        </edu.udg.exit.heartrate.Components.ExpandItem>
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/black" />
+        <!-- Band -->
+        <edu.udg.exit.heartrate.Components.ExpandItem
+                android:id="@+id/main_band"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                expanditem:labelText="Band"
+        >
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@android:color/black" />
+            <Button
+                    android:id="@+id/main_band_scan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Scan for bands"
+            />
+            <Button
+                    android:id="@+id/main_band_settings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Band settings"
+            />
+            <Button
+                    android:id="@+id/main_band_unbind"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Unbind band"
             />
         </edu.udg.exit.heartrate.Components.ExpandItem>
         <View
