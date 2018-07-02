@@ -1,9 +1,6 @@
 package edu.udg.exit.heartrate.Model;
 
-/**
- * POJO class to retrieve errorBody from server response.
- */
-public class ErrorBody {
+public class ResponseBody {
 
     ///////////////
     // Constants //

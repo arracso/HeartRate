@@ -8,9 +8,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
-import com.google.gson.Gson;
 import edu.udg.exit.heartrate.Global;
-import edu.udg.exit.heartrate.Model.ErrorBody;
+import edu.udg.exit.heartrate.Model.ResponseBody;
 import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
@@ -111,7 +110,7 @@ public class LaunchActivity extends Activity {
                     startMainActivity();
                 }else if(response.code() == 401){ // Unauthorized
                     try {
-                        ErrorBody errorBody = Global.gson.fromJson(response.errorBody().string(), ErrorBody.class);
+                        ResponseBody errorBody = Global.gson.fromJson(response.errorBody().string(), ResponseBody.class);
                         Toast.makeText(LaunchActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
                     } catch (IOException e) {
                         Toast.makeText(LaunchActivity.this,"Unknown login error.",Toast.LENGTH_LONG).show();

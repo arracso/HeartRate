@@ -24,7 +24,7 @@ public class ApiService extends Service {
     ///////////////
 
     //public static final String BASE_URL = "http://84.88.154.119:12380";
-    public static final String BASE_URL = "http://81.35.158.90:12380";
+    public static final String BASE_URL = "http://83.47.182.129:12380";
 
     ////////////////
     // Attributes //

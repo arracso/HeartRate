@@ -11,6 +11,7 @@ import android.widget.NumberPicker;
 import android.widget.Toast;
 import edu.udg.exit.heartrate.Components.ExpandItem;
 import edu.udg.exit.heartrate.R;
+import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
@@ -204,9 +205,18 @@ public class MainActivity extends Activity {
      * Sets the value of the user birth year and its listeners and callbacks.
      */
     private void setupBirthYear() {
+        // Constants
+        final int MIN_VALUE = 1900;
+        final int MAX_VALUE = (new GregorianCalendar()).get(Calendar.YEAR);;
         // Get user birth year item & picker
         final ExpandItem birthYearItem = (ExpandItem) findViewById(R.id.user_birth_year);
         final NumberPicker birthYearPicker = (NumberPicker) findViewById(R.id.user_birth_year_picker);
+        // Setup birth year
+        Integer birthYear = ((TodoApp) getApplication()).getUser().getBirthYear();
+        birthYearItem.setLabelValue(birthYear == null ? "" : ""+birthYear);
+        // Setup birth year picker
+        if(birthYear == null) birthYear = MIN_VALUE;
+        setNumberPicker(birthYearPicker,MIN_VALUE,MAX_VALUE,birthYear,true,null,null,null);
         // Set listeners and callbacks
         birthYearItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,24 +227,32 @@ public class MainActivity extends Activity {
         birthYearItem.setOnCollapseCallback(new Runnable() {
             @Override
             public void run() {
-                // TODO - change birth year on user
+                Integer birthYearValue = birthYearPicker.getValue();
+                if(birthYearValue == MIN_VALUE) birthYearValue = null;
+                birthYearItem.setLabelValue(birthYearValue == null ? "" : ""+birthYearValue);
+                ((TodoApp) getApplication()).getUser().setBirthYear(birthYearValue);
+                ((TodoApp) getApplication()).refreshUser();
+                ((TodoApp) getApplication()).updateUser();
             }
         });
-        // Setup birth year
-        Integer birthYear = ((TodoApp) getApplication()).getUser().getBirthYear();
-        birthYearItem.setLabelValue(birthYear == null ? "" : ""+birthYear);
-        // Setup birth year picker
-        int actualYear = (new GregorianCalendar()).get(Calendar.YEAR);
-        setNumberPicker(birthYearPicker,1900, actualYear,1900,true, null, null, null);
     }
 
     /**
      * Sets the value of the user weight and its listeners and callbacks.
      */
     private void setupWeight() {
+        // Constants
+        final int MIN_VALUE = 30;
+        final int MAX_VALUE = 250;
         // Get user weight item & picker
         final ExpandItem weightItem = (ExpandItem) findViewById(R.id.user_weight);
         final NumberPicker weightPicker = (NumberPicker) findViewById(R.id.user_weight_picker);
+        // Setup weight value
+        Integer weight = ((TodoApp) getApplication()).getUser().getWeight();
+        weightItem.setLabelValue(weight == null ? "" : "" + weight + " Kg");
+        // Setup weight picker
+        if(weight == null) weight = MIN_VALUE;
+        setNumberPicker(weightPicker,MIN_VALUE,MAX_VALUE,weight,true, null, " Kg", null);
         // Set listeners and callbacks
         weightItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -245,23 +263,33 @@ public class MainActivity extends Activity {
         weightItem.setOnCollapseCallback(new Runnable() {
             @Override
             public void run() {
-                // TODO - change weight on user
+                Integer weightValue = weightPicker.getValue();
+                if(weightValue == MIN_VALUE) weightValue = null;
+                weightItem.setLabelValue(weightValue == null ? "" : "" + weightValue + " Kg");
+                ((TodoApp) getApplication()).getUser().setWeight(weightValue);
+                ((TodoApp) getApplication()).refreshUser();
+                ((TodoApp) getApplication()).updateUser();
             }
         });
-        // Setup weight
-        Integer weight = ((TodoApp) getApplication()).getUser().getWeight();
-        weightItem.setLabelValue(weight == null ? "" : "" + weight + " Kg");
-        // Setup weight picker
-        setNumberPicker(weightPicker,30, 250,30,true, null, " Kg", null);
+
     }
 
     /**
      * Sets the value of the user height and its listeners and callbacks.
      */
     private void setupHeight() {
+        // Constants
+        final int MIN_VALUE = 50;
+        final int MAX_VALUE = 250;
         // Get user height item & picker
         final ExpandItem heightItem = (ExpandItem) findViewById(R.id.user_height);
         final NumberPicker heightPicker = (NumberPicker) findViewById(R.id.user_height_picker);
+        // Setup weight
+        Integer height = ((TodoApp) getApplication()).getUser().getHeight();
+        heightItem.setLabelValue(height == null ? "" : "" + height + " cm");
+        // Setup weight picker
+        if(height == null) height = MIN_VALUE;
+        setNumberPicker(heightPicker,MIN_VALUE,MAX_VALUE,height,true,null," cm",null);
         // Set listeners and callbacks
         heightItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -272,14 +300,14 @@ public class MainActivity extends Activity {
         heightItem.setOnCollapseCallback(new Runnable() {
             @Override
             public void run() {
-                // TODO - change height on user
+                Integer heightValue = heightPicker.getValue();
+                if(heightValue == MIN_VALUE) heightValue = null;
+                heightItem.setLabelValue(heightValue == null ? "" : "" + heightValue + " cm");
+                ((TodoApp) getApplication()).getUser().setHeight(heightValue);
+                ((TodoApp) getApplication()).refreshUser();
+                ((TodoApp) getApplication()).updateUser();
             }
         });
-        // Setup weight
-        Integer height = ((TodoApp) getApplication()).getUser().getHeight();
-        heightItem.setLabelValue(height == null ? "" : "" + height + " cm");
-        // Setup weight picker
-        setNumberPicker(heightPicker,50, 250,50,true, null, " cm", null);
     }
 
     /**
@@ -356,12 +384,12 @@ public class MainActivity extends Activity {
      * @param numberPicker - Number picker to be configured
      * @param minValue - Min value of the number picker
      * @param maxValue - Max value of the number picker
-     * @param defaultValue - Default value of the number picker
+     * @param value - Value set to the number picker
      * @param firstAsNull - When this is true first value is used to define null value
      * @param onValueChangeListener - Listener of the number picker
      */
     @SuppressWarnings("SameParameterValue")
-    private void setNumberPicker(NumberPicker numberPicker, int minValue, int maxValue, int defaultValue, boolean firstAsNull, String prefix, String suffix, NumberPicker.OnValueChangeListener onValueChangeListener) {
+    private void setNumberPicker(NumberPicker numberPicker, int minValue, int maxValue, int value, boolean firstAsNull, String prefix, String suffix, NumberPicker.OnValueChangeListener onValueChangeListener) {
         // Set range values
         numberPicker.setMinValue(minValue);
         numberPicker.setMaxValue(maxValue);
@@ -371,16 +399,16 @@ public class MainActivity extends Activity {
             String[] displayedValues = new String[nValues];
             displayedValues[0] = " ";
             for (int i=1; i<nValues; i++) {
-                String value = "";
-                if(prefix != null) value = value + prefix;
-                value = value + (minValue+i);
-                if(suffix != null) value = value + suffix;
-                displayedValues[i] = value;
+                String auxValue = "";
+                if(prefix != null) auxValue = auxValue + prefix;
+                auxValue = auxValue + (minValue+i);
+                if(suffix != null) auxValue = auxValue + suffix;
+                displayedValues[i] = auxValue;
             }
             numberPicker.setDisplayedValues(displayedValues);
         }
         // Set user value
-        numberPicker.setValue(defaultValue);
+        numberPicker.setValue(value);
         // Set listener
         numberPicker.setOnValueChangedListener(onValueChangeListener);
         // Clear the focus
