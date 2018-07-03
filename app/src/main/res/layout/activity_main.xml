@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 >
-
     <LinearLayout
             android:id="@+id/main_container"
             android:layout_width="match_parent"
@@ -48,7 +47,7 @@
                     android:layout_height="2dp"
                     android:background="@android:color/black" />
             <TextView
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="15dp"
                     android:text="This is your ID. You can use it to retrive your heart rate measures throught the web."
             />
         </edu.udg.exit.heartrate.Components.ExpandItem>

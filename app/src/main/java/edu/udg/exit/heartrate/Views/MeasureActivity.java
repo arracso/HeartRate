@@ -12,8 +12,6 @@ import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.TodoApp;
 
-import java.util.Date;
-
 public class MeasureActivity extends Activity implements IMeasureView {
 
     private BluetoothService bluetoothService;

@@ -85,10 +85,10 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Starts the ScanActivity.
+     * Starts the DeviceActivity.
      */
-    private void startBandActivity() {
-        Intent device = new Intent(this,MeasureActivity.class);
+    private void startDeviceActivity() {
+        Intent device = new Intent(this,DeviceActivity.class);
         startActivity(device);
     }
 
@@ -219,7 +219,7 @@ public class MainActivity extends Activity {
     private void setupBirthYear() {
         // Constants
         final int MIN_VALUE = 1900;
-        final int MAX_VALUE = (new GregorianCalendar()).get(Calendar.YEAR);;
+        final int MAX_VALUE = (new GregorianCalendar()).get(Calendar.YEAR);
         // Get user birth year item & picker
         final ExpandItem birthYearItem = (ExpandItem) findViewById(R.id.user_birth_year);
         final NumberPicker birthYearPicker = (NumberPicker) findViewById(R.id.user_birth_year_picker);
@@ -361,7 +361,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 bandItem.collapse();
-                startBandActivity();
+                startDeviceActivity();
             }
         });
         unbindButton.setOnClickListener(new View.OnClickListener() {

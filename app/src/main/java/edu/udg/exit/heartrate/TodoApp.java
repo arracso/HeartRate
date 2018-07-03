@@ -12,7 +12,6 @@ import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
-import edu.udg.exit.heartrate.Views.LaunchActivity;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
