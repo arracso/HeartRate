@@ -8,15 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.NumberPicker;
-import android.widget.Toast;
+import android.widget.RadioGroup;
 import edu.udg.exit.heartrate.Components.ExpandItem;
 import edu.udg.exit.heartrate.R;
-import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
 
-import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -182,6 +180,13 @@ public class MainActivity extends Activity {
     private void setupSex() {
         // Get user sex item
         final ExpandItem sexItem = (ExpandItem) findViewById(R.id.user_sex);
+        final RadioGroup sexPicker = (RadioGroup) findViewById(R.id.user_sex_picker);
+        // Setup sex
+        Integer sex = ((TodoApp) getApplication()).getUser().getSex();
+        sexItem.setLabelValue(sex == null ? "" : (sex == 1 ? "Male" : (sex == 2 ? "Female" : "Other")));
+        // Setup sex picker
+        if(sex == null) sexPicker.clearCheck();
+        else sexPicker.check(sex == 1 ? R.id.user_radio_male : (sex == 2 ? R.id.user_radio_female : R.id.user_radio_other));
         // Set listeners and callbacks
         sexItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,13 +197,20 @@ public class MainActivity extends Activity {
         sexItem.setOnCollapseCallback(new Runnable() {
             @Override
             public void run() {
-                // TODO - Change sex on user
+                ((TodoApp) getApplication()).updateUser();
             }
         });
-        // Set sex
-        Integer sex = ((TodoApp) getApplication()).getUser().getSex();
-        sexItem.setLabelValue(sex == null ? "" : (sex == 1 ? "Male" : (sex == 2 ? "Female" : "Other")));
-        // TODO - Control radio buttons
+        sexPicker.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int sexValue = 0;
+                if(checkedId == R.id.user_radio_male) sexValue = 1;
+                else if(checkedId == R.id.user_radio_female) sexValue = 2;
+                sexItem.setLabelValue(sexValue == 1 ? "Male" : (sexValue == 2 ? "Female" : "Other"));
+                ((TodoApp) getApplication()).getUser().setSex(sexValue);
+                ((TodoApp) getApplication()).refreshUser();
+            }
+        });
     }
 
     /**
@@ -216,7 +228,16 @@ public class MainActivity extends Activity {
         birthYearItem.setLabelValue(birthYear == null ? "" : ""+birthYear);
         // Setup birth year picker
         if(birthYear == null) birthYear = MIN_VALUE;
-        setNumberPicker(birthYearPicker,MIN_VALUE,MAX_VALUE,birthYear,true,null,null,null);
+        setNumberPicker(birthYearPicker, MIN_VALUE, MAX_VALUE, birthYear, true, null, null, new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                Integer birthYearValue = newVal;
+                if(birthYearValue == MIN_VALUE) birthYearValue = null;
+                birthYearItem.setLabelValue(birthYearValue == null ? "" : ""+birthYearValue);
+                ((TodoApp) getApplication()).getUser().setBirthYear(birthYearValue);
+                ((TodoApp) getApplication()).refreshUser();
+            }
+        });
         // Set listeners and callbacks
         birthYearItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -227,11 +248,6 @@ public class MainActivity extends Activity {
         birthYearItem.setOnCollapseCallback(new Runnable() {
             @Override
             public void run() {
-                Integer birthYearValue = birthYearPicker.getValue();
-                if(birthYearValue == MIN_VALUE) birthYearValue = null;
-                birthYearItem.setLabelValue(birthYearValue == null ? "" : ""+birthYearValue);
-                ((TodoApp) getApplication()).getUser().setBirthYear(birthYearValue);
-                ((TodoApp) getApplication()).refreshUser();
                 ((TodoApp) getApplication()).updateUser();
             }
         });
@@ -252,7 +268,16 @@ public class MainActivity extends Activity {
         weightItem.setLabelValue(weight == null ? "" : "" + weight + " Kg");
         // Setup weight picker
         if(weight == null) weight = MIN_VALUE;
-        setNumberPicker(weightPicker,MIN_VALUE,MAX_VALUE,weight,true, null, " Kg", null);
+        setNumberPicker(weightPicker, MIN_VALUE, MAX_VALUE, weight, true, null, " Kg", new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                Integer weightValue = newVal;
+                if(weightValue == MIN_VALUE) weightValue = null;
+                weightItem.setLabelValue(weightValue == null ? "" : "" + weightValue + " Kg");
+                ((TodoApp) getApplication()).getUser().setWeight(weightValue);
+                ((TodoApp) getApplication()).refreshUser();
+            }
+        });
         // Set listeners and callbacks
         weightItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,11 +288,6 @@ public class MainActivity extends Activity {
         weightItem.setOnCollapseCallback(new Runnable() {
             @Override
             public void run() {
-                Integer weightValue = weightPicker.getValue();
-                if(weightValue == MIN_VALUE) weightValue = null;
-                weightItem.setLabelValue(weightValue == null ? "" : "" + weightValue + " Kg");
-                ((TodoApp) getApplication()).getUser().setWeight(weightValue);
-                ((TodoApp) getApplication()).refreshUser();
                 ((TodoApp) getApplication()).updateUser();
             }
         });
@@ -289,7 +309,16 @@ public class MainActivity extends Activity {
         heightItem.setLabelValue(height == null ? "" : "" + height + " cm");
         // Setup weight picker
         if(height == null) height = MIN_VALUE;
-        setNumberPicker(heightPicker,MIN_VALUE,MAX_VALUE,height,true,null," cm",null);
+        setNumberPicker(heightPicker, MIN_VALUE, MAX_VALUE, height, true, null, " cm", new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                Integer heightValue = newVal;
+                if(heightValue == MIN_VALUE) heightValue = null;
+                heightItem.setLabelValue(heightValue == null ? "" : "" + heightValue + " cm");
+                ((TodoApp) getApplication()).getUser().setHeight(heightValue);
+                ((TodoApp) getApplication()).refreshUser();
+            }
+        });
         // Set listeners and callbacks
         heightItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -300,11 +329,6 @@ public class MainActivity extends Activity {
         heightItem.setOnCollapseCallback(new Runnable() {
             @Override
             public void run() {
-                Integer heightValue = heightPicker.getValue();
-                if(heightValue == MIN_VALUE) heightValue = null;
-                heightItem.setLabelValue(heightValue == null ? "" : "" + heightValue + " cm");
-                ((TodoApp) getApplication()).getUser().setHeight(heightValue);
-                ((TodoApp) getApplication()).refreshUser();
                 ((TodoApp) getApplication()).updateUser();
             }
         });
@@ -413,15 +437,6 @@ public class MainActivity extends Activity {
         numberPicker.setOnValueChangedListener(onValueChangeListener);
         // Clear the focus
         numberPicker.clearFocus();
-    }
-
-
-    // DEBUG //
-
-    private void test(){
-        DataBase db = new DataBase(this.getApplicationContext());
-
-        File file = db.exportAsCSV(DataBase.RATE_TABLE_NAME, null, null, "HR.csv");
     }
 
 }
