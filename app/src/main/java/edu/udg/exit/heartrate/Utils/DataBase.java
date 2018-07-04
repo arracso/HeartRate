@@ -133,6 +133,7 @@ public class DataBase extends SQLiteOpenHelper {
     public File exportAsCSV(String tableName, Long from, Long to, String fileName) {
         // Retrieve data from data base
         Cursor cursor = select(tableName, from, to);
+        if(cursor == null || cursor.getCount() <= 0 ) return null;
 
         // Create File
         Storage storage = new Storage();

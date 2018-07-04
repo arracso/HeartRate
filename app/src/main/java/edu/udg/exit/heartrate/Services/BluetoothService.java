@@ -52,6 +52,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     // Measure
     private IMeasureView measureView;
+    private Boolean isMeasuring;
 
     // Data base
     private DataBase dataBase;

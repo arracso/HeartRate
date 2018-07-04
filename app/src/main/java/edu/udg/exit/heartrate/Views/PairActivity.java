@@ -68,7 +68,7 @@ public class PairActivity extends BluetoothActivity implements IPairView {
 
         super.onDestroy();
     }
-    
+
     /////////////////////
     // Private methods //
     /////////////////////

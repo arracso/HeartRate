@@ -61,6 +61,7 @@ public class MainActivity extends Activity {
         UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.ACCESS_TOKEN);
         UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.REFRESH_TOKEN);
         UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.USER_PROFILE);
+        UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.HEART_RATE_MEASURE);
         // DELETE DATA BASE MEASUREMENTS
         DataBase dataBase = new DataBase(getApplicationContext());
         dataBase.deleteAllRecords();

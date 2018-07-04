@@ -112,6 +112,7 @@ public class LaunchActivity extends Activity {
                     try {
                         ResponseBody errorBody = Global.gson.fromJson(response.errorBody().string(), ResponseBody.class);
                         Toast.makeText(LaunchActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
+                        startLoginActivity();
                     } catch (IOException e) {
                         Toast.makeText(LaunchActivity.this,"Unknown login error.",Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
