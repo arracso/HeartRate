@@ -23,9 +23,12 @@ public class DataBase extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "measure.db";
 
+    // TABLE
+    private static final String TABLE_COLUMN_TIME = "time";
+
     // RATE TABLE
     public static final String RATE_TABLE_NAME = "rate";
-    private static final String RATE_TABLE_COLUMN_TIME = "time";
+    private static final String RATE_TABLE_COLUMN_TIME = TABLE_COLUMN_TIME;
     private static final String RATE_TABLE_COLUMN_RATE = "rate";
 
     ///////////////
@@ -127,13 +130,16 @@ public class DataBase extends SQLiteOpenHelper {
      * @param tableName - name of the table to be exported.
      * @param from - timestamp to start the selection
      * @param to - timestamp to begin the selection
-     * @param fileName - name of the exported csv file
+     * @param prefix - prefix name of the exported csv file
      * @return File
      */
-    public File exportAsCSV(String tableName, Long from, Long to, String fileName) {
+    public File exportAsCSV(String tableName, Long from, Long to, String prefix) {
         // Retrieve data from data base
         Cursor cursor = select(tableName, from, to);
         if(cursor == null || cursor.getCount() <= 0 ) return null;
+
+        // Generate a file name
+        String fileName = generateFileName(cursor, prefix, "csv");
 
         // Create File
         Storage storage = new Storage();
@@ -187,6 +193,17 @@ public class DataBase extends SQLiteOpenHelper {
             builder.append(cursor.getString(i));
         }
         return builder.toString();
+    }
+
+    private String generateFileName(Cursor cursor, String prefix, String extension) {
+        String fileName = prefix + "(";
+        cursor.moveToFirst();
+        fileName = fileName + cursor.getString(cursor.getColumnIndex(TABLE_COLUMN_TIME));
+        fileName = fileName + "-";
+        cursor.moveToLast();
+        fileName = fileName + cursor.getString(cursor.getColumnIndex(TABLE_COLUMN_TIME));
+        fileName = fileName + ")." + extension;
+        return fileName;
     }
 
 }

@@ -282,7 +282,7 @@ public class DeviceActivity extends Activity implements IMeasureView {
      */
     private void uploadHeartRate(){
         Date date = new Date();
-        File file = db.exportAsCSV(DataBase.RATE_TABLE_NAME, null, date.getTime(), "HR_" + date.getTime() + ".csv");
+        File file = db.exportAsCSV(DataBase.RATE_TABLE_NAME, null, date.getTime(), "HR");
         if(file != null){
             uploadFile(getApplicationContext(),file);
             db.delete(DataBase.RATE_TABLE_NAME, null, date.getTime());
