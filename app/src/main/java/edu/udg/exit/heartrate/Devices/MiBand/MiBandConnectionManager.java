@@ -103,6 +103,7 @@ public class MiBandConnectionManager extends ConnectionManager {
             Log.d("GATTr", "Name -> " + name);
         } else if (MiBandConstants.UUID_CHAR.BATTERY.equals(characteristicUUID)) {
             BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
+            bluetoothService.setBatteryLevel(batteryInfo.getPercent());
             Log.d("GATTr", "Battery -> " + batteryInfo);
         } else if (MiBandConstants.UUID_CHAR.DATE_TIME.equals(characteristicUUID)) {
             MiDate miDate = new MiDate(characteristic.getValue());
@@ -169,10 +170,9 @@ public class MiBandConnectionManager extends ConnectionManager {
             MiDate miDate = new MiDate(characteristic.getValue());
             Log.d("GATTc", "Date -> " + miDate);
         }else if(MiBandConstants.UUID_CHAR.BATTERY.equals(characteristic.getUuid())){
-            BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
-            Log.d("GATTc", "Battery -> " + batteryInfo);
+            handleBatteryNotification(characteristic.getValue());
         }else if(UUID_CHAR.HEARTRATE_NOTIFICATION.equals(characteristic.getUuid())){
-            handleHeartrateNotification(characteristic.getValue());
+            handleHeartRateNotification(characteristic.getValue());
         }else{
             Log.d("GATTc", "Characteristic -> " + characteristic.getUuid() + " - " + convertBytesToString(characteristic.getValue()));
         }
@@ -193,15 +193,21 @@ public class MiBandConnectionManager extends ConnectionManager {
     ////////////////////
 
     @Override
-    public void startMeasure() {
+    public void startHeartRateMeasure() {
         startMeasurement();
         run();
     }
 
     @Override
-    public void stopMeasure() {
+    public void stopHeartRateMeasure() {
         clearCalls();
         stopHeartRateMeasurement();
+        run();
+    }
+
+    @Override
+    public void retrieveBatteryLevel() {
+        addCall(requestBattery());
         run();
     }
 
@@ -321,6 +327,9 @@ public class MiBandConnectionManager extends ConnectionManager {
         addCall(sendHRCommand(COMMAND.START_HEART_RATE_MEASUREMENT_CONTINUOUS));
     }
 
+    /**
+     * Stop to measure heart rate.
+     */
     private void stopHeartRateMeasurement() {
         addCall(sendHRCommand(COMMAND.STOP_HEART_RATE_MEASUREMENT_CONTINUOUS));
         addCall(dissableHeartRateNotifications());
@@ -775,7 +784,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         }
     }
 
-    private void handleHeartrateNotification(byte[] value) {
+    private void handleHeartRateNotification(byte[] value) {
         // Check if value is 2 byte long.
         if(value.length != 2){
             Log.e("Notification", "Received " + value.length + " bytes");
@@ -786,11 +795,16 @@ public class MiBandConnectionManager extends ConnectionManager {
         switch (value[0]) {
             case 6:
                 Log.d("Notification", "Heartrate: " + Parse.BytesToInt(value,1,1));
-                bluetoothService.setMeasure(new Date(),Parse.BytesToInt(value,1,1));
+                bluetoothService.setHeartRateMeasure(new Date(),Parse.BytesToInt(value,1,1));
                 break;
             default:
                 Log.d("Notification", "Code " + value[0] + " value: " + value[1]);
         }
+    }
+
+    private void handleBatteryNotification(byte[] value) {
+        BatteryInfo batteryInfo = new BatteryInfo(value);
+        bluetoothService.setBatteryLevel(batteryInfo.getPercent());
     }
 
     // DEBUG

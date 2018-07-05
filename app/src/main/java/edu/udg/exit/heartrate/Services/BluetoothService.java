@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Bluetooth Low Energy Service
  */
-public class BluetoothService extends Service implements IBluetoothService, IScanService, IPairService, IMeasureService {
+public class BluetoothService extends Service implements IBluetoothService, IScanService, IPairService, IDeviceService {
 
     ///////////////
     // Constants //
@@ -51,8 +51,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     private IPairView pairView;
 
     // Measure
-    private IMeasureView measureView;
-    private Boolean isMeasuring;
+    private IDeviceView deviceView;
 
     // Data base
     private DataBase dataBase;
@@ -76,8 +75,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         // Pair
         pairView = null;
 
-        // Measure
-        measureView = null;
+        // Device
+        deviceView = null;
 
         // Data Base
         dataBase = new DataBase(getApplicationContext());
@@ -232,38 +231,43 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     }
 
     /*-------------------------*/
-    /* IMeasureService methods */
+    /* IDeviceService methods */
     /*-------------------------*/
 
     @Override
-    public IMeasureView getMeasureView() {
-        return measureView;
+    public void setDeviceView(IDeviceView view) {
+        this.deviceView = view;
     }
 
     @Override
-    public void setMeasureView(IMeasureView view) {
-        this.measureView = view;
+    public void unsetDeviceView() {
+        this.deviceView = null;
     }
 
     @Override
-    public void unsetMeasureView() {
-        this.measureView = null;
+    public void startHeartRateMeasure() {
+        connectionManager.startHeartRateMeasure();
     }
 
     @Override
-    public void startMeasure() {
-        connectionManager.startMeasure();
+    public void stopHeartRateMeasure() {
+        connectionManager.stopHeartRateMeasure();
     }
 
     @Override
-    public void stopMeasure() {
-        connectionManager.stopMeasure();
-    }
-
-    @Override
-    public void setMeasure(Date date, Integer measure) {
+    public void setHeartRateMeasure(Date date, Integer measure) {
         dataBase.insertRate(date.getTime(),measure);
-        if(measureView != null) measureView.setHeartRate(measure);
+        if(deviceView != null) deviceView.setHeartRateMeasure(measure);
+    }
+
+    @Override
+    public void retrieveBatteryLevel() {
+        connectionManager.retrieveBatteryLevel();
+    }
+
+    @Override
+    public void setBatteryLevel(Integer battery) {
+        if(deviceView != null) deviceView.setBatteryLevel(battery);
     }
 
     /////////////////////

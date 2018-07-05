@@ -4,13 +4,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 import edu.udg.exit.heartrate.Components.ExpandItem;
-import edu.udg.exit.heartrate.Interfaces.IMeasureView;
+import edu.udg.exit.heartrate.Interfaces.IDeviceView;
+import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.Services.BluetoothService;
@@ -27,7 +30,7 @@ import retrofit2.Response;
 import java.io.File;
 import java.util.Date;
 
-public class DeviceActivity extends Activity implements IMeasureView {
+public class DeviceActivity extends Activity implements IDeviceView {
 
     ///////////////
     // Variables //
@@ -45,8 +48,11 @@ public class DeviceActivity extends Activity implements IMeasureView {
     private ViewGroup container = null;
 
     // Measure heart rate
-    private ExpandItem heartRateItem;
     private Boolean isMeasuring;
+    private ExpandItem heartRateItem;
+
+    // Battery
+    private ExpandItem batteryItem;
 
     // Database
     private DataBase db;
@@ -65,7 +71,7 @@ public class DeviceActivity extends Activity implements IMeasureView {
 
         // Get the bluetooth service & set measure view on it
         bluetoothService = ((TodoApp)getApplication()).getBluetoothService();
-        bluetoothService.setMeasureView(this);
+        bluetoothService.setDeviceView(this);
 
         // Get the api service
         apiService = ((TodoApp)getApplication()).getApiService();
@@ -73,8 +79,9 @@ public class DeviceActivity extends Activity implements IMeasureView {
         // Get the container
         container = (ViewGroup) findViewById(R.id.device_container);
 
-        // Measure
+        // Items
         heartRateItem = (ExpandItem) findViewById(R.id.device_heart_rate);
+        batteryItem = (ExpandItem) findViewById(R.id.device_battery);
 
         // Database
         db = new DataBase(this.getApplicationContext());
@@ -85,7 +92,7 @@ public class DeviceActivity extends Activity implements IMeasureView {
 
     @Override
     protected void onDestroy() {
-        bluetoothService.unsetMeasureView();
+        bluetoothService.unsetDeviceView();
         super.onDestroy();
     }
 
@@ -103,21 +110,21 @@ public class DeviceActivity extends Activity implements IMeasureView {
     }
 
     @Override
-    public void setHeartRate(final int heartRate) {
+    public void setHeartRateMeasure(final int heartRate) {
         if(isMeasuring) handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    heartRateItem.setLabelValue("" + heartRate);
+                    heartRateItem.setLabelValue("- " + heartRate + " -");
                 }
             });
     }
 
     @Override
-    public void showText(final String text) {
+    public void setBatteryLevel(final int battery) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(DeviceActivity.this, text, Toast.LENGTH_SHORT).show();
+                batteryItem.setLabelValue("" + battery + "%");
             }
         });
     }
@@ -193,7 +200,8 @@ public class DeviceActivity extends Activity implements IMeasureView {
             }
         });
         // Setup MAC
-        // TODO
+        String address = UserPreferences.getInstance().load(getApplicationContext(), UserPreferences.BONDED_DEVICE_ADDRESS);
+        macItem.setLabelValue(address);
     }
 
     /**
@@ -210,7 +218,8 @@ public class DeviceActivity extends Activity implements IMeasureView {
             }
         });
         // Setup name
-        // TODO
+        String address = UserPreferences.getInstance().load(getApplicationContext(), UserPreferences.BONDED_DEVICE_ADDRESS);
+        nameItem.setLabelValue(bluetoothService.getRemoteDevice(address).getName());
     }
 
     /**
@@ -224,10 +233,11 @@ public class DeviceActivity extends Activity implements IMeasureView {
             @Override
             public void onClick(View v) {
                 toggleContents(container.indexOfChild(batteryItem));
+                bluetoothService.retrieveBatteryLevel();
             }
         });
         // Setup battery
-        // TODO - Use runnable
+        bluetoothService.retrieveBatteryLevel();
     }
 
     /**
@@ -239,14 +249,10 @@ public class DeviceActivity extends Activity implements IMeasureView {
         final Switch heartRateSwitch = (Switch) findViewById(R.id.device_activate_heart_rate);
         Button heartRateUpload = (Button) findViewById(R.id.device_upload_heart_rate);
         // Setup heart rate
+        heartRateItem.setLabelValue("-  -");
         String heartRateIsOn = UserPreferences.getInstance().load(getApplicationContext(),UserPreferences.HEART_RATE_MEASURE);
-        if(heartRateIsOn == null || heartRateIsOn.equals("false")){
-            heartRateSwitch.setChecked(false);
-            isMeasuring = false;
-        }else{
-            heartRateSwitch.setChecked(true);
-            isMeasuring = true;
-        }
+        isMeasuring = heartRateIsOn != null && !heartRateIsOn.equals("false");
+        heartRateSwitch.setChecked(isMeasuring);
         // Set listeners and callbacks
         heartRateItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -254,19 +260,14 @@ public class DeviceActivity extends Activity implements IMeasureView {
                 toggleContents(container.indexOfChild(heartRateItem));
             }
         });
-        heartRateItem.setOnCollapseCallback(new Runnable() {
+        heartRateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void run() {
-                if(heartRateSwitch.isChecked()){
-                    isMeasuring = true;
-                    UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.HEART_RATE_MEASURE,"true");
-                    bluetoothService.startMeasure();
-                }else{
-                    isMeasuring = false;
-                    UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.HEART_RATE_MEASURE,"false");
-                    bluetoothService.stopMeasure();
-                    heartRateItem.setLabelValue(null);
-                }
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                isMeasuring = isChecked;
+                heartRateItem.setLabelValue("-  -");
+                UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.HEART_RATE_MEASURE, isChecked ? "true" : "false");
+                if(isChecked) bluetoothService.startHeartRateMeasure();
+                else bluetoothService.stopHeartRateMeasure();
             }
         });
         heartRateUpload.setOnClickListener(new View.OnClickListener() {

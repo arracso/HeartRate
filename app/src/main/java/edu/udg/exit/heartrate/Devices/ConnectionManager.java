@@ -198,8 +198,9 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     // Public Methods //
     ////////////////////
 
-    public abstract void startMeasure();
-    public abstract void stopMeasure();
+    public abstract void startHeartRateMeasure();
+    public abstract void stopHeartRateMeasure();
+    public abstract void retrieveBatteryLevel();
 
     /**
      * Check if a device is connected or not to the GATT.
