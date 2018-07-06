@@ -51,4 +51,10 @@ public interface IDeviceService {
      */
     void setBatteryLevel(Integer battery);
 
+    /**
+     * Sets the wear location of the device.
+     * @param wearLocation - (0 -> left | 1 -> right | 2 -> neck)
+     */
+    void setWearLocation(int wearLocation);
+
 }

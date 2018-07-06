@@ -41,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                expanditem:labelText="MAC address"
+                expanditem:labelText="Device MAC Address"
         >
             <View
                     android:layout_width="match_parent"
@@ -62,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                expanditem:labelText="Name"
+                expanditem:labelText="Device Name"
         >
             <View
                     android:layout_width="match_parent"
@@ -83,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                expanditem:labelText="Battery"
+                expanditem:labelText="Device Battery"
         >
             <View
                     android:layout_width="match_parent"
@@ -93,6 +93,45 @@
                     android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="15dp"
                     android:text="Please recharge your device before its battery gets under 10%"
             />
+        </edu.udg.exit.heartrate.Components.ExpandItem>
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/black" />
+        <!-- Hand -->
+        <edu.udg.exit.heartrate.Components.ExpandItem
+                android:id="@+id/device_hand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                expanditem:labelText="Device Hand"
+        >
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@android:color/black" />
+            <RadioGroup
+                    android:id="@+id/device_hand_picker"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="15dp"
+            >
+                <RadioButton
+                        android:id="@+id/device_radio_left"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Left"
+                />
+                <RadioButton
+                        android:id="@+id/device_radio_right"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Right"
+                />
+            </RadioGroup>
         </edu.udg.exit.heartrate.Components.ExpandItem>
         <View
                 android:layout_width="match_parent"

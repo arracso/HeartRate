@@ -7,10 +7,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.Switch;
-import android.widget.Toast;
+import android.widget.*;
 import edu.udg.exit.heartrate.Components.ExpandItem;
 import edu.udg.exit.heartrate.Interfaces.IDeviceView;
 import edu.udg.exit.heartrate.Model.User;
@@ -183,6 +180,7 @@ public class DeviceActivity extends Activity implements IDeviceView {
         setupMAC();
         setupName();
         setupBattery();
+        setupDeviceHand();
         setupHeartRate();
     }
 
@@ -225,7 +223,7 @@ public class DeviceActivity extends Activity implements IDeviceView {
     /**
      * Sets the value of the device battery and its listeners and callbacks.
      */
-    private void setupBattery(){
+    private void setupBattery() {
         // Get battery item
         final ExpandItem batteryItem = (ExpandItem) findViewById(R.id.device_battery);
         // Set listeners and callbacks
@@ -241,9 +239,39 @@ public class DeviceActivity extends Activity implements IDeviceView {
     }
 
     /**
+     * Sets the value of the device hand item and its listeners.
+     */
+    private void setupDeviceHand() {
+        // Gets device hand item
+        final ExpandItem deviceHandItem = (ExpandItem) findViewById(R.id.device_hand);
+        final RadioGroup deviceHandPicker = (RadioGroup) findViewById(R.id.device_hand_picker);
+        // Sets device hand item
+        final String deviceHand = UserPreferences.getInstance().load(bluetoothService.getApplicationContext(),UserPreferences.DEVICE_HAND);
+        deviceHandItem.setLabelValue(deviceHand == null ? "left" : deviceHand);
+        // Setup device hand picker
+        deviceHandPicker.check((deviceHand == null || deviceHand.equals("left")) ? R.id.device_radio_left : R.id.device_radio_right);
+        // Set listeners and callbacks
+        deviceHandItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContents(container.indexOfChild(deviceHandItem));
+            }
+        });
+        deviceHandPicker.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int wearLocation = 0;
+                if(checkedId == R.id.device_radio_right) wearLocation = 1;
+                deviceHandItem.setLabelValue(wearLocation == 0 ? "left" : "right");
+                bluetoothService.setWearLocation(wearLocation);
+            }
+        });
+    }
+
+    /**
      * Sets the value of heart rate measurement and its listeners and callbacks.
      */
-    private void setupHeartRate(){
+    private void setupHeartRate() {
         // Get heart rate item & switch
         final ExpandItem heartRateItem = (ExpandItem) findViewById(R.id.device_heart_rate);
         final Switch heartRateSwitch = (Switch) findViewById(R.id.device_activate_heart_rate);

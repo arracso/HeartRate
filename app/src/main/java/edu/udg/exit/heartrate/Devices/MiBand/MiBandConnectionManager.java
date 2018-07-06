@@ -211,6 +211,19 @@ public class MiBandConnectionManager extends ConnectionManager {
         run();
     }
 
+    @Override
+    public void setWearLocation(int wearLocation) {
+        switch (wearLocation){
+            case 0: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT));
+                break;
+            case 1: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT));
+                break;
+            default: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_NECK));
+                break;
+        }
+        run();
+    }
+
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -254,7 +267,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         // Other Initializations
         addCall(setCurrentDate());
         addCall(requestBattery());
-        addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT)); // Set wear location // TODO - Set by the app
+        setWearLocation();// Set wear location
 
         // Enable battery notifications
         addCall(enableNotificationsFrom(UUID_CHAR.BATTERY));
@@ -289,7 +302,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         // Other Initializations
         addCall(setCurrentDate());
         addCall(requestBattery());
-        addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT)); // Set wear location
+        setWearLocation(); // Set wear location
         addCall(setFitnessGoal(1000)); // TODO - Check and set fitness by the app
 
         // Enable other notifications // Enable only when needed
@@ -359,6 +372,22 @@ public class MiBandConnectionManager extends ConnectionManager {
                 miliService.read(UUID_CHAR.TEST);
             }
         });
+    }
+
+    /**
+     * Sets wear location to user preferences option.
+     */
+    private void setWearLocation() {
+        String deviceHand = UserPreferences.getInstance().load(bluetoothService.getApplicationContext(),UserPreferences.DEVICE_HAND);
+        int wearLocation = (deviceHand == null || deviceHand.equals("left")) ? 0 : (deviceHand.equals("right") ? 1 : 2);
+        switch (wearLocation){
+            case 0: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT));
+                break;
+            case 1: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT));
+                break;
+            default: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_NECK));
+                break;
+        }
     }
 
     /////////////

@@ -208,7 +208,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         String heartRateMeasure = UserPreferences.getInstance().load(getApplicationContext(),UserPreferences.HEART_RATE_MEASURE);
         if(heartRateMeasure != null && heartRateMeasure.equals("true")) startHeartRateMeasure();
     }
-    
+
     @Override
     public void bindDevice(String address) {
         // Get the device
@@ -273,6 +273,11 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     @Override
     public void setBatteryLevel(Integer battery) {
         if(deviceView != null) deviceView.setBatteryLevel(battery);
+    }
+
+    @Override
+    public void setWearLocation(int wearLocation) {
+        connectionManager.setWearLocation(wearLocation);
     }
 
     /////////////////////

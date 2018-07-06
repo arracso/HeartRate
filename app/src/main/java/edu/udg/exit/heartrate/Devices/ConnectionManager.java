@@ -201,6 +201,7 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     public abstract void startHeartRateMeasure();
     public abstract void stopHeartRateMeasure();
     public abstract void retrieveBatteryLevel();
+    public abstract void setWearLocation(int wearLocation);
 
     /**
      * Check if a device is connected or not to the GATT.
