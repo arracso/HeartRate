@@ -84,9 +84,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         // Connection
         connectionManager = new MiBandConnectionManager(this);
 
-        // Check user preferences for device address
+        // Check user preferences for device address & connect to it
         String boundAddress = UserPreferences.getInstance().load(this, UserPreferences.BONDED_DEVICE_ADDRESS);
-        Log.d("BluetoothService", "Address " + boundAddress);
         if(boundAddress != null) connectRemoteDevice(getRemoteDevice(boundAddress));
     }
 
@@ -204,6 +203,12 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         pairView = null;
     }
 
+    @Override
+    public void setDevicePaired() {
+        String heartRateMeasure = UserPreferences.getInstance().load(getApplicationContext(),UserPreferences.HEART_RATE_MEASURE);
+        if(heartRateMeasure != null && heartRateMeasure.equals("true")) startHeartRateMeasure();
+    }
+    
     @Override
     public void bindDevice(String address) {
         // Get the device

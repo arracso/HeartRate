@@ -637,7 +637,9 @@ public class MiBandConnectionManager extends ConnectionManager {
         return new ActionWithoutResponse() {
             @Override
             public void run() {
-                bluetoothService.getPairView().setPairStatus(IPairView.STATUS_SUCCESS);
+                IPairView pairView = bluetoothService.getPairView();
+                if(pairView != null) pairView.setPairStatus(IPairView.STATUS_SUCCESS);
+                bluetoothService.setDevicePaired();
             }
         };
     }

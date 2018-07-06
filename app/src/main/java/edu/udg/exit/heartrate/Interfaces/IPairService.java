@@ -20,6 +20,11 @@ public interface IPairService {
     void unSetPairView();
 
     /**
+     * Tells the bluetooth service that the device its paired so it can make other initializations.
+     */
+    void setDevicePaired();
+
+    /**
      * Bind the device using its address and add to user preferences.
      * @param address - MAC address of the device.
      */
