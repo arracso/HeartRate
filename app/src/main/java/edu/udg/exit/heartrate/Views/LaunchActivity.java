@@ -119,7 +119,7 @@ public class LaunchActivity extends Activity {
                         ResponseBody errorBody = Global.gson.fromJson(response.errorBody().string(), ResponseBody.class);
                         switch (errorBody.getCode()){
                             case ResponseBody.EXPIRED_TOKEN:
-                                refreshToken();
+                                refreshTokens();
                                 break;
                             default:
                                 Toast.makeText(LaunchActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
@@ -145,7 +145,10 @@ public class LaunchActivity extends Activity {
         });
     }
 
-    private void refreshToken() {
+    /**
+     * Gets new access & refresh tokens using the refresh token.
+     */
+    private void refreshTokens() {
         String refreshToken = UserPreferences.getInstance().load(getApplicationContext(),UserPreferences.REFRESH_TOKEN);
         RequestBody body = RequestBody.create(MediaType.parse("text/plain"), refreshToken);
         ApiService apiService = ((TodoApp) getApplication()).getApiService();
