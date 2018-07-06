@@ -61,6 +61,14 @@ public class UserPreferences {
     }
 
     /**
+     * Removes all the values of user preferences.
+     * @param context - Application context
+     */
+    public void removeAll(Context context) {
+        context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE).edit().clear().apply();
+    }
+
+    /**
      * Gets the value of a field.
      * @param context - Application context
      * @param field - Field to get its value
