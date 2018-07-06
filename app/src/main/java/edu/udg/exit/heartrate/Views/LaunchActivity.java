@@ -103,7 +103,6 @@ public class LaunchActivity extends Activity {
                     }
                 },DELAY);
             }
-            startMainActivity();
             return;
         }
 
