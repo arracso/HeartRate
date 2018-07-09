@@ -1,8 +1,6 @@
 package edu.udg.exit.heartrate;
 
 import com.google.gson.Gson;
-import edu.udg.exit.heartrate.Model.User;
-import edu.udg.exit.heartrate.Utils.UserPreferences;
 
 /**
  * Global class to save global variables and constants.

@@ -11,7 +11,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import edu.udg.exit.heartrate.Global;
 import edu.udg.exit.heartrate.Model.Auth;
-import edu.udg.exit.heartrate.Model.ErrorBody;
+import edu.udg.exit.heartrate.Model.ResponseBody;
 import edu.udg.exit.heartrate.Model.Tokens;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
@@ -96,7 +96,7 @@ public class RegisterActivity extends Activity {
                 }else{
                     try {
                         Gson gson = new Gson();
-                        ErrorBody errorBody = gson.fromJson(response.errorBody().string(), ErrorBody.class);
+                        ResponseBody errorBody = gson.fromJson(response.errorBody().string(), ResponseBody.class);
 
                     } catch (IOException e) {
                         Toast.makeText(RegisterActivity.this,"Unknown register error.",Toast.LENGTH_LONG).show();

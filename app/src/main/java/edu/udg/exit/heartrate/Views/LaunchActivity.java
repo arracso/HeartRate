@@ -4,18 +4,22 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
-import com.google.gson.Gson;
 import edu.udg.exit.heartrate.Global;
-import edu.udg.exit.heartrate.Model.ErrorBody;
+import edu.udg.exit.heartrate.Model.ResponseBody;
+import edu.udg.exit.heartrate.Model.Tokens;
 import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import org.w3c.dom.Text;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -109,22 +113,68 @@ public class LaunchActivity extends Activity {
                     User user = (User) response.body();
                     ((TodoApp)getApplication()).setUser(user);
                     startMainActivity();
-                }else if(response.code() == 401){ // Unauthorized
+                }else{
                     try {
-                        ErrorBody errorBody = Global.gson.fromJson(response.errorBody().string(), ErrorBody.class);
-                        Toast.makeText(LaunchActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
+                        ResponseBody errorBody = Global.gson.fromJson(response.errorBody().string(), ResponseBody.class);
+                        switch (errorBody.getCode()){
+                            case ResponseBody.EXPIRED_TOKEN:
+                                refreshTokens();
+                                break;
+                            default:
+                                Toast.makeText(LaunchActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
+                                UserPreferences.getInstance().removeAll(getApplicationContext());
+                                startLoginActivity();
+                                break;
+                        }
                     } catch (IOException e) {
                         Toast.makeText(LaunchActivity.this,"Unknown login error.",Toast.LENGTH_LONG).show();
+                        startMainActivity();
                     } catch (Exception e) {
                         Toast.makeText(LaunchActivity.this,"Fatal login error.",Toast.LENGTH_LONG).show();
+                        startMainActivity();
                     }
-                }else{
-                    Toast.makeText(getApplicationContext(), "Login failed!", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Failed to connect.", Toast.LENGTH_LONG).show();
+                startMainActivity();
+            }
+        });
+    }
+
+    /**
+     * Gets new access & refresh tokens using the refresh token.
+     */
+    private void refreshTokens() {
+        String refreshToken = UserPreferences.getInstance().load(getApplicationContext(),UserPreferences.REFRESH_TOKEN);
+        RequestBody body = RequestBody.create(MediaType.parse("text/plain"), refreshToken);
+        ApiService apiService = ((TodoApp) getApplication()).getApiService();
+        apiService.getAuthService().refresh(body).enqueue(new Callback<Tokens>() {
+            @Override
+            public void onResponse(Call<Tokens> call, Response<Tokens> response) {
+                if(response.isSuccessful()){
+                    Tokens tokens = (Tokens) response.body();
+                    UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.ACCESS_TOKEN,tokens.getAccessToken());
+                    UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.REFRESH_TOKEN,tokens.getRefreshToken());
+                    getUser();
+                }else{
+                    try {
+                        ResponseBody errorBody = Global.gson.fromJson(response.errorBody().string(), ResponseBody.class);
+                        Toast.makeText(LaunchActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        Toast.makeText(LaunchActivity.this,"Unknown error.",Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(LaunchActivity.this,"Fatal error.",Toast.LENGTH_LONG).show();
+                    }
+                    UserPreferences.getInstance().removeAll(getApplicationContext());
+                    startLoginActivity();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Tokens> call, Throwable t) {
                 Toast.makeText(getApplicationContext(), "Failed to connect.", Toast.LENGTH_LONG).show();
                 startMainActivity();
             }

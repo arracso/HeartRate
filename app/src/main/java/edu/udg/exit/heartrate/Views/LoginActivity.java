@@ -11,7 +11,6 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import edu.udg.exit.heartrate.Model.*;
 import edu.udg.exit.heartrate.Global;
-import edu.udg.exit.heartrate.Model.ErrorBody;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.TodoApp;
@@ -99,7 +98,7 @@ public class LoginActivity extends Activity {
                     startLaunchActivity();
                 }else{
                     try {
-                        ErrorBody errorBody = Global.gson.fromJson(response.errorBody().string(), ErrorBody.class);
+                        ResponseBody errorBody = Global.gson.fromJson(response.errorBody().string(), ResponseBody.class);
                         Toast.makeText(LoginActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
                     } catch (IOException e) {
                         Toast.makeText(LoginActivity.this,"Unknown login error.",Toast.LENGTH_LONG).show();
@@ -130,7 +129,7 @@ public class LoginActivity extends Activity {
                 }else{
                     try {
                         Gson gson = new Gson();
-                        ErrorBody errorBody = gson.fromJson(response.errorBody().string(), ErrorBody.class);
+                        ResponseBody errorBody = gson.fromJson(response.errorBody().string(), ResponseBody.class);
                         Toast.makeText(LoginActivity.this,errorBody.getMessage(),Toast.LENGTH_LONG).show();
                     } catch (IOException e) {
                         Toast.makeText(LoginActivity.this,"Unknown login error.",Toast.LENGTH_LONG).show();

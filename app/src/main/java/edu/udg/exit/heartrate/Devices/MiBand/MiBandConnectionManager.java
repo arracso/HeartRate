@@ -103,6 +103,7 @@ public class MiBandConnectionManager extends ConnectionManager {
             Log.d("GATTr", "Name -> " + name);
         } else if (MiBandConstants.UUID_CHAR.BATTERY.equals(characteristicUUID)) {
             BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
+            bluetoothService.setBatteryLevel(batteryInfo.getPercent());
             Log.d("GATTr", "Battery -> " + batteryInfo);
         } else if (MiBandConstants.UUID_CHAR.DATE_TIME.equals(characteristicUUID)) {
             MiDate miDate = new MiDate(characteristic.getValue());
@@ -169,10 +170,9 @@ public class MiBandConnectionManager extends ConnectionManager {
             MiDate miDate = new MiDate(characteristic.getValue());
             Log.d("GATTc", "Date -> " + miDate);
         }else if(MiBandConstants.UUID_CHAR.BATTERY.equals(characteristic.getUuid())){
-            BatteryInfo batteryInfo = new BatteryInfo(characteristic.getValue());
-            Log.d("GATTc", "Battery -> " + batteryInfo);
+            handleBatteryNotification(characteristic.getValue());
         }else if(UUID_CHAR.HEARTRATE_NOTIFICATION.equals(characteristic.getUuid())){
-            handleHeartrateNotification(characteristic.getValue());
+            handleHeartRateNotification(characteristic.getValue());
         }else{
             Log.d("GATTc", "Characteristic -> " + characteristic.getUuid() + " - " + convertBytesToString(characteristic.getValue()));
         }
@@ -193,15 +193,34 @@ public class MiBandConnectionManager extends ConnectionManager {
     ////////////////////
 
     @Override
-    public void startMeasure() {
+    public void startHeartRateMeasure() {
         startMeasurement();
         run();
     }
 
     @Override
-    public void stopMeasure() {
+    public void stopHeartRateMeasure() {
         clearCalls();
         stopHeartRateMeasurement();
+        run();
+    }
+
+    @Override
+    public void retrieveBatteryLevel() {
+        addCall(requestBattery());
+        run();
+    }
+
+    @Override
+    public void setWearLocation(int wearLocation) {
+        switch (wearLocation){
+            case 0: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT));
+                break;
+            case 1: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT));
+                break;
+            default: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_NECK));
+                break;
+        }
         run();
     }
 
@@ -248,7 +267,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         // Other Initializations
         addCall(setCurrentDate());
         addCall(requestBattery());
-        addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT)); // Set wear location // TODO - Set by the app
+        setWearLocation();// Set wear location
 
         // Enable battery notifications
         addCall(enableNotificationsFrom(UUID_CHAR.BATTERY));
@@ -283,7 +302,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         // Other Initializations
         addCall(setCurrentDate());
         addCall(requestBattery());
-        addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT)); // Set wear location
+        setWearLocation(); // Set wear location
         addCall(setFitnessGoal(1000)); // TODO - Check and set fitness by the app
 
         // Enable other notifications // Enable only when needed
@@ -321,6 +340,9 @@ public class MiBandConnectionManager extends ConnectionManager {
         addCall(sendHRCommand(COMMAND.START_HEART_RATE_MEASUREMENT_CONTINUOUS));
     }
 
+    /**
+     * Stop to measure heart rate.
+     */
     private void stopHeartRateMeasurement() {
         addCall(sendHRCommand(COMMAND.STOP_HEART_RATE_MEASUREMENT_CONTINUOUS));
         addCall(dissableHeartRateNotifications());
@@ -350,6 +372,22 @@ public class MiBandConnectionManager extends ConnectionManager {
                 miliService.read(UUID_CHAR.TEST);
             }
         });
+    }
+
+    /**
+     * Sets wear location to user preferences option.
+     */
+    private void setWearLocation() {
+        String deviceHand = UserPreferences.getInstance().load(bluetoothService.getApplicationContext(),UserPreferences.DEVICE_HAND);
+        int wearLocation = (deviceHand == null || deviceHand.equals("left")) ? 0 : (deviceHand.equals("right") ? 1 : 2);
+        switch (wearLocation){
+            case 0: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_LEFT));
+                break;
+            case 1: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_RIGHT));
+                break;
+            default: addCall(sendCommand(COMMAND.SET_WEAR_LOCATION_NECK));
+                break;
+        }
     }
 
     /////////////
@@ -628,7 +666,9 @@ public class MiBandConnectionManager extends ConnectionManager {
         return new ActionWithoutResponse() {
             @Override
             public void run() {
-                bluetoothService.getPairView().setPairStatus(IPairView.STATUS_SUCCESS);
+                IPairView pairView = bluetoothService.getPairView();
+                if(pairView != null) pairView.setPairStatus(IPairView.STATUS_SUCCESS);
+                bluetoothService.setDevicePaired();
             }
         };
     }
@@ -775,7 +815,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         }
     }
 
-    private void handleHeartrateNotification(byte[] value) {
+    private void handleHeartRateNotification(byte[] value) {
         // Check if value is 2 byte long.
         if(value.length != 2){
             Log.e("Notification", "Received " + value.length + " bytes");
@@ -786,11 +826,16 @@ public class MiBandConnectionManager extends ConnectionManager {
         switch (value[0]) {
             case 6:
                 Log.d("Notification", "Heartrate: " + Parse.BytesToInt(value,1,1));
-                bluetoothService.setMeasure(new Date(),Parse.BytesToInt(value,1,1));
+                bluetoothService.setHeartRateMeasure(new Date(),Parse.BytesToInt(value,1,1));
                 break;
             default:
                 Log.d("Notification", "Code " + value[0] + " value: " + value[1]);
         }
+    }
+
+    private void handleBatteryNotification(byte[] value) {
+        BatteryInfo batteryInfo = new BatteryInfo(value);
+        bluetoothService.setBatteryLevel(batteryInfo.getPercent());
     }
 
     // DEBUG

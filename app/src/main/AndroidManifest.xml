@@ -51,9 +51,9 @@
         <activity android:name=".Views.LoginActivity"/>
         <activity android:name=".Views.ScanActivity"/>
         <activity android:name=".Views.PairActivity"/>
-        <activity android:name=".Views.MeasureActivity"/>
         <activity android:name=".Views.RegisterActivity"/>
         <activity android:name=".Views.DeviceActivity"/>
+
     </application>
 
 </manifest>

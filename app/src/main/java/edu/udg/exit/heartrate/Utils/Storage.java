@@ -49,7 +49,7 @@ public class Storage {
     public void createFile(Context ctx, String fileName){
         try {
             this.fileName = fileName;
-            fos = ctx.openFileOutput(fileName, ctx.MODE_PRIVATE);
+            fos = ctx.openFileOutput(fileName, Context.MODE_PRIVATE);
             bw = new BufferedWriter(new OutputStreamWriter(fos));
         } catch(FileNotFoundException e) {
             fos = null;
@@ -98,10 +98,21 @@ public class Storage {
         else return null;
     }
 
-    public void uploadFile(Context ctx){
-        String path = ctx.getFilesDir() + "/" + fileName;
-        File file = new File(path);
-        if(file.exists()) uploadFile(ctx, file);
+    /**
+     * Generates a MultipartBody part from a file and with the given name.
+     * @param name - Name of the part
+     * @param file - File that will be inside the part
+     * @return MultipartBody.Part
+     */
+    public static MultipartBody.Part getMultipartBody(String name, File file){
+        if(file != null){
+            String type = getMimeType(file.getPath());
+            MediaType mediaType = MediaType.parse(type);
+            RequestBody reqFile = RequestBody.create(mediaType, file);
+            return MultipartBody.Part.createFormData(name,file.getName(),reqFile);
+        }else{
+            return null;
+        }
     }
 
     /////////////////////
@@ -113,42 +124,10 @@ public class Storage {
      * @param url - Url of the file
      * @return Mime Type of the file.
      */
-    private String getMimeType(String url) {
+    private static String getMimeType(String url) {
         String extension = MimeTypeMap.getFileExtensionFromUrl(url);
         if (extension != null) return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
         return null;
-    }
-
-    private void uploadFile(final Context ctx, File file){
-        Log.d("File", "start upload");
-        if (file != null){
-            String type = getMimeType(file.getPath());
-            Log.d("File", "type: " + type);
-            MediaType mediaType = MediaType.parse(type);
-            RequestBody reqFile = RequestBody.create(mediaType, file);
-            MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), reqFile);
-
-            Call<ResponseBody> call = ((TodoApp) ctx.getApplicationContext()).getApiService().getFileService().uploadFile(body);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if(response.isSuccessful())
-                        Toast.makeText(ctx, "File uploaded!", Toast.LENGTH_LONG).show();
-                    else
-                        Toast.makeText(ctx, "Failed to upload the file!", Toast.LENGTH_LONG).show();
-                }
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    System.out.println(call.toString());
-                    System.out.println(t.getMessage());
-                    System.out.println(t.getLocalizedMessage());
-                    t.printStackTrace();
-                    Toast.makeText(ctx, "BAD CONNECTION", Toast.LENGTH_LONG).show();
-                }
-            });
-        } else {
-            Toast.makeText(ctx, "FAILED TO UPLOAD THE FILE", Toast.LENGTH_LONG).show();
-        }
     }
 
 }

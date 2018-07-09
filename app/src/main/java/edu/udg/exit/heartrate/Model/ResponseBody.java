@@ -1,15 +1,13 @@
 package edu.udg.exit.heartrate.Model;
 
-/**
- * POJO class to retrieve errorBody from server response.
- */
-public class ErrorBody {
+public class ResponseBody {
 
     ///////////////
     // Constants //
     ///////////////
 
     public static final int ERROR = -1;
+    public static final int SUCCESS = 0;
     public static final int WRONG_CREDENTIALS = 1;
     public static final int ACCOUNT_ALREADY_EXIST = 2;
     public static final int ACCESS_NOT_ALLOWED = 3;

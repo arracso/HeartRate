@@ -16,6 +16,8 @@ public class UserPreferences {
 
     // Fields //
     public static final String USER_PROFILE = "user_profile";
+    public static final String HEART_RATE_MEASURE = "heart_rate_measure";
+    public static final String DEVICE_HAND = "device_hand";
     public static final String BONDED_DEVICE_ADDRESS = "bounded_device_address";
     public static final String ACCESS_TOKEN = "access_token";
     public static final String REFRESH_TOKEN = "refresh_token";
@@ -56,6 +58,14 @@ public class UserPreferences {
      */
     public void remove(Context context, String field) {
         context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE).edit().remove(field).apply();
+    }
+
+    /**
+     * Removes all the values of user preferences.
+     * @param context - Application context
+     */
+    public void removeAll(Context context) {
+        context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE).edit().clear().apply();
     }
 
     /**

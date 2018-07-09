@@ -1,15 +1,11 @@
 package edu.udg.exit.heartrate.Views;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import edu.udg.exit.heartrate.Activities.BluetoothActivity;
 import edu.udg.exit.heartrate.Interfaces.IPairView;
 import edu.udg.exit.heartrate.R;
@@ -22,8 +18,7 @@ public class PairActivity extends BluetoothActivity implements IPairView {
     ///////////////
 
     private static final int REQUEST_ENABLE_BT_TO_PAIR = BluetoothService.REQUEST_ENABLE_BT_TO_PAIR;
-
-    public static final String DEVICE_ADDRESS = "device_address";
+    static final String DEVICE_ADDRESS = "device_address";
 
     ////////////////
     // Attributes //
@@ -74,30 +69,6 @@ public class PairActivity extends BluetoothActivity implements IPairView {
         super.onDestroy();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_ENABLE_BT_TO_PAIR:
-                if(resultCode == -1){ // Bluetooth enabled
-                    if(checkBluetooth(REQUEST_ENABLE_BT_TO_PAIR)){
-                        bluetoothService.scanLeDevice(true);
-                    }
-                }
-                break;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_ENABLE_BT_TO_PAIR:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){ // Location permissions granted
-                    bluetoothService.bindDevice("XXXXX");
-                }
-                break;
-        }
-    }
-
     /////////////////////
     // Private methods //
     /////////////////////
@@ -119,8 +90,8 @@ public class PairActivity extends BluetoothActivity implements IPairView {
     }
 
     private void handleSuccessToPair() {
-        Intent measure = new Intent(PairActivity.this, MeasureActivity.class);
-        startActivity(measure);
+        Intent device = new Intent(PairActivity.this, DeviceActivity.class);
+        startActivity(device);
         PairActivity.this.finish();
     }
 

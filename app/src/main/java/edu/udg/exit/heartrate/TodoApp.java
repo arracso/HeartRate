@@ -7,10 +7,17 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import java.io.IOException;
 
 public class TodoApp extends Application{
 
@@ -99,13 +106,44 @@ public class TodoApp extends Application{
 
     public void setUser(User user) {
         this.user = user;
+        refreshUser();
+    }
+
+    public void refreshUser(){
         String userObj = Global.gson.toJson(user);
-        Log.d("USER","set: " + userObj); // TODO - remove Log
         UserPreferences.getInstance().save(this, UserPreferences.USER_PROFILE, userObj);
     }
 
     public User getUser() {
         return this.user;
+    }
+
+    public void updateUser() {
+        if(apiService == null) return;
+        if(user == null) return;
+        apiService.getUserService().updateUser(user).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful()) Log.d("USER", "Updated!");
+                else if(response.code() == 401) { // Unauthorized
+                    try {
+                        edu.udg.exit.heartrate.Model.ResponseBody errorBody = Global.gson.fromJson(response.errorBody().string(), edu.udg.exit.heartrate.Model.ResponseBody.class);
+                        Toast.makeText(getApplicationContext(),errorBody.getMessage(),Toast.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        Toast.makeText(getApplicationContext(),"Unknown error.",Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(),"Fatal error.",Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Update failed!", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Failed to connect. Try it later.", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     /////////////////////
@@ -114,8 +152,8 @@ public class TodoApp extends Application{
 
     private void retrieveUser() {
         String userObj = UserPreferences.getInstance().load(this, UserPreferences.USER_PROFILE);
-        Log.d("USER","get: " + userObj); // TODO - remove Log
         this.user = Global.gson.fromJson(userObj, User.class);
+        if(this.user == null) this.user = new User();
     }
 
 }
