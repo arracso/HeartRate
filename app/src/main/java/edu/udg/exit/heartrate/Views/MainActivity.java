@@ -76,6 +76,12 @@ public class MainActivity extends Activity {
         startLoginActivity();
     }
 
+    public void closeApp(View view) {
+        stopService(new Intent(getApplicationContext(),BluetoothService.class));
+        this.finishAndRemoveTask();
+        
+    }
+
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -389,7 +395,8 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 String bondedDeviceAddress = UserPreferences.getInstance().load(getApplicationContext(),UserPreferences.BONDED_DEVICE_ADDRESS);
-                if(((TodoApp) getApplication()).getBluetoothService().isConnected()){
+                BluetoothService bluetoothService = ((TodoApp) getApplication()).getBluetoothService();
+                if(bluetoothService != null && bluetoothService.isConnected()){
                     bandItem.setLabelValue(bondedDeviceAddress);
                     scanButton.setVisibility(View.GONE);
                     bandButton.setVisibility(View.VISIBLE);
