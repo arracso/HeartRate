@@ -77,9 +77,7 @@ public class MainActivity extends Activity {
     }
 
     public void closeApp(View view) {
-        stopService(new Intent(getApplicationContext(),BluetoothService.class));
         this.finishAndRemoveTask();
-        
     }
 
     /////////////////////
