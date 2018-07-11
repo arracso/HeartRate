@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 import edu.udg.exit.heartrate.Devices.ConnectionManager;
 import edu.udg.exit.heartrate.Interfaces.*;
@@ -34,6 +35,9 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     ////////////////
     // Attributes //
     ////////////////
+
+    // Wakelock
+    PowerManager.WakeLock wakeLock = null;
 
     // Service
     private final IBinder bluetoothBinder = new BluetoothBinder();
@@ -67,6 +71,13 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     public void onCreate() {
         super.onCreate();
 
+        Log.d("BluetoothService", "onCreate");
+
+        // Acquire wakelock
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        if(powerManager!= null) wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"BluetoothWakeLock");
+        if(wakeLock != null) wakeLock.acquire();
+
         // Scan
         scanning = false;
         scanView = null;
@@ -96,11 +107,13 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent,flags,startId);
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
+        Log.d("BluetoothService", "onDestroy");
         // Scan
         devices.clear();
         scanning = null;
@@ -114,6 +127,13 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         }
 
         super.onDestroy();
+
+        // Release wakeLock
+        wakeLock.release();
+
+        // Restart Bluetooth
+        Intent restartBluetooth = new Intent(".RestartBluetooth");
+        sendBroadcast(restartBluetooth);
     }
 
     /**

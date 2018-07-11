@@ -1,5 +1,6 @@
 package edu.udg.exit.heartrate;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -42,17 +43,30 @@ public class TodoApp extends Application{
         retrieveUser();
         // Connecting & start api service
         Intent apiServiceIntent = new Intent(this,ApiService.class);
-        startService(apiServiceIntent);
+        if (!isMyServiceRunning(apiServiceIntent.getClass())) startService(apiServiceIntent);
         bindService(apiServiceIntent, apiServiceConnection, Context.BIND_AUTO_CREATE);
         // Start & bind bluetooth service
         Intent bluetoothServiceIntent = new Intent(this,BluetoothService.class);
-        startService(bluetoothServiceIntent);
+        if (!isMyServiceRunning(bluetoothServiceIntent.getClass())) startService(bluetoothServiceIntent);
         bindService(bluetoothServiceIntent, bluetoothServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     ////////////////////////
     // Service Connection //
     ////////////////////////
+
+    /**
+     * Checks if service is already running.
+     * @param serviceClass - class of the service that we want to check
+     * @return True if service is running
+     */
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) return true;
+        }
+        return false;
+    }
 
     /**
      * Bluetooth Service Connection handler.

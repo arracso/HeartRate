@@ -11,6 +11,7 @@ import android.widget.NumberPicker;
 import android.widget.RadioGroup;
 import edu.udg.exit.heartrate.Components.ExpandItem;
 import edu.udg.exit.heartrate.R;
+import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
@@ -44,6 +45,12 @@ public class MainActivity extends Activity {
 
         // Setup contents
         setupContents();
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(new Intent(getApplicationContext(),BluetoothService.class));
+        super.onDestroy();
     }
 
     ////////////////////

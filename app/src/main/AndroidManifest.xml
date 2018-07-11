@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="edu.udg.exit.heartrate">
 
+    <!-- Wakelock permissions -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
     <!-- Storage Permissions -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -11,17 +14,15 @@
     <!-- Internet Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- Location Permissions -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
     <!-- Bluetooth Permissions -->
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
-    <!-- Location Permissions -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-
     <!-- Required Bluetooth LE -->
-    <uses-feature
-            android:name="android.hardware.bluetooth_le"
-            android:required="true"/>
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
     <!-- Application -->
     <application
@@ -32,11 +33,6 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-
-        <!-- Services -->
-        <service android:name=".Services.BluetoothService"/>
-        <service android:name=".Services.ApiService"/>
-
         <!-- Launch Activity -->
         <activity android:name=".Views.LaunchActivity">
             <intent-filter>
@@ -54,6 +50,18 @@
         <activity android:name=".Views.RegisterActivity"/>
         <activity android:name=".Views.DeviceActivity"/>
 
+        <!-- Services -->
+        <service android:name=".Services.BluetoothService" android:exported="true"/>
+        <service android:name=".Services.ApiService"/>
+
+        <!-- Receivers -->
+        <receiver
+                android:name=".Services.BluetoothRestarterBroadcastReceiver"
+                android:enabled="true"
+                android:exported="true"
+                android:label="RestartServiceWhenStopped">
+            <intent-filter><action android:name=".RestartBluetooth"/></intent-filter>
+        </receiver>
     </application>
 
 </manifest>
