@@ -203,6 +203,10 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     public abstract void retrieveBatteryLevel();
     public abstract void setWearLocation(int wearLocation);
 
+    public boolean isWorking() {
+        return handler.hasMessages(0); // 0 means runnable
+    }
+
     /**
      * Check if a device is connected or not to the GATT.
      * @return True if a device is connected

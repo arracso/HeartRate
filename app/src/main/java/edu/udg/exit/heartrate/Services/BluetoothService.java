@@ -1,13 +1,17 @@
 package edu.udg.exit.heartrate.Services;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.PowerManager;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.*;
+import android.provider.Settings;
 import android.util.Log;
 import edu.udg.exit.heartrate.Devices.ConnectionManager;
 import edu.udg.exit.heartrate.Interfaces.*;
@@ -37,7 +41,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     ////////////////
 
     // Wakelock
-    PowerManager.WakeLock wakeLock = null;
+    private PowerManager.WakeLock wakeLock = null;
 
     // Service
     private final IBinder bluetoothBinder = new BluetoothBinder();
@@ -73,7 +77,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
         Log.d("BluetoothService", "onCreate");
 
-        // Acquire wakelock
+        // Wakelock
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         if(powerManager!= null) wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"BluetoothWakeLock");
         if(wakeLock != null) wakeLock.acquire();
@@ -166,12 +170,20 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void connectRemoteDevice(BluetoothDevice device) {
-        device.connectGatt(this,false,connectionManager);
+        device.connectGatt(this,true,connectionManager);
     }
 
     @Override
     public boolean isConnected() {
         return connectionManager != null && connectionManager.isConnected();
+    }
+
+    public boolean isWorking()  {
+        return this.connectionManager.isWorking();
+    }
+
+    public void restartWork() {
+        this.connectionManager.run();
     }
 
     /*----------------------*/
@@ -272,11 +284,44 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     @Override
     public void startHeartRateMeasure() {
         connectionManager.startHeartRateMeasure();
+        // Enable receiver that restarts this service
+        ComponentName receiver = new ComponentName(this, BluetoothRestarterBroadcastReceiver.class);
+        PackageManager pm = getPackageManager();
+        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        // Set Alarm
+        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        Intent bluetoothRestarter = new Intent(".RestartBluetooth");
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, bluetoothRestarter, 0);
+        if(alarmManager != null){
+            int milis = 10 * 60 * 1000;
+            alarmManager.cancel(alarmIntent);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,SystemClock.elapsedRealtime() + milis, milis, alarmIntent);
+        }
+        // Avoid doze mode
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Intent intent = new Intent();
+            String packageName = getPackageName();
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            if (powerManager != null && !powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                intent.setData(Uri.parse("package:" + packageName));
+                startActivity(intent);
+            }
+        }
     }
 
     @Override
     public void stopHeartRateMeasure() {
         connectionManager.stopHeartRateMeasure();
+        // Disable receiver that restarts this service
+        ComponentName receiver = new ComponentName(this, BluetoothRestarterBroadcastReceiver.class);
+        PackageManager pm = getPackageManager();
+        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        // Unset alarm
+        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        Intent bluetoothRestarter = new Intent(".RestartBluetooth");
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, bluetoothRestarter, 0);
+        if(alarmManager != null) alarmManager.cancel(alarmIntent);
     }
 
     @Override
