@@ -80,7 +80,7 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
             connectGATT.discoverServices();
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             Log.d("GATT manager", "Device disconnected");
-            connectGATT.close();
+            if(connectGATT != null) connectGATT.close();
             isConnected = false;
             connectGATT = null;
         }

@@ -40,4 +40,15 @@ public interface IBluetoothService {
      */
     boolean isConnected();
 
+    /**
+     * Check if service is working with the remote device.
+     * @return True if service is working.
+     */
+    boolean isWorking();
+
+    /**
+     * Restart the work that was being done by the service.
+     */
+    void restartWork();
+
 }

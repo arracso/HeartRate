@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,9 +16,9 @@ import android.os.*;
 import android.provider.Settings;
 import android.util.Log;
 import edu.udg.exit.heartrate.Devices.ConnectionManager;
+import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants;
 import edu.udg.exit.heartrate.Interfaces.*;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
-import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants;
 import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
 
@@ -53,7 +55,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     private final Map<String, BluetoothDevice> devices = new HashMap<>(10);
     private Boolean scanning;
     private IScanView scanView;
-    private BluetoothAdapter.LeScanCallback scanCallback;
+    //private BluetoothAdapter.LeScanCallback scanCallback;
+    private ScanCallback scanCallback;
 
     // Pair
     private IPairView pairView;
@@ -130,10 +133,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
             connectionManager = null;
         }
 
-        super.onDestroy();
-
-        // Release wakeLock
+        // Release wakeLock // TODO - check
         wakeLock.release();
+
+        super.onDestroy();
 
         // Restart Bluetooth
         Intent restartBluetooth = new Intent(".RestartBluetooth");
@@ -169,8 +172,15 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     }
 
     @Override
-    public void connectRemoteDevice(BluetoothDevice device) {
-        device.connectGatt(this,true,connectionManager);
+    public void connectRemoteDevice(final BluetoothDevice device) {
+        connectionManager.disconnect();
+        device.connectGatt(this,false,connectionManager);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(!isConnected()) connectRemoteDevice(device);
+            }
+        }, 5 * 60 * 1000);
     }
 
     @Override
@@ -178,10 +188,12 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         return connectionManager != null && connectionManager.isConnected();
     }
 
+    @Override
     public boolean isWorking()  {
         return this.connectionManager.isWorking();
     }
 
+    @Override
     public void restartWork() {
         this.connectionManager.run();
     }
@@ -248,11 +260,14 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         // Save device address to user preferences
         UserPreferences.getInstance().save(this, UserPreferences.BONDED_DEVICE_ADDRESS, address);
         // Connect to remote device
-        if(!connectionManager.isConnected()){
+        if(connectionManager != null && !connectionManager.isConnected()){
             connectRemoteDevice(device);
-            pairView.startLoadingAnimation();
-            pairView.setMessage("pairing (" + address + ")");
-        }else{
+            if(pairView != null){
+                pairView.startLoadingAnimation();
+                pairView.setMessage("pairing (" + address + ")");
+            }
+
+        }else if(pairView != null){
             pairView.stopLoadingAnimation();
             pairView.setMessage("Failed");
         }
@@ -260,11 +275,12 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void unbindDevice() {
-        // TODO - UNPAIR
         // Disconnect from remote device
         if(connectionManager != null) connectionManager.disconnect();
-        // Unset device address from user preferences
+        // Unset device address & band settings from user preferences
         UserPreferences.getInstance().remove(this, UserPreferences.BONDED_DEVICE_ADDRESS);
+        UserPreferences.getInstance().remove(this, UserPreferences.DEVICE_HAND);
+        UserPreferences.getInstance().remove(this, UserPreferences.HEART_RATE_MEASURE);
     }
 
     /*-------------------------*/
@@ -283,12 +299,13 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void startHeartRateMeasure() {
-        connectionManager.startHeartRateMeasure();
+        // Start the measure
+        if(connectionManager != null) connectionManager.startHeartRateMeasure();
         // Enable receiver that restarts this service
         ComponentName receiver = new ComponentName(this, BluetoothRestarterBroadcastReceiver.class);
-        PackageManager pm = getPackageManager();
-        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-        // Set Alarm
+        PackageManager packageManager = getPackageManager();
+        packageManager.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        // Set Alarm to check service status every 10 minutes
         AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         Intent bluetoothRestarter = new Intent(".RestartBluetooth");
         PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, bluetoothRestarter, 0);
@@ -312,11 +329,12 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void stopHeartRateMeasure() {
-        connectionManager.stopHeartRateMeasure();
+        // Stop the measure
+        if(connectionManager != null) connectionManager.stopHeartRateMeasure();
         // Disable receiver that restarts this service
         ComponentName receiver = new ComponentName(this, BluetoothRestarterBroadcastReceiver.class);
-        PackageManager pm = getPackageManager();
-        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        PackageManager packageManager = getPackageManager();
+        packageManager.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
         // Unset alarm
         AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         Intent bluetoothRestarter = new Intent(".RestartBluetooth");
@@ -326,13 +344,14 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void setHeartRateMeasure(Date date, Integer measure) {
+        if(dataBase == null) dataBase = new DataBase(getApplicationContext());
         dataBase.insertRate(date.getTime(),measure);
         if(deviceView != null) deviceView.setHeartRateMeasure(measure);
     }
 
     @Override
     public void retrieveBatteryLevel() {
-        connectionManager.retrieveBatteryLevel();
+        if(connectionManager != null) connectionManager.retrieveBatteryLevel();
     }
 
     @Override
@@ -342,38 +361,60 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void setWearLocation(int wearLocation) {
-        connectionManager.setWearLocation(wearLocation);
+        if(connectionManager != null) connectionManager.setWearLocation(wearLocation);
     }
 
     /////////////////////
     // Private methods //
     /////////////////////
 
+    private final Handler handler = new Handler();
+    private final Runnable stopRun = new Runnable() {
+        @Override
+        public void run() { stopScan(); }
+    };
+
     /**
      * Creates a Bluetooth Low Energy ScanCallback
      * @return BluetoothAdapter.LeScanCallback
      */
+    /* TODO - Check deprecated
     private BluetoothAdapter.LeScanCallback initScanCallback() {
         return new BluetoothAdapter.LeScanCallback() {
             @Override
             public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-                boolean supportedDevice = false;
-                if(device.getAddress().startsWith(MiBandConstants.MODEL.MI1A)) supportedDevice = false;// TODO - Support (or remove)
-                if(device.getAddress().startsWith(MiBandConstants.MODEL.MI1S)) supportedDevice = true;
+                boolean isSupportedDevice = false;
+                //if(device.getAddress().startsWith(MiBandConstants.MODEL.MI1A)) isSupportedDevice = false; // Not supported
+                if(device.getAddress().startsWith(MiBandConstants.MODEL.MI1S)) isSupportedDevice = true;
 
-                if(supportedDevice && !devices.containsKey(device.toString())) {
+                if(isSupportedDevice && !devices.containsKey(device.toString())) {
                     devices.put(device.getAddress(),device);
                     if(scanView != null) scanView.addDevice(device);
                 }
             }
         };
     }
+    */
 
-    private final Handler handler = new Handler();
-    private final Runnable stopRun = new Runnable() {
-        @Override
-        public void run() { stopScan(); }
-    };
+    private ScanCallback initScanCallback() {
+        return new ScanCallback() {
+            @Override
+            public void onScanResult(int callbackType, ScanResult result) {
+                super.onScanResult(callbackType, result);
+                // Get the scanned device
+                BluetoothDevice device = result.getDevice();
+                // Check if device is supported b the app
+                boolean isSupportedDevice = false;
+                if(device.getAddress().startsWith(MiBandConstants.MODEL.MI1S)) isSupportedDevice = true;
+                if(device.getAddress().startsWith(MiBandConstants.MODEL.MI1A)) isSupportedDevice = false; // Not supported
+                // Add device onto the scanView
+                if(isSupportedDevice && !devices.containsKey(device.toString())) {
+                    devices.put(device.getAddress(),device);
+                    if(scanView != null) scanView.addDevice(device);
+                }
+            }
+        };
+    }
 
     /**
      * Starts scanning Bluetooth Low Energy Devices
@@ -388,7 +429,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
             if(scanView != null) scanView.clearView();
             if(scanView != null) scanView.startLoadingAnimation();
             handler.postDelayed(stopRun, SCAN_PERIOD);
-            adapter.startLeScan(scanCallback);
+            //adapter.startLeScan(scanCallback); // TODO - check deprecated
+            adapter.getBluetoothLeScanner().startScan(scanCallback);
         }
     }
 
@@ -400,7 +442,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
             scanning = false;
             handler.removeCallbacks(stopRun);
             if(scanView != null) scanView.stopLoadingAnimation();
-            adapter.stopLeScan(scanCallback);
+            //adapter.stopLeScan(scanCallback); // TODO - check deprecated
+            adapter.getBluetoothLeScanner().stopScan(scanCallback);
         }
     }
 }
