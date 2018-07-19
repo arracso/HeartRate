@@ -1,11 +1,18 @@
 package edu.udg.exit.heartrate.Interfaces;
 
+/**
+ * Interface og pair service.
+ */
 public interface IPairService {
 
     /////////////
     // Methods //
     /////////////
 
+    /**
+     * Gets the pair view.
+     * @return PairView
+     */
     IPairView getPairView();
 
     /**

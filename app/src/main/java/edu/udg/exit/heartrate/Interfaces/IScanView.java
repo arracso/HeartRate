@@ -2,6 +2,9 @@ package edu.udg.exit.heartrate.Interfaces;
 
 import android.bluetooth.BluetoothDevice;
 
+/**
+ * Interface of scan view.
+ */
 public interface IScanView {
 
     /////////////
@@ -10,7 +13,7 @@ public interface IScanView {
 
     /**
      * Add a device to the scan view.
-     * @param device
+     * @param device - Device to be added
      */
     void addDevice(BluetoothDevice device);
 

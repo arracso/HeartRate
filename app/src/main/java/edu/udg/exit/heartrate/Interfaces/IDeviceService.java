@@ -3,7 +3,7 @@ package edu.udg.exit.heartrate.Interfaces;
 import java.util.Date;
 
 /**
- * Interface of device service (bluetooth)
+ * Interface of device service (bluetooth).
  */
 public interface IDeviceService {
 

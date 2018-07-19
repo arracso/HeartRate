@@ -1,17 +1,24 @@
 package edu.udg.exit.heartrate.Interfaces;
 
+/**
+ * Interface of scan service.
+ */
 public interface IScanService {
 
     ///////////////
     // Constants //
     ///////////////
 
-    int SCAN_PERIOD = 3000; // delayMillis
+    int SCAN_PERIOD = 5000; // delayMillis
 
     /////////////
     // Methods //
     /////////////
 
+    /**
+     * Gets the scan view.
+     * @return ScanView.
+     */
     IScanView getScanView();
 
     /**
