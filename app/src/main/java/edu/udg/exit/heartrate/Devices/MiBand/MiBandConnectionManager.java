@@ -207,7 +207,7 @@ public class MiBandConnectionManager extends ConnectionManager {
 
     @Override
     public void retrieveBatteryLevel() {
-        addCall(requestBattery());
+        addCallFirst(requestBattery());
         run();
     }
 
@@ -255,19 +255,14 @@ public class MiBandConnectionManager extends ConnectionManager {
         // Set low latency to do a faster initialization
         addCall(setLowLatency());
 
-        // Reading date for stability
-        addCall(requestDate()); // TODO - Check if this is really necessary
-
         // Authentication
         addCall(requestDeviceInformation()); // Needed to send user info to the device
-        addCall(requestDeviceName()); // Not needed to pair
         addCall(sendUserInfo()); // Needed to authenticate
         addCall(checkAuthentication()); // Clear the queue when not authenticated
 
         // Other Initializations
         addCall(setCurrentDate());
-        addCall(requestBattery());
-        setWearLocation();// Set wear location
+        setWearLocation(); // Set wear location
 
         // Enable battery notifications
         addCall(enableNotificationsFrom(UUID_CHAR.BATTERY));
@@ -293,7 +288,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         addCall(requestDate());
 
         // Authentication
-        addCall(pair()); // TODO - Check if this is necessary
+        addCall(pair());
         addCall(requestDeviceInformation()); // Needed to send user info to the device
         addCall(requestDeviceName()); // Not needed to pair
         addCall(sendUserInfo()); // Needed to authenticate
@@ -303,7 +298,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         addCall(setCurrentDate());
         addCall(requestBattery());
         setWearLocation(); // Set wear location
-        addCall(setFitnessGoal(1000)); // TODO - Check and set fitness by the app
+        addCall(setFitnessGoal(1000)); // Set fitness
 
         // Enable other notifications // Enable only when needed
         addCall(enableNotificationsFrom(UUID_CHAR.REALTIME_STEPS));
@@ -361,7 +356,6 @@ public class MiBandConnectionManager extends ConnectionManager {
         });
         addCall(enableNotificationsFrom(UUID_CHAR.REALTIME_STEPS));
 
-        // TODO - Check use
         addCall(sendCommand(COMMAND.FETCH_DATA));
         // TODO - Check data received
         addCall(sendCommand(new byte[]{0x0a,0x12,0x02,0x17,0x0b,0x1c,0x0a,0x00,0x00})); // Confirm
@@ -643,6 +637,7 @@ public class MiBandConnectionManager extends ConnectionManager {
      * Sets the number of steps that the user have as a Goal.
      * @return Action to set fitness goal.
      */
+    @SuppressWarnings("SameParameterValue")
     private Action setFitnessGoal(final int fitnessGoal) {
         return new ActionWithoutResponse() {
             @Override

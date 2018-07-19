@@ -1,6 +1,7 @@
 package edu.udg.exit.heartrate.Services;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -9,6 +10,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -315,6 +317,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         setInexactRepeatingAlarm(0, ".RestartBluetooth", 10 * 60 * 1000);
         // Set battery optimizations to avoid Doze mode (needs permissions)
         setBatteryOptimizations();
+        //getSpecialPermissions();
     }
 
     @Override
@@ -361,7 +364,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
      */
     @SuppressWarnings("SameParameterValue")
     private void enableReceiver(Class receiverClass) {
-        ComponentName receiver = new ComponentName(this, receiverClass);
+        ComponentName receiver = new ComponentName(getApplicationContext(), receiverClass);
         PackageManager packageManager = getPackageManager();
         packageManager.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
     }
@@ -372,7 +375,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
      */
     @SuppressWarnings("SameParameterValue")
     private void disableReceiver(Class receiverClass) {
-        ComponentName receiver = new ComponentName(this, receiverClass);
+        ComponentName receiver = new ComponentName(getApplicationContext(), receiverClass);
         PackageManager packageManager = getPackageManager();
         packageManager.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
     }
@@ -427,6 +430,72 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                 startActivity(intent);
             }
         }
+    }
+
+    /**
+     * Gets special permissions from the user to keep services alive.
+     */
+    private void getSpecialPermissions() {
+        String alertMessage = "Please allow this app to always run in the background, otherwise our services won't be accessed when your phone goes into sleep mode.";
+        final String brand = Build.BRAND;
+
+        // Create dialog builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+        builder.setMessage(alertMessage);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Intent intent = new Intent();
+                if (brand.equalsIgnoreCase("xiaomi")) {
+                    intent.setComponent(new ComponentName("com.miui.securitycenter","com.miui.permcenter.autostart.AutoStartManagementActivity"));
+                    startActivity(intent);
+                } else if (brand.equalsIgnoreCase("Letv")) {
+                    intent.setComponent(new ComponentName("com.letv.android.letvsafe","com.letv.android.letvsafe.AutobootManageActivity"));
+                    startActivity(intent);
+                } else if (brand.equalsIgnoreCase("Honor")) {
+                    intent.setComponent(new ComponentName("com.huawei.systemmanager","com.huawei.systemmanager.optimize.process.ProtectActivity"));
+                    startActivity(intent);
+                } else if (Build.MANUFACTURER.equalsIgnoreCase("oppo")) {
+                    try {
+                        intent.setClassName("com.coloros.safecenter","com.coloros.safecenter.permission.startup.StartupAppListActivity");
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        try {
+                            intent.setClassName("com.oppo.safe","com.oppo.safe.permission.startup.StartupAppListActivity");
+                            startActivity(intent);
+                        } catch (Exception ex) {
+                            try {
+                                intent.setClassName("com.coloros.safecenter","com.coloros.safecenter.startupapp.StartupAppListActivity");
+                                startActivity(intent);
+                            } catch (Exception exx) {
+                                exx.printStackTrace();
+                            }
+                        }
+                    }
+                } else if (Build.MANUFACTURER.contains("vivo")) {
+                    try {
+                        intent.setComponent(new ComponentName("com.iqoo.secure","com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity"));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        try {
+                            intent.setComponent(new ComponentName("com.vivo.permissionmanager","com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
+                            startActivity(intent);
+                        } catch (Exception ex) {
+                            try {
+                                intent.setClassName("com.iqoo.secure","com.iqoo.secure.ui.phoneoptimize.BgStartUpManager");
+                                startActivity(intent);
+                            } catch (Exception exx) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Create and show dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 
