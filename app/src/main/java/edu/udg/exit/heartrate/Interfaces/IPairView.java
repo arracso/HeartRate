@@ -1,5 +1,8 @@
 package edu.udg.exit.heartrate.Interfaces;
 
+/**
+ * Interface of pair view.
+ */
 public interface IPairView {
 
     ///////////////
@@ -24,8 +27,16 @@ public interface IPairView {
      */
     void stopLoadingAnimation();
 
+    /**
+     * Sets a message on the view.
+     * @param message to be set
+     */
     void setMessage(String message);
 
+    /**
+     * Sends the pairing status to the view.
+     * @param status - pairing status
+     */
     void setPairStatus(Integer status);
 
 }

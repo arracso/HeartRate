@@ -3,6 +3,9 @@ package edu.udg.exit.heartrate.Interfaces;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 
+/**
+ * Interface of bluetooth service.
+ */
 public interface IBluetoothService {
 
     /////////////
@@ -39,5 +42,16 @@ public interface IBluetoothService {
      * @return True if service is connected to a remote device.
      */
     boolean isConnected();
+
+    /**
+     * Check if service is working with the remote device.
+     * @return True if service is working.
+     */
+    boolean isWorking();
+
+    /**
+     * Restart the work that was being done by the service.
+     */
+    void restartWork();
 
 }

@@ -18,10 +18,20 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
     >
+        <!-- Buttons (Close/Logout) -->
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
         >
+            <!-- Close App -->
+            <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:onClick="closeApp"
+                    android:text="Close"
+            />
+            <!-- Logout -->
             <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

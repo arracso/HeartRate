@@ -80,7 +80,7 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
             connectGATT.discoverServices();
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             Log.d("GATT manager", "Device disconnected");
-            connectGATT.close();
+            if(connectGATT != null) connectGATT.close();
             isConnected = false;
             connectGATT = null;
         }
@@ -202,6 +202,10 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     public abstract void stopHeartRateMeasure();
     public abstract void retrieveBatteryLevel();
     public abstract void setWearLocation(int wearLocation);
+
+    public boolean isWorking() {
+        return handler.hasMessages(0); // 0 means runnable
+    }
 
     /**
      * Check if a device is connected or not to the GATT.
