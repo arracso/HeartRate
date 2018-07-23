@@ -61,6 +61,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     // Pair
     private IPairView pairView;
+    private int pairCount;
 
     // Measure
     private IDeviceView deviceView;
@@ -93,6 +94,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
         // Pair
         pairView = null;
+        pairCount = 0;
 
         // Device
         deviceView = null;
@@ -183,12 +185,13 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(!isConnected()){
+                if(!isConnected() && pairCount > 0){
                     Log.d("Bluetooth", "Try to reconnect");
+                    pairCount = pairCount - 1;
                     connectRemoteDevice(device);
                 }
             }
-        }, 3 * 60 * 1000);
+        }, 1 * 60 * 1000);
     }
 
     @Override
@@ -275,6 +278,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         UserPreferences.getInstance().save(this, UserPreferences.BONDED_DEVICE_ADDRESS, address);
         // Connect to remote device
         if(connectionManager == null || !connectionManager.isConnected()){
+            pairCount = 10;
             connectRemoteDevice(device);
             if(pairView != null){
                 pairView.startLoadingAnimation();
