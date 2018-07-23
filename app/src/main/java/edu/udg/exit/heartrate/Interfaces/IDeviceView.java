@@ -1,9 +1,17 @@
 package edu.udg.exit.heartrate.Interfaces;
 
+import android.content.Context;
+
 /**
  * Interface of device view.
  */
 public interface IDeviceView {
+
+    /**
+     * Gets the context of the device view.
+     * @return device view context.
+     */
+    Context getContext();
 
     /**
      * Sets the value of the heart rate on the device view.

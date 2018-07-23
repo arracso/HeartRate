@@ -107,6 +107,11 @@ public class DeviceActivity extends Activity implements IDeviceView {
     }
 
     @Override
+    public Context getContext(){
+        return DeviceActivity.this;
+    }
+
+    @Override
     public void setHeartRateMeasure(final int heartRate) {
         if(isMeasuring) handler.post(new Runnable() {
                 @Override
