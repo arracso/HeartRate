@@ -80,9 +80,12 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
             connectGATT.discoverServices();
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             Log.d("GATT manager", "Device disconnected");
+            gatt.close();
             if(connectGATT != null) connectGATT.close();
             isConnected = false;
             connectGATT = null;
+        } else if (newState == BluetoothProfile.STATE_DISCONNECTING) {
+            Log.d("GATT manager", "Device disconnecting");
         }
     }
 
@@ -95,6 +98,7 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
             onServicesDiscovered(gatt); // Handle services discovered.
             run(); // Runs next action of the queue.
         }else{
+            disconnect();
             Log.w("GATT manager", "Failed to discover services");
         }
     }

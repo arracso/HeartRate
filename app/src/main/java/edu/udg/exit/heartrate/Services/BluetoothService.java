@@ -179,12 +179,16 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         // TODO - Select Connection manager with device address (or device name)
         connectionManager = new MiBandConnectionManager(this);
         if(device != null) device.connectGatt(this,false,connectionManager);
+        // Set handler to try to connect when connection fails
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(!isConnected()) connectRemoteDevice(device);
+                if(!isConnected()){
+                    Log.d("Bluetooth", "Try to reconnect");
+                    connectRemoteDevice(device);
+                }
             }
-        }, 5 * 60 * 1000);
+        }, 3 * 60 * 1000);
     }
 
     @Override
@@ -199,6 +203,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void restartWork() {
+        Log.d("Bluetooth", "Restart work");
         // Clear all calls
         this.connectionManager.clearCalls();
         // Restart heart rate measurement
