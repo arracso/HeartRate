@@ -11,13 +11,15 @@ import edu.udg.exit.heartrate.Interfaces.IPairView;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 
+/**
+ * BluetoothActivity that handles device pairing.
+ */
 public class PairActivity extends BluetoothActivity implements IPairView {
 
     ///////////////
     // Constants //
     ///////////////
 
-    private static final int REQUEST_ENABLE_BT_TO_PAIR = BluetoothService.REQUEST_ENABLE_BT_TO_PAIR;
     static final String DEVICE_ADDRESS = "device_address";
 
     ////////////////
@@ -82,19 +84,25 @@ public class PairActivity extends BluetoothActivity implements IPairView {
     }
 
     /**
-     * Set text view
+     * Set text view.
      */
     private void setTextView() {
         textView = (TextView) findViewById(R.id.pair_text);
         textView.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Handles success on device pairing.
+     */
     private void handleSuccessToPair() {
         Intent device = new Intent(PairActivity.this, DeviceActivity.class);
         startActivity(device);
         PairActivity.this.finish();
     }
 
+    /**
+     * Handles fail on device pairing. (close this activity)
+     */
     private void handleFailedToPair(){
         PairActivity.this.finish();
     }

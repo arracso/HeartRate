@@ -38,7 +38,6 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     ///////////////
 
     public static final int REQUEST_ENABLE_BT_TO_SCAN = 1;
-    public static final int REQUEST_ENABLE_BT_TO_PAIR = 2;
 
     ////////////////
     // Attributes //

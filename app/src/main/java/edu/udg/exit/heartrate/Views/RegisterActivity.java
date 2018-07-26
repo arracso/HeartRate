@@ -49,7 +49,7 @@ public class RegisterActivity extends Activity {
      * Sets the actions of all buttons and links of the view.
      */
     private void setButtonActions() {
-        // Login Button
+        // Register Button
         Button registerBtn = (Button) findViewById(R.id.register_button);
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +57,7 @@ public class RegisterActivity extends Activity {
                 register();
             }
         });
-        // Login as guest button
+        // Login Link
         TextView loginLink = (TextView) findViewById(R.id.register_login);
         loginLink.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,9 +114,11 @@ public class RegisterActivity extends Activity {
     }
 
     /**
-     * Starts the login activity and closes this activity. (only need to finish this activity)
+     * Starts the login activity and closes this activity.
+     * (only need to finish this activity, LoginActivity is under this activity)
      */
     private void startLoginActivity() {
+        setResult(RESULT_CANCELED);
         this.finish();
     }
 
@@ -126,6 +128,7 @@ public class RegisterActivity extends Activity {
     private void startLaunchActivity() {
         Intent launch = new Intent(RegisterActivity.this, LaunchActivity.class);
         startActivity(launch);
+        setResult(RESULT_OK);
         this.finish();
     }
 
