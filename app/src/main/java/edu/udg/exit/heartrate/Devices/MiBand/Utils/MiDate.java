@@ -1,7 +1,6 @@
 package edu.udg.exit.heartrate.Devices.MiBand.Utils;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -22,9 +21,9 @@ public class MiDate extends GregorianCalendar {
 
     /**
      * Constructor by params.
-     * @param year
-     * @param month
-     * @param day
+     * @param year of the date
+     * @param month of the year
+     * @param day of the month
      */
     public MiDate(int year, int month, int day) {
         super(year,month,day);
@@ -32,7 +31,7 @@ public class MiDate extends GregorianCalendar {
 
     /**
      * Constructor using raw byte data.
-     * @param data
+     * @param data - date stored as bytes (only 2 digit year)
      */
     public MiDate(byte[] data) {
         this(data,0);
@@ -40,7 +39,8 @@ public class MiDate extends GregorianCalendar {
 
     /**
      * Constructor using raw byte data and an offset.
-     * @param data
+     * @param data - date stored as bytes (only 2 digit year)
+     * @param offset - starting index of the data bytes array
      */
     public MiDate(byte[] data, int offset) {
         this(data,offset,2000);
@@ -48,7 +48,9 @@ public class MiDate extends GregorianCalendar {
 
     /**
      * Constructor using raw byte data, an offset and a base year.
-     * @param data
+     * @param data - date stored as bytes (only 2 digit year)
+     * @param offset - starting index of the data bytes array
+     * @param baseYear - base year for the date
      */
     public MiDate(byte[] data, int offset, int baseYear) {
         super();

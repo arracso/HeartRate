@@ -3,7 +3,6 @@ package edu.udg.exit.heartrate.Devices;
 import android.bluetooth.*;
 import android.os.Handler;
 import android.util.Log;
-
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.Utils.Actions.Action;
 import edu.udg.exit.heartrate.Utils.Actions.ActionWithoutResponse;
@@ -207,6 +206,10 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     public abstract void retrieveBatteryLevel();
     public abstract void setWearLocation(int wearLocation);
 
+    /**
+     * Check if we are working with the device.
+     * @return True if handler has one runnable or more.
+     */
     public boolean isWorking() {
         return handler.hasMessages(0); // 0 means runnable
     }
@@ -291,6 +294,11 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
     // DEBUG //
     ///////////
 
+    /**
+     * Convert a bunch of bytes into a readable String.
+     * @param data - Bytes to be converted
+     * @return String
+     */
     protected String convertBytesToString(byte[] data) {
         StringBuilder str = new StringBuilder("[");
         for(int i = 0; i < data.length; i++){
@@ -301,6 +309,10 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
         return str.toString();
     }
 
+    /**
+     * Logs the services of the Bluetooth GATT
+     * @param gatt - Bluetooth GATT
+     */
     protected void showServices(BluetoothGatt gatt) {
         for(BluetoothGattService service : gatt.getServices()) {
             Log.d("SERVICE", "" + service.getUuid() + " - " + service.getType());
@@ -319,8 +331,19 @@ public abstract class ConnectionManager extends BluetoothGattCallback {
         }
     }
 
+    /**
+     * Action to read on an specific service and characteristic.
+     * @param serviceUUID - UUID of the service
+     * @param characteristicUUID - UUID of the characteristic
+     * @return Action to read a characteristic.
+     */
     protected abstract Action read(final UUID serviceUUID, final UUID characteristicUUID);
 
+    /**
+     * Cheeks if the properties of a characteristic allow reading.
+     * @param properties - Properties of a characteristic
+     * @return True if service can read the property.
+     */
     private boolean canRead(int properties){
         if(properties >= 64) properties = properties - 64;
         if(properties >= 32) properties = properties - 32;

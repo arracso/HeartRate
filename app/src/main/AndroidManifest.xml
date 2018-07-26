@@ -58,7 +58,7 @@
 
         <!-- Receivers -->
         <receiver
-                android:name=".Services.BluetoothRestarterBroadcastReceiver"
+                android:name=".Receivers.BluetoothRestarterBroadcastReceiver"
                 android:enabled="false"
                 android:exported="true"
                 android:label="RestartServiceWhenStopped">

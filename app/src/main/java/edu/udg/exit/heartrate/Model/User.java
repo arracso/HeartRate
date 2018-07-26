@@ -1,7 +1,8 @@
 package edu.udg.exit.heartrate.Model;
 
-import java.util.Date;
-
+/**
+ * User Model Object to retrieve response from rest requests.
+ */
 public class User {
 
     ////////////////
@@ -29,18 +30,6 @@ public class User {
         this.height = null;
     }
 
-    /**
-     * Constructor by copy.
-     * @param user - User to be copied
-     */
-    public User(User user) {
-        this.id = user.id;
-        this.sex = user.sex;
-        this.birthYear = user.birthYear;
-        this.weight = user.weight;
-        this.height = user.height;
-    }
-
     ////////////////////
     // Public Methods //
     ////////////////////
@@ -48,34 +37,39 @@ public class User {
     public Integer getId() {
         return id;
     }
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public Integer getSex() {
         return sex;
-    }
-    public void setSex(Integer sex) {
-        this.sex = sex;
     }
 
     public Integer getBirthYear() {
         return birthYear;
     }
-    public void setBirthYear(Integer birthYear) {
-        this.birthYear = birthYear;
-    }
 
     public Integer getWeight() {
         return weight;
-    }
-    public void setWeight(Integer weight) {
-        this.weight = weight;
     }
 
     public Integer getHeight() {
         return height;
     }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
+    }
+
+    public void setBirthYear(Integer birthYear) {
+        this.birthYear = birthYear;
+    }
+
+    public void setWeight(Integer weight) {
+        this.weight = weight;
+    }
+
     public void setHeight(Integer height) {
         this.height = height;
     }

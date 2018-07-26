@@ -42,7 +42,7 @@ public class DataBase extends SQLiteOpenHelper {
     ///////////////////////
 
     /**
-     * Constructor
+     * Constructor.
      * @param ctx - Context
      */
     public DataBase(Context ctx) {
@@ -159,7 +159,7 @@ public class DataBase extends SQLiteOpenHelper {
         // Close the file
         storage.closeFile();
 
-        return storage.getFile(ctx, fileName);
+        return Storage.getFile(ctx, fileName);
     }
 
     /////////////////////
@@ -195,6 +195,13 @@ public class DataBase extends SQLiteOpenHelper {
         return builder.toString();
     }
 
+    /**
+     * Get a file name with the prefix supplied and first and last rows of the cursor supplied.
+     * @param cursor - Cursor containing data rows with time column.
+     * @param prefix - Prefix name.
+     * @param extension - Extension of the file
+     * @return
+     */
     private String generateFileName(Cursor cursor, String prefix, String extension) {
         String fileName = prefix + "(";
         cursor.moveToFirst();

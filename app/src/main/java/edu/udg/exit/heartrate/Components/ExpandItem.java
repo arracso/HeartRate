@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -12,6 +11,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import edu.udg.exit.heartrate.R;
 
+/**
+ * Component that represents an item with two texts (right & left) and that can be expanded to show its content.
+ */
 public class ExpandItem extends LinearLayout {
 
     ///////////////
@@ -113,7 +115,7 @@ public class ExpandItem extends LinearLayout {
      * @return True when the item is collapsed, false otherwise.
      */
     public boolean isCollapsed() {
-        return isCollapsed();
+        return isCollapsed;
     }
 
     /**
@@ -151,8 +153,6 @@ public class ExpandItem extends LinearLayout {
         labelValue.setText(value);
     }
 
-
-
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -180,7 +180,7 @@ public class ExpandItem extends LinearLayout {
      */
     private void initializeViews(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.item_expand, this);
+        if(inflater != null) inflater.inflate(R.layout.item_expand, this);
     }
 
 

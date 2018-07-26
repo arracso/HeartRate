@@ -3,6 +3,9 @@ package edu.udg.exit.heartrate.Devices.MiBand.Services;
 import android.bluetooth.BluetoothGatt;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants;
 
+/**
+ * Mi Band Heart Rate Service.
+ */
 public class HeartRateService extends MiBandService {
 
     ////////////////////////
@@ -33,12 +36,18 @@ public class HeartRateService extends MiBandService {
     /**
      * Enables notifications.
      * REQUIREMENT : Heart Rate Support
+     * @return True on success.
      */
     public boolean enableNotifications() {
         return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.HEARTRATE, MiBandConstants.UUID_CHAR.HEARTRATE_NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,true);
     }
 
-    public boolean dissableNotifications() {
+    /**
+     * Disables notifications.
+     * REQUIREMENT : Heart Rate Support
+     * @return True on success.
+     */
+    public boolean disableNotifications() {
         return setCharacteristicNotification(MiBandConstants.UUID_SERVICE.HEARTRATE, MiBandConstants.UUID_CHAR.HEARTRATE_NOTIFICATION, MiBandConstants.UUID_DESC.UPDATE_NOTIFICATION,false);
     }
 }

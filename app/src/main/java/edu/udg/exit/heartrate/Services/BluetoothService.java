@@ -21,6 +21,7 @@ import edu.udg.exit.heartrate.Devices.ConnectionManager;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants;
 import edu.udg.exit.heartrate.Interfaces.*;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
+import edu.udg.exit.heartrate.Receivers.BluetoothRestarterBroadcastReceiver;
 import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
 

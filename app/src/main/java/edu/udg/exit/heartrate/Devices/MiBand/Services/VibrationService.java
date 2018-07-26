@@ -3,6 +3,9 @@ package edu.udg.exit.heartrate.Devices.MiBand.Services;
 import android.bluetooth.BluetoothGatt;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants.*;
 
+/**
+ * Mi Band Vibration Service.
+ */
 public class VibrationService extends MiBandService {
 
     ////////////////////////
@@ -11,7 +14,7 @@ public class VibrationService extends MiBandService {
 
     /**
      * Constructor.
-     * @param gatt
+     * @param gatt - Connected GATT
      */
     public VibrationService(BluetoothGatt gatt) {
         super(gatt);
@@ -45,7 +48,10 @@ public class VibrationService extends MiBandService {
         writeCharacteristic(UUID_SERVICE.VIBRATION, UUID_CHAR.VIBRATION, PROTOCOL.VIBRATION_10_TIMES_WITH_LED);
     }
 
-
+    /**
+     * Vibraton Test
+     * @param data - data test.
+     */
     public void vibrationTest(byte[] data) {
         writeCharacteristic(UUID_SERVICE.VIBRATION, UUID_CHAR.VIBRATION, data);
     }

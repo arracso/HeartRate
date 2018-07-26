@@ -137,7 +137,7 @@ public class MainActivity extends Activity {
      */
     private void expandContent(int content) {
         ExpandItem item = (ExpandItem) container.getChildAt(content);
-        item.expand();
+        if(item.isCollapsed()) item.expand();
     }
 
     /**
@@ -146,7 +146,7 @@ public class MainActivity extends Activity {
      */
     private void collapseContent(int content) {
         ExpandItem item = (ExpandItem) container.getChildAt(content);
-        item.collapse();
+        if(!item.isCollapsed()) item.collapse();
     }
 
     //***********************//

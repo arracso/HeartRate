@@ -17,13 +17,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 
+/**
+ * Service that handles api rest services initializations and access.
+ */
 public class ApiService extends Service {
 
     ///////////////
     // Constants //
     ///////////////
 
-    //public static final String BASE_URL = "http://84.88.154.119:12380";
     public static final String BASE_URL = "http://83.44.191.144:12380";
 
     ////////////////
@@ -108,17 +110,25 @@ public class ApiService extends Service {
     ////////////////////
 
     /**
-     *
-     * @return
+     * Gets the authentication api rest service.
+     * @return Authentication Api Rest Service.
      */
     public AuthApi getAuthService() {
         return authService;
     }
 
+    /**
+     * Gets the user api rest service.
+     * @return User Api Rest Service.
+     */
     public UserApi getUserService() {
         return userService;
     }
 
+    /**
+     * Gets the file api rest service.
+     * @return File Api Rest Service.
+     */
     public FileApi getFileService() {
         return fileService;
     }

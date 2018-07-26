@@ -66,11 +66,12 @@ public abstract class MiBandService {
     ////////////////////////////////
 
     /**
-     * Enables or disables a notification
-     * @param serviceUUID
-     * @param characteristicUUID
-     * @param descriptorUUID
-     * @param enable
+     * Enables or disables a notification.
+     * @param serviceUUID - UUID of the service
+     * @param characteristicUUID - UUID of the characteristic
+     * @param descriptorUUID - UUID of the descriptor
+     * @param enable - If we want to enable the notifications
+     * @return True on success.
      */
     protected boolean setCharacteristicNotification(UUID serviceUUID, UUID characteristicUUID, UUID descriptorUUID, boolean enable){
         // Retrieve the service
@@ -116,8 +117,8 @@ public abstract class MiBandService {
 
     /**
      * Reads a value from a characteristic of the service.
-     * @param serviceUUID
-     * @param characteristicUUID
+     * @param serviceUUID - UUID of the service
+     * @param characteristicUUID - UUID of the characteristic
      */
     protected void readCharacteristic(UUID serviceUUID, UUID characteristicUUID) {
         // Retrieve the service
@@ -138,9 +139,9 @@ public abstract class MiBandService {
 
     /**
      * Writes a value to a characteristic of the service.
-     * @param serviceUUID
-     * @param characteristicUUID
-     * @param value
+     * @param serviceUUID - UUID of the service
+     * @param characteristicUUID - UUID of the characteristic
+     * @param value - Value to be write
      */
     protected void writeCharacteristic(UUID serviceUUID, UUID characteristicUUID, byte[] value) {
         // Retrieve the service

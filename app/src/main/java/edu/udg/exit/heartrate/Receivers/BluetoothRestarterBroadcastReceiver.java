@@ -1,13 +1,17 @@
-package edu.udg.exit.heartrate.Services;
+package edu.udg.exit.heartrate.Receivers;
 
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
+import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
 
+/**
+ * Broadcast Receiver that restarts the Bluetooth Service and its work.
+ */
 public class BluetoothRestarterBroadcastReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {

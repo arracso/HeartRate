@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothGatt;
 
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants.*;
 import edu.udg.exit.heartrate.Devices.MiBand.Utils.Latency;
-import edu.udg.exit.heartrate.Devices.MiBand.Utils.MiDate;
 
 import java.util.UUID;
 
@@ -130,15 +129,6 @@ public class MiliService extends MiBandService {
     }
 
     /**
-     * Unpair.
-     * REQUIREMENT : TODO - ANY ??
-     * TODO - Not working
-     */
-    public void unpair() {
-        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.PAIR,new byte[]{0x0});
-    }
-
-    /**
      * Read pair.
      * REQUIREMENT : ANY
      */
@@ -189,31 +179,23 @@ public class MiliService extends MiBandService {
         writeCharacteristic(UUID_SERVICE.MILI,UUID_CHAR.CONTROL_POINT, command);
     }
 
-    /**
-     * Self test - Mi Band will do crazy things.
-     * REQUIREMENT : TODO - NOT WORKING.
-     * WARNING : Will need to unlink Mi Band from bluetooth.
-     */
-    public void selfTest() {
-        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.TEST, PROTOCOL.SELF_TEST);
-    }
-
-    /**
-     * Remote disconnect from the Mi Band.
-     * REQUIREMENT :  TODO - NOT WORKING
-     * WARNING : Will need to unlink Mi Band from bluetooth.
-     */
-    public void remoteDisconnect() {
-        writeCharacteristic(UUID_SERVICE.MILI, UUID_CHAR.TEST, PROTOCOL.REMOTE_DISCONNECT);
-    }
-
-
+    ///////////
     // DEBUG //
+    ///////////
 
+    /**
+     * Read a characteristic from this service.
+     * @param characteristicUUID - UUID of the characteristic.
+     */
     public void read(UUID characteristicUUID){
         readCharacteristic(UUID_SERVICE.MILI,characteristicUUID);
     }
 
+    /**
+     * Read a characteristic from a service.
+     * @param serviceUUID - UUID of the service
+     * @param characteristicUUID - UUID of the characteristic
+     */
     public void read(UUID serviceUUID, UUID characteristicUUID){
         readCharacteristic(serviceUUID,characteristicUUID);
     }

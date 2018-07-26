@@ -3,19 +3,11 @@ package edu.udg.exit.heartrate.Utils;
 import android.content.Context;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
-import android.widget.Toast;
-import edu.udg.exit.heartrate.Global;
-import edu.udg.exit.heartrate.TodoApp;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import java.io.*;
-import java.util.Date;
 
 public class Storage {
 
@@ -23,7 +15,6 @@ public class Storage {
     // Attributes //
     ////////////////
 
-    private String fileName;
     private FileOutputStream fos;
     private BufferedWriter bw;
 
@@ -32,7 +23,6 @@ public class Storage {
     ///////////////////////
 
     public Storage(){
-        this.fileName = null;
         this.fos = null;
         this.bw = null;
     }
@@ -48,7 +38,6 @@ public class Storage {
      */
     public void createFile(Context ctx, String fileName){
         try {
-            this.fileName = fileName;
             fos = ctx.openFileOutput(fileName, Context.MODE_PRIVATE);
             bw = new BufferedWriter(new OutputStreamWriter(fos));
         } catch(FileNotFoundException e) {
@@ -73,6 +62,10 @@ public class Storage {
         }
     }
 
+    /**
+     * Writes to the current opened file.
+     * @param text - Text to be write.
+     */
     public void writeToFile(String text){
         if(bw != null){
             try {
@@ -91,7 +84,7 @@ public class Storage {
      * @param fileName - Name of the file
      * @return File
      */
-    public File getFile(Context ctx, String fileName) {
+    public static File getFile(Context ctx, String fileName) {
         String path = ctx.getFilesDir() + "/" + fileName;
         File file = new File(path);
         if(file.exists()) return file;

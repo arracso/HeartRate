@@ -1,5 +1,8 @@
 package edu.udg.exit.heartrate.Devices.MiBand.Utils;
 
+/**
+ * Class utility to parse Bytes, Ints, etc
+ */
 public class Parse {
 
     /**
