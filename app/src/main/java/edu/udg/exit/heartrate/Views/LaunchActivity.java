@@ -24,6 +24,9 @@ import retrofit2.Response;
 
 import java.io.IOException;
 
+/**
+ * Activity started when user attempts to login or register.
+ */
 public class LaunchActivity extends Activity {
 
     ///////////////

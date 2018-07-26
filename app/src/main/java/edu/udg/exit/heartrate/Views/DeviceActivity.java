@@ -4,13 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import edu.udg.exit.heartrate.Components.ExpandItem;
 import edu.udg.exit.heartrate.Interfaces.IDeviceView;
-import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.Services.BluetoothService;
@@ -324,6 +322,11 @@ public class DeviceActivity extends Activity implements IDeviceView {
 
     }
 
+    /**
+     * Upload a file to the server.
+     * @param ctx - context
+     * @param file - file to be upload
+     */
     private void uploadFile(final Context ctx, File file){
         if (file != null){
             MultipartBody.Part body = Storage.getMultipartBody("file", file);

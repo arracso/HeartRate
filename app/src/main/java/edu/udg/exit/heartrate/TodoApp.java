@@ -20,7 +20,11 @@ import retrofit2.Response;
 
 import java.io.IOException;
 
-public class TodoApp extends Application{
+/**
+ * Class that overrides Application.
+ * Saves the user profile and a reference to all services that it starts.
+ */
+public class TodoApp extends Application {
 
     ////////////////
     // Attributes //
@@ -120,20 +124,34 @@ public class TodoApp extends Application{
         return apiService;
     }
 
+    /**
+     * Sets the user profile.
+     * @param user - profile
+     */
     public void setUser(User user) {
         this.user = user;
         refreshUser();
     }
 
+    /**
+     * Save the user profile to persistent memory.
+     */
     public void refreshUser(){
         String userObj = Global.gson.toJson(user);
         UserPreferences.getInstance().save(this, UserPreferences.USER_PROFILE, userObj);
     }
 
+    /**
+     * Gets the usre profile.
+     * @return User.
+     */
     public User getUser() {
         return this.user;
     }
 
+    /**
+     * Update the user stored on the remote data base with the user stored locally.
+     */
     public void updateUser() {
         if(apiService == null) return;
         if(user == null) return;
@@ -166,6 +184,9 @@ public class TodoApp extends Application{
     // Private Methods //
     /////////////////////
 
+    /**
+     * Retrieve the user form persistent storage.
+     */
     private void retrieveUser() {
         String userObj = UserPreferences.getInstance().load(this, UserPreferences.USER_PROFILE);
         this.user = Global.gson.fromJson(userObj, User.class);
