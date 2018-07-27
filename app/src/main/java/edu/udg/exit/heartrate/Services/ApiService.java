@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import edu.udg.exit.heartrate.ApiRest.*;
@@ -26,7 +25,7 @@ public class ApiService extends Service {
     // Constants //
     ///////////////
 
-    public static final String BASE_URL = "http://83.44.191.144:12380";
+    private static final String BASE_URL = "http://rateserver.tk:12380";
 
     ////////////////
     // Attributes //

@@ -432,11 +432,6 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
             String packageName = getPackageName();
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
             if (powerManager != null && !powerManager.isIgnoringBatteryOptimizations(packageName)) {
-                // TODO - remove
-                //Intent intent = new Intent();
-                //intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                //intent.setData(Uri.parse("package:" + packageName));
-                //startActivity(intent);
                 if(deviceView != null) getSpecialPermissions(deviceView.getContext());
             }
         }
@@ -448,7 +443,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
      */
     private void getSpecialPermissions(Context context) {
         String alertMessage = "Please disable battery optimizations for this app and allow it be started automatically.";
-        alertMessage = alertMessage + "Otherwise our service won't be working when yout phone goes into sleeps mode.";
+        alertMessage = alertMessage + " " + "Otherwise our service won't be working when your phone goes into sleeps mode.";
 
         // Create dialog builder
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
