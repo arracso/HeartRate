@@ -24,12 +24,12 @@ public class Latency {
 
     /**
      * Constructor by params.
-     * @param minConnectionInterval
-     * @param maxConnectionInterval
-     * @param latency
-     * @param timeout
-     * @param connectionInterval
-     * @param advertisementInterval
+     * @param minConnectionInterval - minimum connection interval on latency
+     * @param maxConnectionInterval - maximum connection interval on latency
+     * @param latency - latency
+     * @param timeout - timeout to wait for a response
+     * @param connectionInterval - connection interval on latency
+     * @param advertisementInterval - advertisement interval on latency
      */
     public Latency(int minConnectionInterval, int maxConnectionInterval, int latency, int timeout, int connectionInterval, int advertisementInterval) {
         latencyBytes = new byte[12];
@@ -49,7 +49,7 @@ public class Latency {
 
     /**
      * Constructor by data.
-     * @param data
+     * @param data - latency stored as bytes
      */
     public Latency(byte[] data) {
         this.latencyBytes = data;
@@ -61,11 +61,11 @@ public class Latency {
 
     /**
      * Set the bytes of the mi band latency.
-     * @param minConnectionInterval
-     * @param maxConnectionInterval
-     * @param latency
-     * @param timeout
-     * @param advertisementInterval
+     * @param minConnectionInterval - minimum connection interval on latency
+     * @param maxConnectionInterval - maximum connection interval on latency
+     * @param latency - latency
+     * @param timeout - timeout to wait for response
+     * @param advertisementInterval - advertisement interval on latency
      */
     public void setLatencyBytes(int minConnectionInterval, int maxConnectionInterval, int latency, int timeout, int advertisementInterval) {
         latencyBytes[0] = (byte) (minConnectionInterval & 0xff);
