@@ -176,9 +176,18 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     @Override
     public void connectRemoteDevice(final BluetoothDevice device) {
         if(connectionManager != null) connectionManager.disconnect();
-        // TODO - Select Connection manager with device address (or device name)
-        connectionManager = new MiBandConnectionManager(this);
-        if(device != null) device.connectGatt(this,false,connectionManager);
+        if(device != null){
+            String deviceAddress = device.getAddress();
+            String deviceName = device.getName();
+            // Select Connection manager with device address (or device name)
+            if((deviceAddress != null && deviceAddress.startsWith("C8:0F:10")) || (deviceName != null && deviceName.equals("MI1S"))) // Mi Band 1S
+                connectionManager = new MiBandConnectionManager(this);
+            else // Use Mi Band 1s (for the moment)
+                connectionManager = new MiBandConnectionManager(this);
+            
+            // Connect to the device gatt
+            device.connectGatt(this,false,connectionManager);
+        }
         // Set handler to try to connect when connection fails
         handler.postDelayed(new Runnable() {
             @Override
