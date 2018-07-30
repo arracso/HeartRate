@@ -1,7 +1,10 @@
 package edu.udg.exit.heartrate.Services;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import com.google.gson.Gson;
@@ -130,5 +133,18 @@ public class ApiService extends Service {
      */
     public FileApi getFileService() {
         return fileService;
+    }
+
+    /**
+     * Check if wifi is on and connected.
+     * @return True when wifi is on and connected.
+     */
+    public boolean isWifiOnAndConnected() {
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager != null && wifiManager.isWifiEnabled()) { // Wi-Fi adapter is ON
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            return wifiInfo.getNetworkId() != -1; // Connected to an access point
+        }
+        return false;
     }
 }

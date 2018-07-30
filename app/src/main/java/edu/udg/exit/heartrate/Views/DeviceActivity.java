@@ -13,6 +13,7 @@ import edu.udg.exit.heartrate.R;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.TodoApp;
+import edu.udg.exit.heartrate.Utils.CallBack;
 import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.Storage;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
@@ -312,45 +313,55 @@ public class DeviceActivity extends Activity implements IDeviceView {
     /**
      * Uploads heart rate measurements to the server.
      */
-    private void uploadHeartRate(){
-        Date date = new Date();
+    private void uploadHeartRate() {
+        final Date date = new Date();
         File file = db.exportAsCSV(DataBase.RATE_TABLE_NAME, null, date.getTime(), "HR");
         if(file != null){
-            uploadFile(getApplicationContext(),file);
-            db.delete(DataBase.RATE_TABLE_NAME, null, date.getTime());
-        }
+            uploadFile(file, new CallBack() {
+                @Override
+                public void onSuccess(int code) {
+                    Toast.makeText(DeviceActivity.this, "File uploaded!", Toast.LENGTH_LONG).show();
+                    db.delete(DataBase.RATE_TABLE_NAME, null, date.getTime());
+                }
+                @Override
+                public void onFailure(int code) {
+                    switch (code){
+                        case CallBack.BAD_CONNECTION:
+                            Toast.makeText(DeviceActivity.this, "BAD CONNECTION", Toast.LENGTH_LONG).show();
+                            break;
+                        case CallBack.ERROR:
+                        default:
+                            Toast.makeText(DeviceActivity.this, "FAILED TO UPLOAD THE FILE", Toast.LENGTH_LONG).show();
+                            break;
+                    }
+                }
+            });
 
+        }
     }
 
     /**
      * Upload a file to the server.
-     * @param ctx - context
      * @param file - file to be upload
+     * @param callback - callback to be run on success or on failure
      */
-    private void uploadFile(final Context ctx, File file){
+    private void uploadFile(File file, final CallBack callback) {
         if (file != null){
             MultipartBody.Part body = Storage.getMultipartBody("file", file);
 
             apiService.getFileService().uploadFile(body).enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if(response.isSuccessful())
-                        Toast.makeText(ctx, "File uploaded!", Toast.LENGTH_LONG).show();
-                    else
-                        Toast.makeText(ctx, "Failed to upload the file!", Toast.LENGTH_LONG).show();
+                    if(response.isSuccessful()) callback.onSuccess(CallBack.SUCCESS);
+                    else callback.onFailure(CallBack.ERROR);
                 }
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    System.out.println(call.toString());
-                    System.out.println(t.getMessage());
-                    System.out.println(t.getLocalizedMessage());
-                    t.printStackTrace();
-                    Toast.makeText(ctx, "BAD CONNECTION", Toast.LENGTH_LONG).show();
+                    callback.onFailure(CallBack.BAD_CONNECTION);
                 }
             });
-        } else {
-            Toast.makeText(ctx, "FAILED TO UPLOAD THE FILE", Toast.LENGTH_LONG).show();
         }
+        else callback.onFailure(CallBack.ERROR);
     }
 
 }

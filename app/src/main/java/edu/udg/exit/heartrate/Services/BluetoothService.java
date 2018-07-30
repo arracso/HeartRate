@@ -1,29 +1,27 @@
 package edu.udg.exit.heartrate.Services;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.*;
 import android.provider.Settings;
 import android.util.Log;
 import edu.udg.exit.heartrate.Devices.ConnectionManager;
+import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants;
 import edu.udg.exit.heartrate.Interfaces.*;
-import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
-import edu.udg.exit.heartrate.Receivers.BluetoothRestarterBroadcastReceiver;
+import edu.udg.exit.heartrate.Receivers.BluetoothRestarter;
+import edu.udg.exit.heartrate.Receivers.FileUploader;
 import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
+import edu.udg.exit.heartrate.Utils.Utils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -191,7 +189,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                     connectRemoteDevice(device);
                 }
             }
-        }, 1 * 60 * 1000);
+        }, 60 * 1000);
     }
 
     @Override
@@ -320,10 +318,12 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         if(connectionManager != null) connectionManager.startHeartRateMeasure();
         // Acquire wake lock
         if(wakeLock != null) wakeLock.acquire(10 * 24 * 60 * 60 * 1000);
-        // Enable receiver that restarts this service
-        enableReceiver(BluetoothRestarterBroadcastReceiver.class);
-        // Set alarm to check service status every 10 minutes
-        setInexactRepeatingAlarm(0, ".RestartBluetooth", 10 * 60 * 1000);
+        // Enable receiver and set alarm to check service status every 10 minutes
+        Utils.enableReceiver(getApplicationContext(), BluetoothRestarter.class);
+        Utils.setInexactRepeatingAlarm(getApplicationContext(),0, ".RestartBluetooth", 10 * 60 * 1000);
+        // Enable receiver and set alarm to upload the measurements every day
+        Utils.enableReceiver(getApplicationContext(), FileUploader.class);
+        Utils.setInexactRepeatingAlarm(getApplicationContext(),0, ".UploadMeasurements", 24 * 60 * 60 * 1000);
         // Set battery optimizations to avoid Doze mode (needs permissions)
         setBatteryOptimizations();
     }
@@ -335,9 +335,9 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         // Release wake lock
         if(wakeLock != null) wakeLock.release();
         // Disable receiver that restarts this service
-        disableReceiver(BluetoothRestarterBroadcastReceiver.class);
+        Utils.disableReceiver(getApplicationContext(), BluetoothRestarter.class);
         // Unset alarm that checks this service status
-        unsetAlarm(0, ".RestartBluetooth");
+        Utils.unsetAlarm(getApplicationContext(),0,".RestartBluetooth");
     }
 
     @Override
@@ -365,64 +365,6 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     /////////////////////
     // Private methods //
     /////////////////////
-
-    /**
-     * Enables a receiver.
-     * @param receiverClass - Class of the receiver to be enabled
-     */
-    @SuppressWarnings("SameParameterValue")
-    private void enableReceiver(Class receiverClass) {
-        ComponentName receiver = new ComponentName(getApplicationContext(), receiverClass);
-        PackageManager packageManager = getPackageManager();
-        packageManager.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-    }
-
-    /**
-     * Disables a receiver.
-     * @param receiverClass - Class of the receiver to be disabled
-     */
-    @SuppressWarnings("SameParameterValue")
-    private void disableReceiver(Class receiverClass) {
-        ComponentName receiver = new ComponentName(getApplicationContext(), receiverClass);
-        PackageManager packageManager = getPackageManager();
-        packageManager.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-    }
-
-    /**
-     * Sets a repeating alarm.
-     * @param action - Action that performs the alarm when triggered
-     * @param milis - Alarm period
-     */
-    @SuppressWarnings("SameParameterValue")
-    private void setInexactRepeatingAlarm(int requestCode, String action, int milis){
-        // Set action intent
-        Intent actionIntent = new Intent(action);
-        // Set alarm intent
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode, actionIntent, 0);
-        // Set alarm manager
-        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        // Set alarm
-        if(alarmManager != null){
-            alarmManager.cancel(alarmIntent);
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,SystemClock.elapsedRealtime() + milis, milis, alarmIntent);
-        }
-    }
-
-    /**
-     * Unsets a repeating alarm.
-     * @param action - Action that performs the alarm when triggered
-     */
-    @SuppressWarnings("SameParameterValue")
-    private void unsetAlarm(int requestCode, String action){
-        // Set action intent
-        Intent actionIntent = new Intent(action);
-        // Set alarm intent
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode, actionIntent, 0);
-        // Set alarm manager
-        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        // Unset alarm
-        if(alarmManager != null) alarmManager.cancel(alarmIntent);
-    }
 
     /**
      * Set battery optimizations and ask the user for permissions.

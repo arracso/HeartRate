@@ -8,11 +8,12 @@ import android.util.Log;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.TodoApp;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
+import edu.udg.exit.heartrate.Utils.Utils;
 
 /**
- * Broadcast Receiver that restarts the Bluetooth Service and its work.
+ * Broadcast Receiver that restarts the Bluetooth Service and his work.
  */
-public class BluetoothRestarterBroadcastReceiver extends WakefulBroadcastReceiver {
+public class BluetoothRestarter extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("RESTARTER", "Triggered");
@@ -22,9 +23,7 @@ public class BluetoothRestarterBroadcastReceiver extends WakefulBroadcastReceive
                 case "android.intent.action.QUICKBOOT_POWERON":
                 case "android.bluetooth.device.action.ACL_DISCONNECTED":
                 case ".RestartBluetooth":
-                    if(!isMyServiceRunning(BluetoothService.class,context)){
-                        startWakefulService(context, new Intent(context, BluetoothService.class));
-                    }else{
+                    if(Utils.isMyServiceRunning(context, BluetoothService.class)){
                         BluetoothService bluetoothService = ((TodoApp) context.getApplicationContext()).getBluetoothService();
                         if(bluetoothService != null && !bluetoothService.isConnected()){
                             String boundAddress = UserPreferences.getInstance().load(context, UserPreferences.BONDED_DEVICE_ADDRESS);
@@ -33,24 +32,9 @@ public class BluetoothRestarterBroadcastReceiver extends WakefulBroadcastReceive
                             bluetoothService.restartWork();
                         }
                     }
+                    else startWakefulService(context, new Intent(context, BluetoothService.class));
                     break;
             }
         }
-    }
-
-    /**
-     * Checks if service is already running.
-     * @param serviceClass - class of the service that we want to check
-     * @return True if service is running
-     */
-    @SuppressWarnings("SameParameterValue")
-    private boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
-        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        if(manager != null){
-            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-                if (serviceClass.getName().equals(service.service.getClassName())) return true;
-            }
-        }
-        return false;
     }
 }
