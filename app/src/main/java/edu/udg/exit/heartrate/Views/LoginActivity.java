@@ -26,6 +26,12 @@ import java.io.IOException;
  */
 public class LoginActivity extends Activity {
 
+    ///////////////
+    // Constants //
+    ///////////////
+
+    private static final int REGISTER_REQUEST = 1;
+
     ///////////////////////
     // Lifecycle methods //
     ///////////////////////
@@ -37,6 +43,14 @@ public class LoginActivity extends Activity {
 
         // Set button actions
         setButtonActions();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == REGISTER_REQUEST) {
+            if (resultCode == RESULT_OK) LoginActivity.this.finish();
+        }
     }
 
     /////////////////////
@@ -151,7 +165,7 @@ public class LoginActivity extends Activity {
      */
     private void startRegisterActivity() {
         Intent register = new Intent(LoginActivity.this, RegisterActivity.class);
-        startActivity(register);
+        startActivityForResult(register,REGISTER_REQUEST);
     }
 
     /**

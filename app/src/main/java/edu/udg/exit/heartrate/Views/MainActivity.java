@@ -65,10 +65,7 @@ public class MainActivity extends Activity {
         // UNBIND MI BAND
         (((TodoApp) this.getApplication())).getBluetoothService().unbindDevice();
         // DELETE USER PREFERENCES
-        UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.ACCESS_TOKEN);
-        UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.REFRESH_TOKEN);
-        UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.USER_PROFILE);
-        UserPreferences.getInstance().remove(getApplicationContext(),UserPreferences.HEART_RATE_MEASURE);
+        UserPreferences.getInstance().removeAll(getApplicationContext());
         // DELETE DATA BASE MEASUREMENTS
         DataBase dataBase = new DataBase(getApplicationContext());
         dataBase.deleteAllRecords();
@@ -76,6 +73,10 @@ public class MainActivity extends Activity {
         startLoginActivity();
     }
 
+    /**
+     * Closes the app without closing the services.
+     * @param view - MainActivity view
+     */
     public void closeApp(View view) {
         this.finishAndRemoveTask();
     }
@@ -136,7 +137,7 @@ public class MainActivity extends Activity {
      */
     private void expandContent(int content) {
         ExpandItem item = (ExpandItem) container.getChildAt(content);
-        item.expand();
+        if(item.isCollapsed()) item.expand();
     }
 
     /**
@@ -145,7 +146,7 @@ public class MainActivity extends Activity {
      */
     private void collapseContent(int content) {
         ExpandItem item = (ExpandItem) container.getChildAt(content);
-        item.collapse();
+        if(!item.isCollapsed()) item.collapse();
     }
 
     //***********************//

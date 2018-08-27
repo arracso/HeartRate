@@ -12,7 +12,7 @@ public class DeviceInfo {
     private String id;
     private Integer profileVersion;
 
-    // Hardaware and firmware
+    // Hardware and firmware
     private Integer firmwareVersion;
     private Integer hardwareVersion;
     private Integer feature;
@@ -20,15 +20,15 @@ public class DeviceInfo {
 
     // Hearth rate monitoring
     private Integer firmwareVersion2;
-    private boolean test1AHRMode;
+    private boolean test1AHRMode = false;
 
     ////////////////////////
     // Life Cycle Methods //
     ////////////////////////
 
     /**
-     * Constructor
-     * @param data
+     * Constructor.
+     * @param data - Device information stored as bytes
      */
     public DeviceInfo(byte[] data) {
         boolean checked = isChecksumCorrect(data);
@@ -66,8 +66,8 @@ public class DeviceInfo {
 
     /**
      * Checks if the information is correct.
-     * @param data
-     * @return
+     * @param data - Device information stored as bytes
+     * @return True if the checksum is correct.
      */
     private boolean isChecksumCorrect(byte[] data) {
         int crc8 = CheckSums.getCRC8(new byte[]{data[0], data[1], data[2], data[3], data[4], data[5], data[6]});
@@ -133,7 +133,7 @@ public class DeviceInfo {
 
     /**
      * Checks device model.
-     * @return true if the device is a Mi Band 1
+     * @return True if the device is a Mi Band 1.
      */
     public boolean isMili1() {
         return hardwareVersion == 2 || (feature == 0 && appearance == 0 && hardwareVersion == 8 && firmwareVersion2 == -1);
@@ -141,7 +141,7 @@ public class DeviceInfo {
 
     /**
      * Checks device model.
-     * @return true if the device is a Mi Band 1A
+     * @return True if the device is a Mi Band 1A.
      */
     public boolean isMili1A() {
         return feature == 5 && appearance == 0 || feature == 0 && hardwareVersion == 208;
@@ -149,8 +149,8 @@ public class DeviceInfo {
 
     /**
      * Checks device model.
-     * @return true if the device is a Mi Band 1S
-     * TODO : this is probably not quite correct, but sufficient for early 1S support
+     * @return True if the device is a Mi Band 1S
+     * TODO - this is probably not quite correct, but sufficient for early 1S support
      */
     public boolean isMili1S() {
         return (feature == 4 && appearance == 0) || hardwareVersion == 4;
@@ -158,7 +158,7 @@ public class DeviceInfo {
 
     /**
      * Checks support for heart rate measurement.
-     * @return true if device is 1S or 1A (in test mode)
+     * @return True if device is 1S or 1A (in test mode).
      */
     public boolean supportsHeartRate() {
         return isMili1S() || (test1AHRMode && isMili1A());

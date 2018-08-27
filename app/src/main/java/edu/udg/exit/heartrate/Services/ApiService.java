@@ -1,10 +1,12 @@
 package edu.udg.exit.heartrate.Services;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import edu.udg.exit.heartrate.ApiRest.*;
@@ -17,14 +19,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 
+/**
+ * Service that handles api rest services initializations and access.
+ */
 public class ApiService extends Service {
 
     ///////////////
     // Constants //
     ///////////////
 
-    //public static final String BASE_URL = "http://84.88.154.119:12380";
-    public static final String BASE_URL = "http://83.44.191.144:12380";
+    private static final String BASE_URL = "http://rateserver.tk:12380";
 
     ////////////////
     // Attributes //
@@ -108,18 +112,39 @@ public class ApiService extends Service {
     ////////////////////
 
     /**
-     *
-     * @return
+     * Gets the authentication api rest service.
+     * @return Authentication Api Rest Service.
      */
     public AuthApi getAuthService() {
         return authService;
     }
 
+    /**
+     * Gets the user api rest service.
+     * @return User Api Rest Service.
+     */
     public UserApi getUserService() {
         return userService;
     }
 
+    /**
+     * Gets the file api rest service.
+     * @return File Api Rest Service.
+     */
     public FileApi getFileService() {
         return fileService;
+    }
+
+    /**
+     * Check if wifi is on and connected.
+     * @return True when wifi is on and connected.
+     */
+    public boolean isWifiOnAndConnected() {
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager != null && wifiManager.isWifiEnabled()) { // Wi-Fi adapter is ON
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            return wifiInfo.getNetworkId() != -1; // Connected to an access point
+        }
+        return false;
     }
 }

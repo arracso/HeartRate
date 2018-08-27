@@ -6,6 +6,9 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
+/**
+ * Interface for authentication api rest.
+ */
 public interface AuthApi {
 
     @POST("auth/login")

@@ -2,6 +2,10 @@ package edu.udg.exit.heartrate.Devices.MiBand;
 
 import java.util.UUID;
 
+/**
+ * Mi Band Constants File.
+ * It contains service UUIDs, characteristic UUIDs, and some commands and protocols.
+ */
 public final class MiBandConstants {
 
     /*
@@ -25,9 +29,12 @@ public final class MiBandConstants {
     // Services //
     //////////////
 
+    /**
+     * Class containing service UUIDs.
+     */
     public static final class UUID_SERVICE {
         public static final UUID MILI = UUID.fromString(String.format(BASE_UUID, "FEE0"));
-        public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "1802")); // Inmediate Alert
+        public static final UUID VIBRATION = UUID.fromString(String.format(BASE_UUID, "1802")); // Immediate Alert
         public static final UUID HEARTRATE = UUID.fromString(String.format(BASE_UUID, "180D")); // Heart Rate
 
         // Unknown services
@@ -40,6 +47,9 @@ public final class MiBandConstants {
     // Characteristics //
     /////////////////////
 
+    /**
+     * Class containing characteristic UUIDs.
+     */
     public static final class UUID_CHAR {
         // MILI SERVICE //
         public static final UUID DEVICE_INFO = UUID.fromString(String.format(BASE_UUID, "FF01")); // Read
@@ -91,6 +101,9 @@ public final class MiBandConstants {
     // Descriptors //
     /////////////////
 
+    /**
+     * Class containing descriptor UUIDs.
+     */
     public static final class UUID_DESC {
         // GATT descriptors
         private static final UUID GATT_CLIENT_CHARACTERISTIC_CONFIGURATION = UUID.fromString(String.format(BASE_UUID, "2902"));
@@ -103,21 +116,20 @@ public final class MiBandConstants {
     // PROTOCOL //
     //////////////
 
+    /**
+     * Class containing some protocols.
+     */
     public static final class PROTOCOL {
         // PAIR //
         public static final byte[] PAIR = {2}; // Works
 
-        public static final byte[] STOP_VIBRATION = {0};
-
-        // TEST //
-        public static final byte[] REMOTE_DISCONNECT = {1}; // TODO - Doesn't works
-        public static final byte[] SELF_TEST = {2}; // TODO - Doesn't works
-
         // VIBRATION //
         public static final byte[] VIBRATION_WITH_LED = {1}; // Works
         public static final byte[] VIBRATION_10_TIMES_WITH_LED = {2}; // Works
-        public static final byte[] VIBRATION_WITH_LED2 = {3}; // Works (same as 1)
+        public static final byte[] VIBRATION_WITH_LED2 = {3}; // Works (same result as 1)
         public static final byte[] VIBRATION_WITHOUT_LED = {4}; // Works
+
+        public static final byte[] STOP_VIBRATION = {0};
     }
 
     //////////////
@@ -153,7 +165,7 @@ public final class MiBandConstants {
 
         public static final byte[] FACTORY_RESET = {9};
         public static final byte[] CONFIRM_ACTIVITY_DATA_TRANSFER_COMPLETE = {10};
-        public static final byte[] SYNC = {11};
+        public static final byte[] SYNC = {11}; // works
         public static final byte[] REBOOT = {12}; // works
 
         // COLORS // 1s has no colors
@@ -187,9 +199,9 @@ public final class MiBandConstants {
 
         public static final byte[] START_HEART_RATE_MEASUREMENT_SLEEP = {21, 0, 1};
         public static final byte[] STOP_HEART_RATE_MEASUREMENT_SLEEP = {21, 0, 0};
-        public static final byte[] START_HEART_RATE_MEASUREMENT_CONTINUOUS = {21, 1, 1}; // works
+        public static final byte[] START_HEART_RATE_MEASUREMENT_CONTINUOUS = {21, 1, 1};
         public static final byte[] STOP_HEART_RATE_MEASUREMENT_CONTINUOUS = {21, 1, 0};
-        public static final byte[] START_HEART_RATE_MEASUREMENT_MANUAL = {21, 2, 1}; // works
+        public static final byte[] START_HEART_RATE_MEASUREMENT_MANUAL = {21, 2, 1};
         public static final byte[] STOP_HEART_RATE_MEASUREMENT_MANUAL = {21, 2, 0};
 
     }
@@ -198,6 +210,9 @@ public final class MiBandConstants {
     // NOTIFICATION PROTOCOL //
     ///////////////////////////
 
+    /**
+     * Class containing the notification protocol.
+     */
     public static final class NOTIFICATION {
         public static final byte UNKNOWN = -0x1;
         public static final byte NORMAL = 0x0;

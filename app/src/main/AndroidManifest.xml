@@ -15,6 +15,8 @@
 
     <!-- Internet Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <!-- Location Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -39,7 +41,6 @@
         <activity android:name=".Views.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -54,11 +55,11 @@
 
         <!-- Services -->
         <service android:name=".Services.BluetoothService" android:exported="true"/>
-        <service android:name=".Services.ApiService"/>
+        <service android:name=".Services.ApiService" android:exported="true"/>
 
         <!-- Receivers -->
         <receiver
-                android:name=".Services.BluetoothRestarterBroadcastReceiver"
+                android:name=".Receivers.BluetoothRestarter"
                 android:enabled="false"
                 android:exported="true"
                 android:label="RestartServiceWhenStopped">
@@ -67,6 +68,17 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
                 <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+                android:name=".Receivers.FileUploader"
+                android:enabled="false"
+                android:exported="true"
+                android:label="UploadFileMeasurements">
+            <intent-filter>
+                <action android:name=".UploadMeasurements"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
     </application>

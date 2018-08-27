@@ -10,7 +10,6 @@ public class BatteryInfo {
     ///////////////
 
     public static final int UNKNOWN = -1;
-
     public static final int NORMAL = 0;
     public static final int LOW = 1;
     public static final int CHARGING = 2;
@@ -32,7 +31,7 @@ public class BatteryInfo {
 
     /**
      * Constructor by data.
-     * @param data
+     * @param data - Battery information stored as bytes
      */
     public BatteryInfo(byte[] data) {
         if(data.length >= 1) percent = new Integer(data[0]);
@@ -54,8 +53,8 @@ public class BatteryInfo {
     ////////////////////
 
     /**
-     * Gets the percent of battery level.
-     * @return
+     * Gets the percent of battery level on the device.
+     * @return Percent of battery level.
      */
     public Integer getPercent() {
         if(percent == null) return null;
@@ -66,7 +65,7 @@ public class BatteryInfo {
 
     /**
      * Gets the number of times the device has been charged.
-     * @return
+     * @return Number of charges.
      */
     public Integer getNumberOfCharges() {
         return numCharges;
@@ -74,7 +73,7 @@ public class BatteryInfo {
 
     /**
      * Gets the state of the battery.
-     * @return
+     * @return Battery level state.
      */
     public Integer getState() {
         switch (state != null ? state : UNKNOWN){
@@ -96,7 +95,7 @@ public class BatteryInfo {
 
     /**
      * Gets the last time the device was charged.
-     * @return
+     * @return Last charge time.
      */
     public MiDate getLastCharge() {
         return lastCharge;

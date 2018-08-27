@@ -1,28 +1,27 @@
 package edu.udg.exit.heartrate.Services;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.*;
 import android.provider.Settings;
 import android.util.Log;
 import edu.udg.exit.heartrate.Devices.ConnectionManager;
+import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
 import edu.udg.exit.heartrate.Devices.MiBand.MiBandConstants;
 import edu.udg.exit.heartrate.Interfaces.*;
-import edu.udg.exit.heartrate.Devices.MiBand.MiBandConnectionManager;
+import edu.udg.exit.heartrate.Receivers.BluetoothRestarter;
+import edu.udg.exit.heartrate.Receivers.FileUploader;
 import edu.udg.exit.heartrate.Utils.DataBase;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
+import edu.udg.exit.heartrate.Utils.Utils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -38,7 +37,6 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     ///////////////
 
     public static final int REQUEST_ENABLE_BT_TO_SCAN = 1;
-    public static final int REQUEST_ENABLE_BT_TO_PAIR = 2;
 
     ////////////////
     // Attributes //
@@ -61,6 +59,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     // Pair
     private IPairView pairView;
+    private int pairCount;
 
     // Measure
     private IDeviceView deviceView;
@@ -93,6 +92,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
         // Pair
         pairView = null;
+        pairCount = 0;
 
         // Device
         deviceView = null;
@@ -176,15 +176,29 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     @Override
     public void connectRemoteDevice(final BluetoothDevice device) {
         if(connectionManager != null) connectionManager.disconnect();
-        // TODO - Select Connection manager with device address (or device name)
-        connectionManager = new MiBandConnectionManager(this);
-        if(device != null) device.connectGatt(this,false,connectionManager);
+        if(device != null){
+            String deviceAddress = device.getAddress();
+            String deviceName = device.getName();
+            // Select Connection manager with device address (or device name)
+            if((deviceAddress != null && deviceAddress.startsWith("C8:0F:10")) || (deviceName != null && deviceName.equals("MI1S"))) // Mi Band 1S
+                connectionManager = new MiBandConnectionManager(this);
+            else // Use Mi Band 1s (for the moment)
+                connectionManager = new MiBandConnectionManager(this);
+            
+            // Connect to the device gatt
+            device.connectGatt(this,false,connectionManager);
+        }
+        // Set handler to try to connect when connection fails
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(!isConnected()) connectRemoteDevice(device);
+                if(!isConnected() && pairCount > 0){
+                    Log.d("Bluetooth", "Try to reconnect");
+                    pairCount = pairCount - 1;
+                    connectRemoteDevice(device);
+                }
             }
-        }, 5 * 60 * 1000);
+        }, 60 * 1000);
     }
 
     @Override
@@ -199,6 +213,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
 
     @Override
     public void restartWork() {
+        Log.d("Bluetooth", "Restart work");
         // Clear all calls
         this.connectionManager.clearCalls();
         // Restart heart rate measurement
@@ -270,6 +285,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         UserPreferences.getInstance().save(this, UserPreferences.BONDED_DEVICE_ADDRESS, address);
         // Connect to remote device
         if(connectionManager == null || !connectionManager.isConnected()){
+            pairCount = 10;
             connectRemoteDevice(device);
             if(pairView != null){
                 pairView.startLoadingAnimation();
@@ -311,13 +327,14 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         if(connectionManager != null) connectionManager.startHeartRateMeasure();
         // Acquire wake lock
         if(wakeLock != null) wakeLock.acquire(10 * 24 * 60 * 60 * 1000);
-        // Enable receiver that restarts this service
-        enableReceiver(BluetoothRestarterBroadcastReceiver.class);
-        // Set alarm to check service status every 10 minutes
-        setInexactRepeatingAlarm(0, ".RestartBluetooth", 10 * 60 * 1000);
+        // Enable receiver and set alarm to check service status every 10 minutes
+        Utils.enableReceiver(getApplicationContext(), BluetoothRestarter.class);
+        Utils.setInexactRepeatingAlarm(getApplicationContext(),0, ".RestartBluetooth", 10 * 60 * 1000);
+        // Enable receiver and set alarm to upload the measurements every day
+        Utils.enableReceiver(getApplicationContext(), FileUploader.class);
+        Utils.setInexactRepeatingAlarm(getApplicationContext(),0, ".UploadMeasurements", 24 * 60 * 60 * 1000);
         // Set battery optimizations to avoid Doze mode (needs permissions)
         setBatteryOptimizations();
-        //getSpecialPermissions();
     }
 
     @Override
@@ -327,9 +344,9 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         // Release wake lock
         if(wakeLock != null) wakeLock.release();
         // Disable receiver that restarts this service
-        disableReceiver(BluetoothRestarterBroadcastReceiver.class);
+        Utils.disableReceiver(getApplicationContext(), BluetoothRestarter.class);
         // Unset alarm that checks this service status
-        unsetAlarm(0, ".RestartBluetooth");
+        Utils.unsetAlarm(getApplicationContext(),0,".RestartBluetooth");
     }
 
     @Override
@@ -359,137 +376,35 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
     /////////////////////
 
     /**
-     * Enables a receiver.
-     * @param receiverClass - Class of the receiver to be enabled
-     */
-    @SuppressWarnings("SameParameterValue")
-    private void enableReceiver(Class receiverClass) {
-        ComponentName receiver = new ComponentName(getApplicationContext(), receiverClass);
-        PackageManager packageManager = getPackageManager();
-        packageManager.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-    }
-
-    /**
-     * Disables a receiver.
-     * @param receiverClass - Class of the receiver to be disabled
-     */
-    @SuppressWarnings("SameParameterValue")
-    private void disableReceiver(Class receiverClass) {
-        ComponentName receiver = new ComponentName(getApplicationContext(), receiverClass);
-        PackageManager packageManager = getPackageManager();
-        packageManager.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-    }
-
-    /**
-     * Sets a repeating alarm.
-     * @param action - Action that performs the alarm when triggered
-     * @param milis - Alarm period
-     */
-    @SuppressWarnings("SameParameterValue")
-    private void setInexactRepeatingAlarm(int requestCode, String action, int milis){
-        // Set action intent
-        Intent actionIntent = new Intent(action);
-        // Set alarm intent
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode, actionIntent, 0);
-        // Set alarm manager
-        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        // Set alarm
-        if(alarmManager != null){
-            alarmManager.cancel(alarmIntent);
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,SystemClock.elapsedRealtime() + milis, milis, alarmIntent);
-        }
-    }
-
-    /**
-     * Unsets a repeating alarm.
-     * @param action - Action that performs the alarm when triggered
-     */
-    @SuppressWarnings("SameParameterValue")
-    private void unsetAlarm(int requestCode, String action){
-        // Set action intent
-        Intent actionIntent = new Intent(action);
-        // Set alarm intent
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode, actionIntent, 0);
-        // Set alarm manager
-        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        // Unset alarm
-        if(alarmManager != null) alarmManager.cancel(alarmIntent);
-    }
-
-    /**
      * Set battery optimizations and ask the user for permissions.
      */
     private void setBatteryOptimizations() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Intent intent = new Intent();
             String packageName = getPackageName();
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
             if (powerManager != null && !powerManager.isIgnoringBatteryOptimizations(packageName)) {
-                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                intent.setData(Uri.parse("package:" + packageName));
-                startActivity(intent);
+                if(deviceView != null) getSpecialPermissions(deviceView.getContext());
             }
         }
     }
 
     /**
      * Gets special permissions from the user to keep services alive.
+     * @param context - Activity context (does not work with application context)
      */
-    private void getSpecialPermissions() {
-        String alertMessage = "Please allow this app to always run in the background, otherwise our services won't be accessed when your phone goes into sleep mode.";
-        final String brand = Build.BRAND;
+    private void getSpecialPermissions(Context context) {
+        String alertMessage = "Please disable battery optimizations for this app and allow it be started automatically.";
+        alertMessage = alertMessage + " " + "Otherwise our service won't be working when your phone goes into sleeps mode.";
 
         // Create dialog builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(alertMessage);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Intent intent = new Intent();
-                if (brand.equalsIgnoreCase("xiaomi")) {
-                    intent.setComponent(new ComponentName("com.miui.securitycenter","com.miui.permcenter.autostart.AutoStartManagementActivity"));
-                    startActivity(intent);
-                } else if (brand.equalsIgnoreCase("Letv")) {
-                    intent.setComponent(new ComponentName("com.letv.android.letvsafe","com.letv.android.letvsafe.AutobootManageActivity"));
-                    startActivity(intent);
-                } else if (brand.equalsIgnoreCase("Honor")) {
-                    intent.setComponent(new ComponentName("com.huawei.systemmanager","com.huawei.systemmanager.optimize.process.ProtectActivity"));
-                    startActivity(intent);
-                } else if (Build.MANUFACTURER.equalsIgnoreCase("oppo")) {
-                    try {
-                        intent.setClassName("com.coloros.safecenter","com.coloros.safecenter.permission.startup.StartupAppListActivity");
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        try {
-                            intent.setClassName("com.oppo.safe","com.oppo.safe.permission.startup.StartupAppListActivity");
-                            startActivity(intent);
-                        } catch (Exception ex) {
-                            try {
-                                intent.setClassName("com.coloros.safecenter","com.coloros.safecenter.startupapp.StartupAppListActivity");
-                                startActivity(intent);
-                            } catch (Exception exx) {
-                                exx.printStackTrace();
-                            }
-                        }
-                    }
-                } else if (Build.MANUFACTURER.contains("vivo")) {
-                    try {
-                        intent.setComponent(new ComponentName("com.iqoo.secure","com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity"));
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        try {
-                            intent.setComponent(new ComponentName("com.vivo.permissionmanager","com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
-                            startActivity(intent);
-                        } catch (Exception ex) {
-                            try {
-                                intent.setClassName("com.iqoo.secure","com.iqoo.secure.ui.phoneoptimize.BgStartUpManager");
-                                startActivity(intent);
-                            } catch (Exception exx) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }
-                }
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", getPackageName(), null));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
 

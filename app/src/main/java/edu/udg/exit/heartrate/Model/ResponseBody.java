@@ -1,5 +1,8 @@
 package edu.udg.exit.heartrate.Model;
 
+/**
+ * ResponseBody Model Object to retrieve response from rest requests.
+ */
 public class ResponseBody {
 
     ///////////////
@@ -30,13 +33,15 @@ public class ResponseBody {
     public int getCode() {
         return code;
     }
-    public void setCode(int code) {
-        this.code = code;
-    }
 
     public String getMessage() {
         return message;
     }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
     public void setMessage(String message) {
         this.message = message;
     }

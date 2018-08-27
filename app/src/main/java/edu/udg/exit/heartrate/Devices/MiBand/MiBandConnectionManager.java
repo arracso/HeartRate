@@ -705,7 +705,7 @@ public class MiBandConnectionManager extends ConnectionManager {
         return new ActionWithConditionalResponse() {
             @Override
             public void run() {
-                if(deviceInfo.supportsHeartRate()) this.expectsResult = heartRateService.dissableNotifications();
+                if(deviceInfo.supportsHeartRate()) this.expectsResult = heartRateService.disableNotifications();
             }
         };
     }
@@ -810,6 +810,10 @@ public class MiBandConnectionManager extends ConnectionManager {
         }
     }
 
+    /**
+     * Handles heart rate notifications.
+     * @param value - Value of the notification.
+     */
     private void handleHeartRateNotification(byte[] value) {
         // Check if value is 2 byte long.
         if(value.length != 2){
@@ -828,12 +832,19 @@ public class MiBandConnectionManager extends ConnectionManager {
         }
     }
 
+    /**
+     * Handles battery notifications.
+     * @param value - Value of the notification.
+     */
     private void handleBatteryNotification(byte[] value) {
         BatteryInfo batteryInfo = new BatteryInfo(value);
         bluetoothService.setBatteryLevel(batteryInfo.getPercent());
     }
 
-    // DEBUG
+    ///////////
+    // DEBUG //
+    ///////////
+
     @Override
     protected Action read(final UUID serviceUUID, final UUID characteristicUUID){
         return new ActionWithResponse() {

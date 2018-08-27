@@ -13,6 +13,7 @@ import edu.udg.exit.heartrate.Model.User;
 import edu.udg.exit.heartrate.Services.ApiService;
 import edu.udg.exit.heartrate.Services.BluetoothService;
 import edu.udg.exit.heartrate.Utils.UserPreferences;
+import edu.udg.exit.heartrate.Utils.Utils;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -20,7 +21,11 @@ import retrofit2.Response;
 
 import java.io.IOException;
 
-public class TodoApp extends Application{
+/**
+ * Class that overrides Application.
+ * Saves the user profile and a reference to all services that it starts.
+ */
+public class TodoApp extends Application {
 
     ////////////////
     // Attributes //
@@ -43,32 +48,17 @@ public class TodoApp extends Application{
         retrieveUser();
         // Connecting & start api service
         Intent apiServiceIntent = new Intent(this,ApiService.class);
-        if (!isMyServiceRunning(apiServiceIntent.getClass())) startService(apiServiceIntent);
+        if (!Utils.isMyServiceRunning(getApplicationContext(),apiServiceIntent.getClass())) startService(apiServiceIntent);
         bindService(apiServiceIntent, apiServiceConnection, Context.BIND_AUTO_CREATE);
         // Start & bind bluetooth service
         Intent bluetoothServiceIntent = new Intent(this,BluetoothService.class);
-        if (!isMyServiceRunning(bluetoothServiceIntent.getClass())) startService(bluetoothServiceIntent);
+        if (!Utils.isMyServiceRunning(getApplicationContext(),bluetoothServiceIntent.getClass())) startService(bluetoothServiceIntent);
         bindService(bluetoothServiceIntent, bluetoothServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     ////////////////////////
     // Service Connection //
     ////////////////////////
-
-    /**
-     * Checks if service is already running.
-     * @param serviceClass - class of the service that we want to check
-     * @return True if service is running
-     */
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        if(manager != null){
-            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-                if (serviceClass.getName().equals(service.service.getClassName())) return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * Bluetooth Service Connection handler.
@@ -120,20 +110,34 @@ public class TodoApp extends Application{
         return apiService;
     }
 
+    /**
+     * Sets the user profile.
+     * @param user - profile
+     */
     public void setUser(User user) {
         this.user = user;
         refreshUser();
     }
 
+    /**
+     * Save the user profile to persistent memory.
+     */
     public void refreshUser(){
         String userObj = Global.gson.toJson(user);
         UserPreferences.getInstance().save(this, UserPreferences.USER_PROFILE, userObj);
     }
 
+    /**
+     * Gets the usre profile.
+     * @return User.
+     */
     public User getUser() {
         return this.user;
     }
 
+    /**
+     * Update the user stored on the remote data base with the user stored locally.
+     */
     public void updateUser() {
         if(apiService == null) return;
         if(user == null) return;
@@ -166,6 +170,9 @@ public class TodoApp extends Application{
     // Private Methods //
     /////////////////////
 
+    /**
+     * Retrieve the user form persistent storage.
+     */
     private void retrieveUser() {
         String userObj = UserPreferences.getInstance().load(this, UserPreferences.USER_PROFILE);
         this.user = Global.gson.fromJson(userObj, User.class);

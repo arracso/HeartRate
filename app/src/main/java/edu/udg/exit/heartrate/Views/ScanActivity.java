@@ -15,6 +15,9 @@ import edu.udg.exit.heartrate.Services.BluetoothService;
 
 import java.util.*;
 
+/**
+ * Bluetooth Activity that handles device scanning.
+ */
 public class ScanActivity extends BluetoothActivity implements IScanView {
 
     ///////////////

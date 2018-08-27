@@ -1,7 +1,6 @@
 package edu.udg.exit.heartrate.Devices.MiBand.Utils;
 
 import android.util.Log;
-import edu.udg.exit.heartrate.Model.User;
 
 import java.util.Arrays;
 
@@ -53,6 +52,7 @@ public class UserInfo {
 
     /**
      * Constructor by data.
+     * @param data - user information
      */
     public UserInfo(byte[] data) {
         userID = Parse.BytesToInt(data,0,4);
