@@ -1,6 +1,5 @@
 package edu.udg.exit.heartrate;
 
-import android.app.ActivityManager;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
