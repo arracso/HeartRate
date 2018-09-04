@@ -184,7 +184,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
                 connectionManager = new MiBandConnectionManager(this);
             else // Use Mi Band 1s (for the moment)
                 connectionManager = new MiBandConnectionManager(this);
-            
+
             // Connect to the device gatt
             device.connectGatt(this,false,connectionManager);
         }
