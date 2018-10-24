@@ -299,7 +299,10 @@ public class DeviceActivity extends Activity implements IDeviceView {
                 heartRateItem.setLabelValue("-  -");
                 UserPreferences.getInstance().save(getApplicationContext(),UserPreferences.HEART_RATE_MEASURE, isChecked ? "true" : "false");
                 if(isChecked) bluetoothService.startHeartRateMeasure();
-                else bluetoothService.stopHeartRateMeasure();
+                else {
+                    bluetoothService.stopHeartRateMeasure();
+                    uploadHeartRate();
+                }
             }
         });
         heartRateUpload.setOnClickListener(new View.OnClickListener() {
