@@ -28,7 +28,7 @@ public class ApiService extends Service {
     // Constants //
     ///////////////
 
-    private static final String BASE_URL = "http://rateserver.tk:12380";
+    private static final String BASE_URL = "http://leffe.udg.edu:11180";
 
     ////////////////
     // Attributes //
