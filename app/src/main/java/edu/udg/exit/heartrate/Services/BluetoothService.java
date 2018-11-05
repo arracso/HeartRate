@@ -332,7 +332,7 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         Utils.setInexactRepeatingAlarm(getApplicationContext(),0, ".RestartBluetooth", 10 * 60 * 1000);
         // Enable receiver and set alarm to upload the measurements every day
         Utils.enableReceiver(getApplicationContext(), FileUploader.class);
-        Utils.setInexactRepeatingAlarm(getApplicationContext(),0, ".UploadMeasurements", 12 * 60 * 60 * 1000);
+        Utils.setInexactRepeatingAlarm(getApplicationContext(),0, ".UploadMeasurements", 6 * 60 * 60 * 1000);
 
         // Set battery optimizations to avoid Doze mode (needs permissions)
         setBatteryOptimizations();
