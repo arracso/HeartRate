@@ -329,11 +329,10 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         if(wakeLock != null) wakeLock.acquire(10 * 24 * 60 * 60 * 1000);
         // Enable receiver and set alarm to check service status every 10 minutes
         Utils.enableReceiver(getApplicationContext(), BluetoothRestarter.class);
-        Utils.setInexactRepeatingAlarm(getApplicationContext(),0, ".RestartBluetooth", 10 * 60 * 1000);
+        Utils.setInexactRepeatingAlarm(getApplicationContext(),0, ".RestartBluetooth", 5 * 60 * 1000);
         // Enable receiver and set alarm to upload the measurements every day
         Utils.enableReceiver(getApplicationContext(), FileUploader.class);
-        Utils.setInexactRepeatingAlarm(getApplicationContext(),0, ".UploadMeasurements", 6 * 60 * 60 * 1000);
-
+        Utils.setInexactRepeatingAlarm(getApplicationContext(),1, ".UploadMeasurements", 6 * 60 * 60 * 1000);
         // Set battery optimizations to avoid Doze mode (needs permissions)
         setBatteryOptimizations();
     }
@@ -348,6 +347,8 @@ public class BluetoothService extends Service implements IBluetoothService, ISca
         Utils.disableReceiver(getApplicationContext(), BluetoothRestarter.class);
         // Unset alarm that checks this service status
         Utils.unsetAlarm(getApplicationContext(),0,".RestartBluetooth");
+        // Disable receiver that uploads measurements
+        Utils.disableReceiver(getApplicationContext(), FileUploader.class);
         // Unset alarm that uploads measurements
         Utils.unsetAlarm(getApplicationContext(),1,".UploadMeasurements");
     }
